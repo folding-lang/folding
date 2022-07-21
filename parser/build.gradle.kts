@@ -16,16 +16,16 @@ buildscript {
     }
 }
 
+val antlrGroup = "com.strumenta.antlr-kotlin"
+val antlrVersion = "-SNAPSHOT"
+
 kotlin {
     jvm()
-    js {
-        browser {}
-    }
+    js()
 
     sourceSets {
         val commonAntlr by creating {
-            val antlrGroup = "com.strumenta.antlr-kotlin"
-            val antlrVersion = "-SNAPSHOT"
+
             dependencies {
                 api(kotlin("stdlib-common"))
                 api("$antlrGroup:antlr-kotlin-runtime:$antlrVersion")
@@ -41,3 +41,29 @@ kotlin {
         }
     }
 }
+
+tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generateKotlinCommonGrammarSource") {
+    // the classpath used to run antlr code generation
+    antlrClasspath = configurations.detachedConfiguration(
+        // antlr itself
+        // antlr is transitive added by antlr-kotlin-target,
+        // add another dependency if you want to choose another antlr4 version (not recommended)
+        // project.dependencies.create("org.antlr:antlr4:$antlrVersion"),
+
+        // antlr target, required to create kotlin code
+        project.dependencies.create("$antlrGroup:antlr-kotlin-target:$antlrVersion")
+    )
+    maxHeapSize = "64m"
+    packageName = "foldenx.parser"
+    arguments = listOf("-no-visitor", "-no-listener")
+    source = project.objects
+        .sourceDirectorySet("antlr", "antlr")
+        .srcDir("${rootDir.absolutePath}/grammar/grammars/antlr4").apply {
+            include("*.g4")
+        }
+    outputDirectory = File("src/commonAntlr/kotlin")
+}
+
+// to allow -x jsIrBrowserTest -x jsLegacyBrowserTest, see .ci.sh
+tasks.register("jsIrBrowserTest")
+tasks.register("jsLegacyBrowserTest")
