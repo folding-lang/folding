@@ -21,7 +21,12 @@ val antlrVersion = "-SNAPSHOT"
 
 kotlin {
     jvm()
-    js()
+    js {
+        browser {}
+        nodejs {}
+        useCommonJs()
+        binaries.executable()
+    }
 
     sourceSets {
         val commonAntlr by creating {
@@ -54,7 +59,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         project.dependencies.create("$antlrGroup:antlr-kotlin-target:$antlrVersion")
     )
     maxHeapSize = "64m"
-    packageName = "foldenx.parser"
+    packageName = "foldenx.parser.raw"
     arguments = listOf("-no-visitor", "-no-listener")
     source = project.objects
         .sourceDirectorySet("antlr", "antlr")
