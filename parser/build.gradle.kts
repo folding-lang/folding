@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.7.0"
+    kotlin("multiplatform") version "1.7.10"
 }
 
 
@@ -21,12 +21,33 @@ val antlrVersion = "-SNAPSHOT"
 
 kotlin {
     jvm()
-    js {
+    js(BOTH) {
         browser {}
         nodejs {}
-        useCommonJs()
-        binaries.executable()
     }
+
+    // region:Region: Configurations for Kotlin/Native
+    ios("ios") {
+        binaries {
+            staticLib()
+        }
+    }
+    linuxX64("linux") {
+        binaries {
+            staticLib()
+        }
+    }
+    macosX64("mac") {
+        binaries {
+            staticLib()
+        }
+    }
+    mingwX64("windows") {
+        binaries {
+            staticLib()
+        }
+    }
+    // endregion
 
     sourceSets {
         val commonAntlr by creating {
@@ -68,7 +89,3 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         }
     outputDirectory = File("src/commonAntlr/kotlin")
 }
-
-// to allow -x jsIrBrowserTest -x jsLegacyBrowserTest, see .ci.sh
-tasks.register("jsIrBrowserTest")
-tasks.register("jsLegacyBrowserTest")
