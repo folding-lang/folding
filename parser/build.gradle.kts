@@ -89,3 +89,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         }
     outputDirectory = File("src/commonAntlr/kotlin")
 }
+
+tasks.build {
+    dependsOn("generateKotlinCommonGrammarSource")
+}
