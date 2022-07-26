@@ -27,17 +27,7 @@ kotlin {
     }
 
     // region:Region: Configurations for Kotlin/Native
-    ios("ios") {
-        binaries {
-            staticLib()
-        }
-    }
     linuxX64("linux") {
-        binaries {
-            staticLib()
-        }
-    }
-    macosX64("mac") {
         binaries {
             staticLib()
         }
