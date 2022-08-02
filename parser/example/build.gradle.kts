@@ -10,6 +10,18 @@ kotlin {
         useCommonJs()
         binaries.executable()
     }
+    linuxX64("linux") {
+        binaries {
+            staticLib()
+            executable()
+        }
+    }
+    mingwX64("windows") {
+        binaries {
+            staticLib()
+            executable()
+        }
+    }
 
     sourceSets {
 
@@ -27,6 +39,18 @@ kotlin {
         }
 
         val jsMain by getting {
+            dependencies {
+                implementation(project(":parser"))
+            }
+        }
+
+        val linuxMain by getting {
+            dependencies {
+                implementation(project(":parser"))
+            }
+        }
+
+        val windowsMain by getting {
             dependencies {
                 implementation(project(":parser"))
             }

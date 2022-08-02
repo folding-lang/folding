@@ -1,5 +1,5 @@
 package foldenx.parser.example
 
-fun main() {
+fun mainProcess() {
     usingAntlrGenerationParserTest()
 }
