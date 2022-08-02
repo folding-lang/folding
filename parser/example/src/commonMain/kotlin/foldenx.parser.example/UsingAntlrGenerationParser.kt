@@ -24,7 +24,7 @@ fun usingAntlrGenerationParserTest(input: String = """
 
     val root = parser.file()
 
-    val definitions = root.findDefinition()//.distinctBy { it.text }
+    val definitions = root.findDefinition()
 
     println(definitions.joinToString("\n\n","=== Definitions ===\n\n","\n\n===================") {
         when {
