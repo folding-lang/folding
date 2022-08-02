@@ -12,7 +12,7 @@ fun usingAntlrGenerationParserTest(input: String = """
 
     console foreign Console
 
-    myFunc[a ~ [Calc(a)]](x a) = (x * 2 + 7) * (x + 9) * pi
+    myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9) * pi
 
     main() = {
         console.log(myFunc(1))
@@ -24,7 +24,7 @@ fun usingAntlrGenerationParserTest(input: String = """
 
     val root = parser.file()
 
-    val definitions = root.findDefinition().distinctBy { it.text }
+    val definitions = root.findDefinition()//.distinctBy { it.text }
 
     println(definitions.joinToString("\n\n","=== Definitions ===\n\n","\n\n===================") {
         when {
