@@ -27,10 +27,10 @@ class FoldingParser(input: TokenStream) : Parser(input) {
                                                               FoldingParser.BodyContext::class,
                                                               FoldingParser.CompoContext::class,
                                                               FoldingParser.DefinitionInBodyContext::class,
-                                                              FoldingParser.DataContext::class,
-                                                              FoldingParser.DataBodyContext::class,
-                                                              FoldingParser.DefinitionInDataContext::class,
-                                                              FoldingParser.AbstractDefinitionInDataContext::class,
+                                                              FoldingParser.Class_Context::class,
+                                                              FoldingParser.ClassBodyContext::class,
+                                                              FoldingParser.DefinitionInClassContext::class,
+                                                              FoldingParser.AbstractDefinitionInClassContext::class,
                                                               FoldingParser.StaticDefinitionContext::class,
                                                               FoldingParser.ConstuctorContext::class,
                                                               FoldingParser.Interface_Context::class,
@@ -41,14 +41,14 @@ class FoldingParser(input: TokenStream) : Parser(input) {
                                                               FoldingParser.DefInInterfaceContext::class,
                                                               FoldingParser.TypeParamContext::class,
                                                               FoldingParser.TypeParamCompoContext::class,
-                                                              FoldingParser.TypeParamOnTypeContext::class,
+                                                              FoldingParser.TypeParamOnTypeclassContext::class,
                                                               FoldingParser.TypeContext::class,
-                                                              FoldingParser.TypeDefBodyContext::class,
-                                                              FoldingParser.DefInTypeContext::class,
-                                                              FoldingParser.ParamExInTypeContext::class,
-                                                              FoldingParser.ParameterInTypeContext::class,
-                                                              FoldingParser.OpParameterInTypeContext::class,
-                                                              FoldingParser.AopParameterInTypeContext::class,
+                                                              FoldingParser.TypeclassDefBodyContext::class,
+                                                              FoldingParser.DefInTypeclassContext::class,
+                                                              FoldingParser.ParamExInTypeclassContext::class,
+                                                              FoldingParser.ParameterInTypeclassContext::class,
+                                                              FoldingParser.OpParameterInTypeclassContext::class,
+                                                              FoldingParser.AopParameterInTypeclassContext::class,
                                                               FoldingParser.ImplContext::class,
                                                               FoldingParser.ImplBodyContext::class,
                                                               FoldingParser.ParamExInImplContext::class,
@@ -140,10 +140,10 @@ class FoldingParser(input: TokenStream) : Parser(input) {
         RULE_body(6),
         RULE_compo(7),
         RULE_definitionInBody(8),
-        RULE_data(9),
-        RULE_dataBody(10),
-        RULE_definitionInData(11),
-        RULE_abstractDefinitionInData(12),
+        RULE_class_(9),
+        RULE_classBody(10),
+        RULE_definitionInClass(11),
+        RULE_abstractDefinitionInClass(12),
         RULE_staticDefinition(13),
         RULE_constuctor(14),
         RULE_interface_(15),
@@ -154,14 +154,14 @@ class FoldingParser(input: TokenStream) : Parser(input) {
         RULE_defInInterface(20),
         RULE_typeParam(21),
         RULE_typeParamCompo(22),
-        RULE_typeParamOnType(23),
+        RULE_typeParamOnTypeclass(23),
         RULE_type(24),
-        RULE_typeDefBody(25),
-        RULE_defInType(26),
-        RULE_paramExInType(27),
-        RULE_parameterInType(28),
-        RULE_opParameterInType(29),
-        RULE_aopParameterInType(30),
+        RULE_typeclassDefBody(25),
+        RULE_defInTypeclass(26),
+        RULE_paramExInTypeclass(27),
+        RULE_parameterInTypeclass(28),
+        RULE_opParameterInTypeclass(29),
+        RULE_aopParameterInTypeclass(30),
         RULE_impl(31),
         RULE_implBody(32),
         RULE_paramExInImpl(33),
@@ -196,32 +196,32 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 
         val ruleNames = arrayOf("file", "importEx", "importBody", "importElement", 
                                 "package_", "namespace", "body", "compo", 
-                                "definitionInBody", "data", "dataBody", 
-                                "definitionInData", "abstractDefinitionInData", 
+                                "definitionInBody", "class_", "classBody", 
+                                "definitionInClass", "abstractDefinitionInClass", 
                                 "staticDefinition", "constuctor", "interface_", 
                                 "interfaceBody", "propertyInInterface", 
                                 "valInInterface", "varInInterface", "defInInterface", 
-                                "typeParam", "typeParamCompo", "typeParamOnType", 
-                                "type", "typeDefBody", "defInType", "paramExInType", 
-                                "parameterInType", "opParameterInType", 
-                                "aopParameterInType", "impl", "implBody", 
-                                "paramExInImpl", "parameterInImpl", "opParameterInImpl", 
-                                "aopParameterInImpl", "defInImpl", "definition", 
-                                "value", "typeCasting", "paramEx", "parameter", 
-                                "opParameter", "aopParameter", "argEx", 
-                                "argValue", "val_", "var_", "def", "lambdaParamEx", 
-                                "lambda", "opIdWrap", "aopIdWrap", "typeEx", 
-                                "typeExSingle")
+                                "typeParam", "typeParamCompo", "typeParamOnTypeclass", 
+                                "type", "typeclassDefBody", "defInTypeclass", 
+                                "paramExInTypeclass", "parameterInTypeclass", 
+                                "opParameterInTypeclass", "aopParameterInTypeclass", 
+                                "impl", "implBody", "paramExInImpl", "parameterInImpl", 
+                                "opParameterInImpl", "aopParameterInImpl", 
+                                "defInImpl", "definition", "value", "typeCasting", 
+                                "paramEx", "parameter", "opParameter", "aopParameter", 
+                                "argEx", "argValue", "val_", "var_", "def", 
+                                "lambdaParamEx", "lambda", "opIdWrap", "aopIdWrap", 
+                                "typeEx", "typeExSingle")
 
         private val LITERAL_NAMES: List<String?> = listOf(null, null, null, 
                                                           null, "'as'", 
                                                           "'abstract'", 
-                                                          "'data'", "'foreign'", 
+                                                          "'class'", "'foreign'", 
                                                           "'folding'", "'namespace'", 
                                                           "'override'", 
                                                           "'internal'", 
                                                           "'import'", "'impl'", 
-                                                          "'return'", "'type'", 
+                                                          "'return'", "'typeclass'", 
                                                           "'var'", "'val'", 
                                                           "'do'", "'static'", 
                                                           "'interface'", 
@@ -765,7 +765,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun findVar_() : Var_Context? = getRuleContext(solver.getType("Var_Context"),0)
 		fun findVal_() : Val_Context? = getRuleContext(solver.getType("Val_Context"),0)
 		fun findImpl() : ImplContext? = getRuleContext(solver.getType("ImplContext"),0)
-		fun findData() : DataContext? = getRuleContext(solver.getType("DataContext"),0)
+		fun findClass_() : Class_Context? = getRuleContext(solver.getType("Class_Context"),0)
 		fun findInterface_() : Interface_Context? = getRuleContext(solver.getType("Interface_Context"),0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
@@ -806,7 +806,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			enterOuterAlt(_localctx, 5)
 			if (true){
 			this.state = 189
-			data()
+			class_()
 			}}
 			INTERFACE  ->  /*LL1AltBlock*/{
 			enterOuterAlt(_localctx, 6)
@@ -828,13 +828,13 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class DataContext : ParserRuleContext {
+	open class Class_Context : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_data.id
+	        get() = Rules.RULE_class_.id
 	        set(value) { throw RuntimeException() }
 		fun DATA() : TerminalNode? = getToken(FoldingParser.Tokens.DATA.id, 0)
 		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
-		fun findDataBody() : DataBodyContext? = getRuleContext(solver.getType("DataBodyContext"),0)
+		fun findClassBody() : ClassBodyContext? = getRuleContext(solver.getType("ClassBodyContext"),0)
 		fun ABSTRACT() : TerminalNode? = getToken(FoldingParser.Tokens.ABSTRACT.id, 0)
 		fun findTypeParam() : TypeParamContext? = getRuleContext(solver.getType("TypeParamContext"),0)
 		fun TILDE() : TerminalNode? = getToken(FoldingParser.Tokens.TILDE.id, 0)
@@ -844,9 +844,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		}
 	}
 
-	fun  data() : DataContext {
-		var _localctx : DataContext = DataContext(context, state)
-		enterRule(_localctx, 18, Rules.RULE_data.id)
+	fun  class_() : Class_Context {
+		var _localctx : Class_Context = Class_Context(context, state)
+		enterRule(_localctx, 18, Rules.RULE_class_.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -900,7 +900,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			}
 
 			this.state = 209
-			dataBody()
+			classBody()
 			}
 		}
 		catch (re: RecognitionException) {
@@ -914,27 +914,27 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class DataBodyContext : ParserRuleContext {
+	open class ClassBodyContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_dataBody.id
+	        get() = Rules.RULE_classBody.id
 	        set(value) { throw RuntimeException() }
 		fun LBRACE() : TerminalNode? = getToken(FoldingParser.Tokens.LBRACE.id, 0)
 		fun RBRACE() : TerminalNode? = getToken(FoldingParser.Tokens.RBRACE.id, 0)
 		fun findConstuctor() : List<ConstuctorContext> = getRuleContexts(solver.getType("ConstuctorContext"))
 		fun findConstuctor(i: Int) : ConstuctorContext? = getRuleContext(solver.getType("ConstuctorContext"),i)
-		fun findDefinitionInData() : List<DefinitionInDataContext> = getRuleContexts(solver.getType("DefinitionInDataContext"))
-		fun findDefinitionInData(i: Int) : DefinitionInDataContext? = getRuleContext(solver.getType("DefinitionInDataContext"),i)
+		fun findDefinitionInClass() : List<DefinitionInClassContext> = getRuleContexts(solver.getType("DefinitionInClassContext"))
+		fun findDefinitionInClass(i: Int) : DefinitionInClassContext? = getRuleContext(solver.getType("DefinitionInClassContext"),i)
 		fun findStaticDefinition() : List<StaticDefinitionContext> = getRuleContexts(solver.getType("StaticDefinitionContext"))
 		fun findStaticDefinition(i: Int) : StaticDefinitionContext? = getRuleContext(solver.getType("StaticDefinitionContext"),i)
-		fun findAbstractDefinitionInData() : List<AbstractDefinitionInDataContext> = getRuleContexts(solver.getType("AbstractDefinitionInDataContext"))
-		fun findAbstractDefinitionInData(i: Int) : AbstractDefinitionInDataContext? = getRuleContext(solver.getType("AbstractDefinitionInDataContext"),i)
+		fun findAbstractDefinitionInClass() : List<AbstractDefinitionInClassContext> = getRuleContexts(solver.getType("AbstractDefinitionInClassContext"))
+		fun findAbstractDefinitionInClass(i: Int) : AbstractDefinitionInClassContext? = getRuleContext(solver.getType("AbstractDefinitionInClassContext"),i)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
 	}
 
-	fun  dataBody() : DataBodyContext {
-		var _localctx : DataBodyContext = DataBodyContext(context, state)
-		enterRule(_localctx, 20, Rules.RULE_dataBody.id)
+	fun  classBody() : ClassBodyContext {
+		var _localctx : ClassBodyContext = ClassBodyContext(context, state)
+		enterRule(_localctx, 20, Rules.RULE_classBody.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -965,7 +965,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 				when ( interpreter!!.adaptivePredict(_input!!,19,context) ) {
 				1 -> {if (true){
 				this.state = 218
-				definitionInData()
+				definitionInClass()
 				}}
 				2 -> {if (true){
 				this.state = 219
@@ -973,7 +973,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 				}}
 				3 -> {if (true){
 				this.state = 220
-				abstractDefinitionInData()
+				abstractDefinitionInClass()
 				}}
 				}
 				}
@@ -996,9 +996,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class DefinitionInDataContext : ParserRuleContext {
+	open class DefinitionInClassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_definitionInData.id
+	        get() = Rules.RULE_definitionInClass.id
 	        set(value) { throw RuntimeException() }
 		fun findVal_() : Val_Context? = getRuleContext(solver.getType("Val_Context"),0)
 		fun findVar_() : Var_Context? = getRuleContext(solver.getType("Var_Context"),0)
@@ -1010,9 +1010,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		}
 	}
 
-	fun  definitionInData() : DefinitionInDataContext {
-		var _localctx : DefinitionInDataContext = DefinitionInDataContext(context, state)
-		enterRule(_localctx, 22, Rules.RULE_definitionInData.id)
+	fun  definitionInClass() : DefinitionInClassContext {
+		var _localctx : DefinitionInClassContext = DefinitionInClassContext(context, state)
+		enterRule(_localctx, 22, Rules.RULE_definitionInClass.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -1071,9 +1071,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class AbstractDefinitionInDataContext : ParserRuleContext {
+	open class AbstractDefinitionInClassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_abstractDefinitionInData.id
+	        get() = Rules.RULE_abstractDefinitionInClass.id
 	        set(value) { throw RuntimeException() }
 		fun findPropertyInInterface() : PropertyInInterfaceContext? = getRuleContext(solver.getType("PropertyInInterfaceContext"),0)
 		fun findDefInInterface() : DefInInterfaceContext? = getRuleContext(solver.getType("DefInInterfaceContext"),0)
@@ -1082,9 +1082,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		}
 	}
 
-	fun  abstractDefinitionInData() : AbstractDefinitionInDataContext {
-		var _localctx : AbstractDefinitionInDataContext = AbstractDefinitionInDataContext(context, state)
-		enterRule(_localctx, 24, Rules.RULE_abstractDefinitionInData.id)
+	fun  abstractDefinitionInClass() : AbstractDefinitionInClassContext {
+		var _localctx : AbstractDefinitionInClassContext = AbstractDefinitionInClassContext(context, state)
+		enterRule(_localctx, 24, Rules.RULE_abstractDefinitionInClass.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -1133,7 +1133,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun findVal_() : Val_Context? = getRuleContext(solver.getType("Val_Context"),0)
 		fun findVar_() : Var_Context? = getRuleContext(solver.getType("Var_Context"),0)
 		fun findDef() : DefContext? = getRuleContext(solver.getType("DefContext"),0)
-		fun findData() : DataContext? = getRuleContext(solver.getType("DataContext"),0)
+		fun findClass_() : Class_Context? = getRuleContext(solver.getType("Class_Context"),0)
 		fun findInterface_() : Interface_Context? = getRuleContext(solver.getType("Interface_Context"),0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
@@ -1164,7 +1164,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			}}
 			ABSTRACT , DATA  ->  /*LL1AltBlock*/{if (true){
 			this.state = 251
-			data()
+			class_()
 			}}
 			INTERFACE  ->  /*LL1AltBlock*/{if (true){
 			this.state = 252
@@ -1891,9 +1891,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class TypeParamOnTypeContext : ParserRuleContext {
+	open class TypeParamOnTypeclassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_typeParamOnType.id
+	        get() = Rules.RULE_typeParamOnTypeclass.id
 	        set(value) { throw RuntimeException() }
 		fun LPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.LPAREN.id, 0)
 		fun RPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.RPAREN.id, 0)
@@ -1903,9 +1903,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		}
 	}
 
-	fun  typeParamOnType() : TypeParamOnTypeContext {
-		var _localctx : TypeParamOnTypeContext = TypeParamOnTypeContext(context, state)
-		enterRule(_localctx, 46, Rules.RULE_typeParamOnType.id)
+	fun  typeParamOnTypeclass() : TypeParamOnTypeclassContext {
+		var _localctx : TypeParamOnTypeclassContext = TypeParamOnTypeclassContext(context, state)
+		enterRule(_localctx, 46, Rules.RULE_typeParamOnTypeclass.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -1947,8 +1947,8 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 	        set(value) { throw RuntimeException() }
 		fun TYPE() : TerminalNode? = getToken(FoldingParser.Tokens.TYPE.id, 0)
 		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
-		fun findTypeParamOnType() : TypeParamOnTypeContext? = getRuleContext(solver.getType("TypeParamOnTypeContext"),0)
-		fun findTypeDefBody() : TypeDefBodyContext? = getRuleContext(solver.getType("TypeDefBodyContext"),0)
+		fun findTypeParamOnTypeclass() : TypeParamOnTypeclassContext? = getRuleContext(solver.getType("TypeParamOnTypeclassContext"),0)
+		fun findTypeclassDefBody() : TypeclassDefBodyContext? = getRuleContext(solver.getType("TypeclassDefBodyContext"),0)
 		fun TILDE() : TerminalNode? = getToken(FoldingParser.Tokens.TILDE.id, 0)
 		fun findTypeEx() : List<TypeExContext> = getRuleContexts(solver.getType("TypeExContext"))
 		fun findTypeEx(i: Int) : TypeExContext? = getRuleContext(solver.getType("TypeExContext"),i)
@@ -1968,7 +1968,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 409
 			match(ID) as Token
 			this.state = 410
-			typeParamOnType()
+			typeParamOnTypeclass()
 			this.state = 417
 			errorHandler.sync(this)
 			_la = _input!!.LA(1)
@@ -1994,7 +1994,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			}
 
 			this.state = 419
-			typeDefBody()
+			typeclassDefBody()
 			}
 		}
 		catch (re: RecognitionException) {
@@ -2008,21 +2008,21 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class TypeDefBodyContext : ParserRuleContext {
+	open class TypeclassDefBodyContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_typeDefBody.id
+	        get() = Rules.RULE_typeclassDefBody.id
 	        set(value) { throw RuntimeException() }
 		fun LBRACE() : TerminalNode? = getToken(FoldingParser.Tokens.LBRACE.id, 0)
 		fun RBRACE() : TerminalNode? = getToken(FoldingParser.Tokens.RBRACE.id, 0)
-		fun findDefInType() : List<DefInTypeContext> = getRuleContexts(solver.getType("DefInTypeContext"))
-		fun findDefInType(i: Int) : DefInTypeContext? = getRuleContext(solver.getType("DefInTypeContext"),i)
+		fun findDefInTypeclass() : List<DefInTypeclassContext> = getRuleContexts(solver.getType("DefInTypeclassContext"))
+		fun findDefInTypeclass(i: Int) : DefInTypeclassContext? = getRuleContext(solver.getType("DefInTypeclassContext"),i)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
 	}
 
-	fun  typeDefBody() : TypeDefBodyContext {
-		var _localctx : TypeDefBodyContext = TypeDefBodyContext(context, state)
-		enterRule(_localctx, 50, Rules.RULE_typeDefBody.id)
+	fun  typeclassDefBody() : TypeclassDefBodyContext {
+		var _localctx : TypeclassDefBodyContext = TypeclassDefBodyContext(context, state)
+		enterRule(_localctx, 50, Rules.RULE_typeclassDefBody.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -2036,7 +2036,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 				if (true){
 				if (true){
 				this.state = 422
-				defInType()
+				defInTypeclass()
 				}
 				}
 				this.state = 427
@@ -2058,26 +2058,26 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class DefInTypeContext : ParserRuleContext {
+	open class DefInTypeclassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_defInType.id
+	        get() = Rules.RULE_defInTypeclass.id
 	        set(value) { throw RuntimeException() }
 		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
 		fun findTypeEx() : TypeExContext? = getRuleContext(solver.getType("TypeExContext"),0)
 		fun findTypeParam() : TypeParamContext? = getRuleContext(solver.getType("TypeParamContext"),0)
-		fun findParameterInType() : List<ParameterInTypeContext> = getRuleContexts(solver.getType("ParameterInTypeContext"))
-		fun findParameterInType(i: Int) : ParameterInTypeContext? = getRuleContext(solver.getType("ParameterInTypeContext"),i)
+		fun findParameterInTypeclass() : List<ParameterInTypeclassContext> = getRuleContexts(solver.getType("ParameterInTypeclassContext"))
+		fun findParameterInTypeclass(i: Int) : ParameterInTypeclassContext? = getRuleContext(solver.getType("ParameterInTypeclassContext"),i)
 		fun findOpIdWrap() : OpIdWrapContext? = getRuleContext(solver.getType("OpIdWrapContext"),0)
-		fun findOpParameterInType() : OpParameterInTypeContext? = getRuleContext(solver.getType("OpParameterInTypeContext"),0)
+		fun findOpParameterInTypeclass() : OpParameterInTypeclassContext? = getRuleContext(solver.getType("OpParameterInTypeclassContext"),0)
 		fun findAopIdWrap() : AopIdWrapContext? = getRuleContext(solver.getType("AopIdWrapContext"),0)
-		fun findAopParameterInType() : AopParameterInTypeContext? = getRuleContext(solver.getType("AopParameterInTypeContext"),0)
+		fun findAopParameterInTypeclass() : AopParameterInTypeclassContext? = getRuleContext(solver.getType("AopParameterInTypeclassContext"),0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
 	}
 
-	fun  defInType() : DefInTypeContext {
-		var _localctx : DefInTypeContext = DefInTypeContext(context, state)
-		enterRule(_localctx, 52, Rules.RULE_defInType.id)
+	fun  defInTypeclass() : DefInTypeclassContext {
+		var _localctx : DefInTypeclassContext = DefInTypeclassContext(context, state)
+		enterRule(_localctx, 52, Rules.RULE_defInTypeclass.id)
 		var _la: Int
 		try {
 			var _alt: Int
@@ -2107,7 +2107,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 					if (true){
 					if (true){
 					this.state = 434
-					parameterInType()
+					parameterInTypeclass()
 					}
 					} 
 				}
@@ -2134,7 +2134,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			}
 
 			this.state = 445
-			opParameterInType()
+			opParameterInTypeclass()
 			this.state = 446
 			typeEx(0)
 			}}
@@ -2154,7 +2154,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			}
 
 			this.state = 452
-			aopParameterInType()
+			aopParameterInTypeclass()
 			this.state = 453
 			typeEx(0)
 			}}
@@ -2171,9 +2171,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class ParamExInTypeContext : ParserRuleContext {
+	open class ParamExInTypeclassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_paramExInType.id
+	        get() = Rules.RULE_paramExInTypeclass.id
 	        set(value) { throw RuntimeException() }
 		fun findTypeEx() : TypeExContext? = getRuleContext(solver.getType("TypeExContext"),0)
 		fun ELLIPSIS() : TerminalNode? = getToken(FoldingParser.Tokens.ELLIPSIS.id, 0)
@@ -2181,9 +2181,9 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		}
 	}
 
-	fun  paramExInType() : ParamExInTypeContext {
-		var _localctx : ParamExInTypeContext = ParamExInTypeContext(context, state)
-		enterRule(_localctx, 54, Rules.RULE_paramExInType.id)
+	fun  paramExInTypeclass() : ParamExInTypeclassContext {
+		var _localctx : ParamExInTypeclassContext = ParamExInTypeclassContext(context, state)
+		enterRule(_localctx, 54, Rules.RULE_paramExInTypeclass.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -2213,21 +2213,21 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class ParameterInTypeContext : ParserRuleContext {
+	open class ParameterInTypeclassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_parameterInType.id
+	        get() = Rules.RULE_parameterInTypeclass.id
 	        set(value) { throw RuntimeException() }
 		fun LPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.LPAREN.id, 0)
 		fun RPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.RPAREN.id, 0)
-		fun findParamExInType() : List<ParamExInTypeContext> = getRuleContexts(solver.getType("ParamExInTypeContext"))
-		fun findParamExInType(i: Int) : ParamExInTypeContext? = getRuleContext(solver.getType("ParamExInTypeContext"),i)
+		fun findParamExInTypeclass() : List<ParamExInTypeclassContext> = getRuleContexts(solver.getType("ParamExInTypeclassContext"))
+		fun findParamExInTypeclass(i: Int) : ParamExInTypeclassContext? = getRuleContext(solver.getType("ParamExInTypeclassContext"),i)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
 	}
 
-	fun  parameterInType() : ParameterInTypeContext {
-		var _localctx : ParameterInTypeContext = ParameterInTypeContext(context, state)
-		enterRule(_localctx, 56, Rules.RULE_parameterInType.id)
+	fun  parameterInTypeclass() : ParameterInTypeclassContext {
+		var _localctx : ParameterInTypeclassContext = ParameterInTypeclassContext(context, state)
+		enterRule(_localctx, 56, Rules.RULE_parameterInTypeclass.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
@@ -2241,7 +2241,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 				if (true){
 				if (true){
 				this.state = 462
-				paramExInType()
+				paramExInTypeclass()
 				}
 				}
 				this.state = 467
@@ -2263,30 +2263,30 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class OpParameterInTypeContext : ParserRuleContext {
+	open class OpParameterInTypeclassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_opParameterInType.id
+	        get() = Rules.RULE_opParameterInTypeclass.id
 	        set(value) { throw RuntimeException() }
 		fun LPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.LPAREN.id, 0)
-		fun findParamExInType() : List<ParamExInTypeContext> = getRuleContexts(solver.getType("ParamExInTypeContext"))
-		fun findParamExInType(i: Int) : ParamExInTypeContext? = getRuleContext(solver.getType("ParamExInTypeContext"),i)
+		fun findParamExInTypeclass() : List<ParamExInTypeclassContext> = getRuleContexts(solver.getType("ParamExInTypeclassContext"))
+		fun findParamExInTypeclass(i: Int) : ParamExInTypeclassContext? = getRuleContext(solver.getType("ParamExInTypeclassContext"),i)
 		fun RPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.RPAREN.id, 0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
 	}
 
-	fun  opParameterInType() : OpParameterInTypeContext {
-		var _localctx : OpParameterInTypeContext = OpParameterInTypeContext(context, state)
-		enterRule(_localctx, 58, Rules.RULE_opParameterInType.id)
+	fun  opParameterInTypeclass() : OpParameterInTypeclassContext {
+		var _localctx : OpParameterInTypeclassContext = OpParameterInTypeclassContext(context, state)
+		enterRule(_localctx, 58, Rules.RULE_opParameterInTypeclass.id)
 		try {
 			enterOuterAlt(_localctx, 1)
 			if (true){
 			this.state = 470
 			match(LPAREN) as Token
 			this.state = 471
-			paramExInType()
+			paramExInTypeclass()
 			this.state = 472
-			paramExInType()
+			paramExInTypeclass()
 			this.state = 473
 			match(RPAREN) as Token
 			}
@@ -2302,27 +2302,27 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class AopParameterInTypeContext : ParserRuleContext {
+	open class AopParameterInTypeclassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_aopParameterInType.id
+	        get() = Rules.RULE_aopParameterInTypeclass.id
 	        set(value) { throw RuntimeException() }
 		fun LPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.LPAREN.id, 0)
-		fun findParamExInType() : ParamExInTypeContext? = getRuleContext(solver.getType("ParamExInTypeContext"),0)
+		fun findParamExInTypeclass() : ParamExInTypeclassContext? = getRuleContext(solver.getType("ParamExInTypeclassContext"),0)
 		fun RPAREN() : TerminalNode? = getToken(FoldingParser.Tokens.RPAREN.id, 0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
 	}
 
-	fun  aopParameterInType() : AopParameterInTypeContext {
-		var _localctx : AopParameterInTypeContext = AopParameterInTypeContext(context, state)
-		enterRule(_localctx, 60, Rules.RULE_aopParameterInType.id)
+	fun  aopParameterInTypeclass() : AopParameterInTypeclassContext {
+		var _localctx : AopParameterInTypeclassContext = AopParameterInTypeclassContext(context, state)
+		enterRule(_localctx, 60, Rules.RULE_aopParameterInTypeclass.id)
 		try {
 			enterOuterAlt(_localctx, 1)
 			if (true){
 			this.state = 475
 			match(LPAREN) as Token
 			this.state = 476
-			paramExInType()
+			paramExInTypeclass()
 			this.state = 477
 			match(RPAREN) as Token
 			}
@@ -2792,7 +2792,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun findVar_() : Var_Context? = getRuleContext(solver.getType("Var_Context"),0)
 		fun findType() : TypeContext? = getRuleContext(solver.getType("TypeContext"),0)
 		fun findImpl() : ImplContext? = getRuleContext(solver.getType("ImplContext"),0)
-		fun findData() : DataContext? = getRuleContext(solver.getType("DataContext"),0)
+		fun findClass_() : Class_Context? = getRuleContext(solver.getType("Class_Context"),0)
 		fun findInterface_() : Interface_Context? = getRuleContext(solver.getType("Interface_Context"),0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
@@ -2839,7 +2839,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			enterOuterAlt(_localctx, 6)
 			if (true){
 			this.state = 573
-			data()
+			class_()
 			}}
 			INTERFACE  ->  /*LL1AltBlock*/{
 			enterOuterAlt(_localctx, 7)
@@ -3631,10 +3631,10 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun findAopIdWrap() : AopIdWrapContext? = getRuleContext(solver.getType("AopIdWrapContext"),0)
 		fun findAopParameter() : AopParameterContext? = getRuleContext(solver.getType("AopParameterContext"),0)
 		fun FOREIGN() : TerminalNode? = getToken(FoldingParser.Tokens.FOREIGN.id, 0)
-		fun findParameterInType() : List<ParameterInTypeContext> = getRuleContexts(solver.getType("ParameterInTypeContext"))
-		fun findParameterInType(i: Int) : ParameterInTypeContext? = getRuleContext(solver.getType("ParameterInTypeContext"),i)
-		fun findOpParameterInType() : OpParameterInTypeContext? = getRuleContext(solver.getType("OpParameterInTypeContext"),0)
-		fun findAopParameterInType() : AopParameterInTypeContext? = getRuleContext(solver.getType("AopParameterInTypeContext"),0)
+		fun findParameterInTypeclass() : List<ParameterInTypeclassContext> = getRuleContexts(solver.getType("ParameterInTypeclassContext"))
+		fun findParameterInTypeclass(i: Int) : ParameterInTypeclassContext? = getRuleContext(solver.getType("ParameterInTypeclassContext"),i)
+		fun findOpParameterInTypeclass() : OpParameterInTypeclassContext? = getRuleContext(solver.getType("OpParameterInTypeclassContext"),0)
+		fun findAopParameterInTypeclass() : AopParameterInTypeclassContext? = getRuleContext(solver.getType("AopParameterInTypeclassContext"),0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
 	}
@@ -3823,7 +3823,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 					if (true){
 					if (true){
 					this.state = 793
-					parameterInType()
+					parameterInTypeclass()
 					}
 					} 
 				}
@@ -3862,7 +3862,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 807
 			match(FOREIGN) as Token
 			this.state = 808
-			opParameterInType()
+			opParameterInTypeclass()
 			this.state = 809
 			typeEx(0)
 			}}
@@ -3894,7 +3894,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 818
 			match(FOREIGN) as Token
 			this.state = 819
-			aopParameterInType()
+			aopParameterInTypeclass()
 			this.state = 820
 			typeEx(0)
 			}}
