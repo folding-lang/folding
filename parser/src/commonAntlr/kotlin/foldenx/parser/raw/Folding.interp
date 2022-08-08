@@ -52,7 +52,7 @@ INTERNAL
 IMPORT
 IMPL
 RETURN
-TYPE
+TYPECLASS
 VAR
 VAL
 STATIC
@@ -100,7 +100,7 @@ defInInterface
 typeParam
 typeParamCompo
 typeParamOnTypeclass
-type
+typeclass
 typeclassDefBody
 defInTypeclass
 paramExInTypeclass

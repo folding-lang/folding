@@ -43,7 +43,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
                                                               FoldingParser.TypeParamContext::class,
                                                               FoldingParser.TypeParamCompoContext::class,
                                                               FoldingParser.TypeParamOnTypeclassContext::class,
-                                                              FoldingParser.TypeContext::class,
+                                                              FoldingParser.TypeclassContext::class,
                                                               FoldingParser.TypeclassDefBodyContext::class,
                                                               FoldingParser.DefInTypeclassContext::class,
                                                               FoldingParser.ParamExInTypeclassContext::class,
@@ -107,7 +107,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
         IMPORT(12),
         IMPL(13),
         RETURN(14),
-        TYPE(15),
+        TYPECLASS(15),
         VAR(16),
         VAL(17),
         STATIC(18),
@@ -156,7 +156,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
         RULE_typeParam(22),
         RULE_typeParamCompo(23),
         RULE_typeParamOnTypeclass(24),
-        RULE_type(25),
+        RULE_typeclass(25),
         RULE_typeclassDefBody(26),
         RULE_defInTypeclass(27),
         RULE_paramExInTypeclass(28),
@@ -203,7 +203,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
                                 "interfaceBody", "propertyInInterface", 
                                 "valInInterface", "varInInterface", "defInInterface", 
                                 "typeParam", "typeParamCompo", "typeParamOnTypeclass", 
-                                "type", "typeclassDefBody", "defInTypeclass", 
+                                "typeclass", "typeclassDefBody", "defInTypeclass", 
                                 "paramExInTypeclass", "parameterInTypeclass", 
                                 "opParameterInTypeclass", "aopParameterInTypeclass", 
                                 "impl", "implBody", "paramExInImpl", "parameterInImpl", 
@@ -238,7 +238,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
                                                            "FOLDING", "NAMESPACE", 
                                                            "OVERRIDE", "INTERNAL", 
                                                            "IMPORT", "IMPL", 
-                                                           "RETURN", "TYPE", 
+                                                           "RETURN", "TYPECLASS", 
                                                            "VAR", "VAL", 
                                                            "STATIC", "INTERFACE", 
                                                            "ASSGIN", "ELLIPSIS", 
@@ -290,7 +290,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
     private val IMPORT = Tokens.IMPORT.id
     private val IMPL = Tokens.IMPL.id
     private val RETURN = Tokens.RETURN.id
-    private val TYPE = Tokens.TYPE.id
+    private val TYPECLASS = Tokens.TYPECLASS.id
     private val VAR = Tokens.VAR.id
     private val VAL = Tokens.VAL.id
     private val STATIC = Tokens.STATIC.id
@@ -364,7 +364,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 126
 			errorHandler.sync(this);
 			_la = _input!!.LA(1)
-			while ((((_la) and 0x3f.inv()) == 0 && ((1L shl _la) and ((1L shl ABSTRACT) or (1L shl DATA) or (1L shl FOLDING) or (1L shl IMPL) or (1L shl TYPE) or (1L shl VAR) or (1L shl VAL) or (1L shl INTERFACE) or (1L shl LSQUARE) or (1L shl ID))) != 0L)) {
+			while ((((_la) and 0x3f.inv()) == 0 && ((1L shl _la) and ((1L shl ABSTRACT) or (1L shl DATA) or (1L shl FOLDING) or (1L shl IMPL) or (1L shl TYPECLASS) or (1L shl VAR) or (1L shl VAL) or (1L shl INTERFACE) or (1L shl LSQUARE) or (1L shl ID))) != 0L)) {
 				if (true){
 				if (true){
 				this.state = 123
@@ -1968,11 +1968,11 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		return _localctx
 	}
 
-	open class TypeContext : ParserRuleContext {
+	open class TypeclassContext : ParserRuleContext {
 	    override var ruleIndex: Int
-	        get() = Rules.RULE_type.id
+	        get() = Rules.RULE_typeclass.id
 	        set(value) { throw RuntimeException() }
-		fun TYPE() : TerminalNode? = getToken(FoldingParser.Tokens.TYPE.id, 0)
+		fun TYPECLASS() : TerminalNode? = getToken(FoldingParser.Tokens.TYPECLASS.id, 0)
 		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
 		fun findTypeParamOnTypeclass() : TypeParamOnTypeclassContext? = getRuleContext(solver.getType("TypeParamOnTypeclassContext"),0)
 		fun findTypeclassDefBody() : TypeclassDefBodyContext? = getRuleContext(solver.getType("TypeclassDefBodyContext"),0)
@@ -1983,15 +1983,15 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		}
 	}
 
-	fun  type() : TypeContext {
-		var _localctx : TypeContext = TypeContext(context, state)
-		enterRule(_localctx, 50, Rules.RULE_type.id)
+	fun  typeclass() : TypeclassContext {
+		var _localctx : TypeclassContext = TypeclassContext(context, state)
+		enterRule(_localctx, 50, Rules.RULE_typeclass.id)
 		var _la: Int
 		try {
 			enterOuterAlt(_localctx, 1)
 			if (true){
 			this.state = 411
-			match(TYPE) as Token
+			match(TYPECLASS) as Token
 			this.state = 412
 			match(ID) as Token
 			this.state = 413
@@ -2817,7 +2817,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun findDef() : DefContext? = getRuleContext(solver.getType("DefContext"),0)
 		fun findVal_() : Val_Context? = getRuleContext(solver.getType("Val_Context"),0)
 		fun findVar_() : Var_Context? = getRuleContext(solver.getType("Var_Context"),0)
-		fun findType() : TypeContext? = getRuleContext(solver.getType("TypeContext"),0)
+		fun findTypeclass() : TypeclassContext? = getRuleContext(solver.getType("TypeclassContext"),0)
 		fun findImpl() : ImplContext? = getRuleContext(solver.getType("ImplContext"),0)
 		fun findClass_() : Class_Context? = getRuleContext(solver.getType("Class_Context"),0)
 		fun findInterface_() : Interface_Context? = getRuleContext(solver.getType("Interface_Context"),0)
@@ -2850,11 +2850,11 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 573
 			var_()
 			}}
-			TYPE  ->  /*LL1AltBlock*/{
+			TYPECLASS  ->  /*LL1AltBlock*/{
 			enterOuterAlt(_localctx, 4)
 			if (true){
 			this.state = 574
-			type()
+			typeclass()
 			}}
 			IMPL  ->  /*LL1AltBlock*/{
 			enterOuterAlt(_localctx, 5)

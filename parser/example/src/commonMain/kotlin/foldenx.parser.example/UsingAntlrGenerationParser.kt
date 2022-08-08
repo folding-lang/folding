@@ -30,7 +30,7 @@ fun usingAntlrGenerationParserTest(input: String = """
         when {
             it.findDef() != null -> "Def: ${it.text}"
             it.findInterface_() != null -> "Interface: ${it.text}"
-            it.findType() != null -> "Type: ${it.text}"
+            it.findTypeclass() != null -> "Typeclass: ${it.text}"
             it.findClass_() != null -> "Class: ${it.text}"
             it.findVal_() != null -> "Val: ${it.text}"
             it.findVar_() != null -> "Var: ${it.text}"
