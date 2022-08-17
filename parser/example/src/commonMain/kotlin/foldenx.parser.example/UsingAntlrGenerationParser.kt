@@ -1,7 +1,7 @@
 package foldenx.parser.example
 
-import foldenx.parser.raw.FoldingLexer
-import foldenx.parser.raw.FoldingParser
+import foldenx.parser.FoldingLexer
+import foldenx.parser.FoldingParser
 import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 
