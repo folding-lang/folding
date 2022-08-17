@@ -4,7 +4,7 @@ interface Console {
 
 console foreign Console
 
-myFunc[a ~ [Calc(a)]](x a) = (x * 2 + 7) * (x + 9) * pi
+myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9) * pi
 
 main() = {
     console.log(myFunc(1))
