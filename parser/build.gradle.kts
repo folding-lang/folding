@@ -70,7 +70,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         project.dependencies.create("$antlrGroup:antlr-kotlin-target:$antlrVersion")
     )
     maxHeapSize = "64m"
-    packageName = "foldenx.parser.raw"
+    packageName = "foldenx.parser"
     arguments = listOf("-no-visitor", "-no-listener")
     source = project.objects
         .sourceDirectorySet("antlr", "antlr")

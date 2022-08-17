@@ -1,5 +1,5 @@
 // Generated from java-escape by ANTLR 4.7.1
-package foldenx.parser.raw;
+package foldenx.parser;
 import com.strumenta.kotlinmultiplatform.asCharArray
 import com.strumenta.kotlinmultiplatform.getType
 import com.strumenta.kotlinmultiplatform.TypeDeclarator
