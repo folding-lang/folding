@@ -8,16 +8,19 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 fun usingAntlrGenerationParserTest(input: String = """
     package samples
     
-    interface Console {
-        log(msg String) Unit
+    class Console {
     }
     
+    data Console {
+        log(msg String) external Unit
+    }
+
     console external Console
-    
-    myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9) * pi
-    
-    main() = {
-        console.log(myFunc(1))
+
+    myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9)
+
+    main = immediately do {
+        console:log(myFunc(1))
     }
 """.trimIndent()): FoldingParser.FileContext {
     val stream = CharStreams.fromString(input)

@@ -4,14 +4,14 @@
  *
  */
 
-function console_0_Console() {
+function console_0() {
     return console
 }
 
-function Console_log_0_Unit() {
-    return function(this_Console) {
-        return function(Console_log_0_msg_String) {
-            return this_Console.log(Console_log_0_msg_String)
+function Console_log_0() {
+    return function(Console_this) {
+        return function(Console_log_0_msg) {
+            return Console_this.log(Console_log_0_msg)
         }
     }
 }
