@@ -1,11 +1,13 @@
-interface Console {
-    log(msg String) Unit
+package samples
+
+data Console {
+    log(msg String) external Unit
 }
 
-console foreign Console
+console external Console
 
-myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9) * pi
+myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9)
 
-main() = {
-    console.log(myFunc(1))
+main = do {
+    console:log(myFunc(1))
 }

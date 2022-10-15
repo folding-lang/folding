@@ -6,14 +6,16 @@ import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 
 fun usingAntlrGenerationParserTest(input: String = """
+    package samples
+    
     interface Console {
         log(msg String) Unit
     }
-
-    console foreign Console
-
+    
+    console external Console
+    
     myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9) * pi
-
+    
     main() = {
         console.log(myFunc(1))
     }
