@@ -1,6 +1,6 @@
 package samples
 
-data Console {
+class Console {
     log(msg String) external Unit
 }
 
@@ -8,6 +8,6 @@ console external Console
 
 myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9)
 
-main = immediately do {
+main = do {
     console:log(myFunc(1))
 }
