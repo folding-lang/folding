@@ -1,17 +1,18 @@
 /*
  *
- * The names of the functions for each external definition are follow the compilation rules of identifier.
+ * This is the compiled code.
+ * Actually, this is not real going to compile same as this.
+ * This is just a imagination of compilation.
  *
  */
 
-function console_0() {
-    return console
+export function myFunc(x) {
+    return (x * 2 + 7) * (x + 9);
 }
 
-function Console_log_0() {
-    return function(Console_this) {
-        return function(Console_log_0_msg) {
-            return Console_this.log(Console_log_0_msg)
-        }
+export function main() {
+    function _do() {
+        console.log(myFunc(1))
     }
+    return _do()
 }
