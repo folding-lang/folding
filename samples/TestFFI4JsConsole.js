@@ -6,13 +6,17 @@
  *
  */
 
+export function bind(value,func) {
+    return func(value)
+}
+
 export function myFunc(x) {
-    return (x * 2 + 7) * (x + 9);
+    return ((x * 2) + 7) * (x + 9);
 }
 
 export function main() {
     function _do() {
-        console.log(myFunc(1))
+        console.log(bind(1,myFunc))
     }
     return _do()
 }
