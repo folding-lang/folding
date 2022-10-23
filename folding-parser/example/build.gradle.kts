@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.7.10"
+    kotlin("multiplatform") version "1.7.20"
 }
 
 kotlin {
@@ -28,31 +28,31 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation(project(":parser"))
+                implementation(project(":folding-parser"))
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation(project(":parser"))
+                implementation(project(":folding-parser"))
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation(project(":parser"))
+                implementation(project(":folding-parser"))
             }
         }
 
         val linuxMain by getting {
             dependencies {
-                implementation(project(":parser"))
+                implementation(project(":folding-parser"))
             }
         }
 
         val windowsMain by getting {
             dependencies {
-                implementation(project(":parser"))
+                implementation(project(":folding-parser"))
             }
         }
 

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.7.10"
+    kotlin("multiplatform") version "1.7.20"
 }
 
 
@@ -74,7 +74,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
     arguments = listOf("-no-visitor", "-no-listener")
     source = project.objects
         .sourceDirectorySet("antlr", "antlr")
-        .srcDir("${rootDir.absolutePath}/grammar/grammars/antlr4").apply {
+        .srcDir("${rootDir.absolutePath}/folding-grammar/grammars/antlr4").apply {
             include("*.g4")
         }
     outputDirectory = File("src/commonAntlr/kotlin")

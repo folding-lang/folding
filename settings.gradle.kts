@@ -1,3 +1,3 @@
 rootProject.name = "folding"
-include("parser")
-include("parser:example")
+include("folding-parser")
+include("folding-parser:example")
