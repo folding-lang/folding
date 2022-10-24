@@ -15,8 +15,8 @@ export function myFunc(x) {
 }
 
 export function main() {
-    function _do() {
+    function _do$main() {
         console.log(bind(1,myFunc))
     }
-    return _do()
+    return _do$main()
 }
