@@ -14,9 +14,10 @@ export function myFunc(x) {
     return ((x * 2) + 7) * (x + 9);
 }
 
-export function main() {
-    function _do$main() {
+function _do$main() {
         console.log(bind(1,myFunc))
     }
+
+export function main() {
     return _do$main()
 }
