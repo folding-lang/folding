@@ -4,7 +4,7 @@ interface Console {
     log(msg String) Unit
 }
 
-[>>=]::bind[T R](value T  func (T) -> R) R = func(value)
+[>>=]#bind[T R](value T  func (T) -> R) R = func(value)
 
 console external Console
 
