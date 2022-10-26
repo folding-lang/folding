@@ -32,29 +32,5 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
-            dependencies {
-                implementation(project(":folding-parser"))
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(project(":folding-parser"))
-            }
-        }
-
-        val linuxMain by getting {
-            dependencies {
-                implementation(project(":folding-parser"))
-            }
-        }
-
-        val windowsMain by getting {
-            dependencies {
-                implementation(project(":folding-parser"))
-            }
-        }
-
     }
 }
