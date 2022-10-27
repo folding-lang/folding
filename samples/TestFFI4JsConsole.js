@@ -6,7 +6,7 @@
  *
  */
 
-export function bind(value,func) {
+export function pipe(value,func) {
     return func(value)
 }
 
@@ -15,8 +15,8 @@ export function myFunc(x) {
 }
 
 function _do$main() {
-        console.log(bind(1,myFunc))
-    }
+    console.log(pipe(1,myFunc))
+}
 
 export function main() {
     return _do$main()
