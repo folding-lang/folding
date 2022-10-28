@@ -1,15 +1,15 @@
 package samples
 
 interface Console {
-    log(msg String) Unit
+    log: msg String => :Unit
 }
 
-[|>]#pipe[T R](value T  func (T) -> R) R = func(value)
+[|>]#pipe T R: value T func (T) -> R => func(value)
 
 console external Console
 
-myFunc[a ~ Calc(a)](x a) = (x * 2 + 7) * (x + 9)
+myFunc T ~ Calc(T): x T => (x * 2 + 7) * (x + 9)
 
-main = do {
-    console:log(1 |> myFunc)
+main => do {
+    console::log(1 |> myFunc)
 }
