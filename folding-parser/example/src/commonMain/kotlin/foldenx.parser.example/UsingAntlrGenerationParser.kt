@@ -19,7 +19,7 @@ fun usingAntlrGenerationParserTest(input: String = """
     myFunc T ~ Calc(T): x T => (x * 2 + 7) * (x + 9)
 
     main => do {
-        console:log((-1) |> myFunc)
+        console:log(-1 |> myFunc)
     }
 """.trimIndent()): FoldingParser.FileContext {
     val stream = CharStreams.fromString(input)
