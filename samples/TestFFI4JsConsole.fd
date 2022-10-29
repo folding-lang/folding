@@ -11,5 +11,5 @@ console external Console
 myFunc T ~ Calc(T): x T => (x * 2 + 7) * (x + 9)
 
 main => do {
-    console::log(1 |> myFunc)
+    console:log(1 |> myFunc)
 }
