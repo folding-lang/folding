@@ -14,7 +14,7 @@ fun usingAntlrGenerationParserTest(input: String = """
 
     [|>]#pipe T R: value T func (T) -> R => func(value)
 
-    console external Console
+    console foreign Console
 
     myFunc T ~ Calc(T): x T => (x * 2 + 7) * (x + 9)
 
