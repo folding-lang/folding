@@ -8,7 +8,7 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 fun usingAntlrGenerationParserTest(input: String = """
     package samples
 
-    interface Console {
+    class Console {
         log: msg String => :Unit
     }
 
@@ -33,7 +33,6 @@ fun usingAntlrGenerationParserTest(input: String = """
     println(definitions.joinToString("\n\n","=== Definitions ===\n\n","\n\n===================") {
         when {
             it.findDef() != null -> "Def: ${it.text}"
-            it.findInterface_() != null -> "Interface: ${it.text}"
             it.findClass_() != null -> "Class: ${it.text}"
             else -> "[Error]"
         }

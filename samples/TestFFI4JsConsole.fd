@@ -1,6 +1,6 @@
 package samples
 
-interface Console {
+class Console {
     log: msg String => :Unit
 }
 

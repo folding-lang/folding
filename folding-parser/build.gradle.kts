@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
 }
 
 buildscript {
@@ -51,6 +52,7 @@ kotlin {
             dependsOn(commonAntlr)
             dependencies {
                 implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
             }
         }
     }
