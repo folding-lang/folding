@@ -12,14 +12,15 @@ fun usingAntlrGenerationParserTest(input: String = """
         log (msg~String) Unit
     }
 
-    [|>]#pipe T R (value~T func~ (T) -> R) R = func(value)
+    [|>] T R (value~T func~ (T) -> R) R = #func[#value]
 
-    console foreign Console
+    console foreign Console `console`
 
-    myFunc T ~ Calc(T) (x~T) T = (x * 2 + 7) * (x + 9)
+    myFunc T ~ Calc(T) (x~T) T = (#x + 2) + (#x * 7)
+    inverse r (T (#r - 2)/8)
 
     main Unit = do {
-        console:log(-1 |> myFunc)
+        console:log(-6 |> ::myFunc)
     }
 """.trimIndent()): FoldingParser.FileContext {
     val stream = CharStreams.fromString(input)
