@@ -1543,7 +1543,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun findReference() : ReferenceContext? = getRuleContext(solver.getType("ReferenceContext"),0)
 		constructor(ctx: ValueContext) { copyFrom(ctx) }
 	}
-	open class CallFuncthonContext : ValueContext {
+	open class CallFunctionContext : ValueContext {
 		fun findReference() : ReferenceContext? = getRuleContext(solver.getType("ReferenceContext"),0)
 		fun findArgValue() : ArgValueContext? = getRuleContext(solver.getType("ArgValueContext"),0)
 		constructor(ctx: ValueContext) { copyFrom(ctx) }
@@ -1558,10 +1558,6 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun findValue() : ValueContext? = getRuleContext(solver.getType("ValueContext"),0)
 		fun DOUBLECOLON() : TerminalNode? = getToken(FoldingParser.Tokens.DOUBLECOLON.id, 0)
 		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
-		constructor(ctx: ValueContext) { copyFrom(ctx) }
-	}
-	open class DoExpresionContext : ValueContext {
-		fun findDoBlock() : DoBlockContext? = getRuleContext(solver.getType("DoBlockContext"),0)
 		constructor(ctx: ValueContext) { copyFrom(ctx) }
 	}
 	open class JustLambdaContext : ValueContext {
@@ -1581,6 +1577,10 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 	open class GetFieldGlobalContext : ValueContext {
 		fun SHARP() : TerminalNode? = getToken(FoldingParser.Tokens.SHARP.id, 0)
 		fun findReference() : ReferenceContext? = getRuleContext(solver.getType("ReferenceContext"),0)
+		constructor(ctx: ValueContext) { copyFrom(ctx) }
+	}
+	open class DoExpressionContext : ValueContext {
+		fun findDoBlock() : DoBlockContext? = getRuleContext(solver.getType("DoBlockContext"),0)
 		constructor(ctx: ValueContext) { copyFrom(ctx) }
 	}
 	open class ValueTypeCastingContext : ValueContext {
@@ -1658,7 +1658,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			match(RPAREN) as Token
 			}}
 			4 -> {if (true){
-			_localctx = CallFuncthonContext(_localctx)
+			_localctx = CallFunctionContext(_localctx)
 			context = _localctx
 			_prevctx = _localctx
 			this.state = 307
@@ -1691,7 +1691,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			value(5)
 			}}
 			7 -> {if (true){
-			_localctx = DoExpresionContext(_localctx)
+			_localctx = DoExpressionContext(_localctx)
 			context = _localctx
 			_prevctx = _localctx
 			this.state = 315
