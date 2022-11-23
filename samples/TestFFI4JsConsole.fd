@@ -1,5 +1,10 @@
 package samples
 
+[+] (a~Int b~Int) foreign Int `a + b`
+[-] (a~Int b~Int) foreign Int `a - b`
+[*] (a~Int b~Int) foreign Int `a * b`
+[/] (a~Int b~Int) foreign Double `a / b`
+
 class Console {
     log (msg~String) Unit
 }
