@@ -7,7 +7,6 @@ interface LightValueTranspiler {
 
     fun processJustDefaultValue(fdDefaultValueContext: FoldingParser.JustDefaultValueContext): String
     fun processReflected(fdReflectedContext: FoldingParser.ReflectedContext): String
-    fun processCallInvFunc(fdCallInvFuncContext: FoldingParser.CallInvFuncContext): String
     fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String
     fun processGetFieldGlobal(fdGetFieldGlobalContext: FoldingParser.GetFieldGlobalContext): String
     fun processGetField(fdGetFieldContext: FoldingParser.GetFieldContext): String
