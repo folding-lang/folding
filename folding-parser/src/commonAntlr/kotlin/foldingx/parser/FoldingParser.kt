@@ -2596,25 +2596,11 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 	    override var ruleIndex: Int
 	        get() = Rules.RULE_commonIdentifier.id
 	        set(value) { throw RuntimeException() }
+		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
+		fun findOpIdWrap() : OpIdWrapContext? = getRuleContext(solver.getType("OpIdWrapContext"),0)
+		fun findAopIdWrap() : AopIdWrapContext? = getRuleContext(solver.getType("AopIdWrapContext"),0)
 		constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState){
 		}
-	 
-		constructor() : super() { }
-		fun copyFrom(ctx: CommonIdentifierContext) {
-			super.copyFrom(ctx)
-		}
-	}
-	open class AopIdContext : CommonIdentifierContext {
-		fun findAopIdWrap() : AopIdWrapContext? = getRuleContext(solver.getType("AopIdWrapContext"),0)
-		constructor(ctx: CommonIdentifierContext) { copyFrom(ctx) }
-	}
-	open class OpIdContext : CommonIdentifierContext {
-		fun findOpIdWrap() : OpIdWrapContext? = getRuleContext(solver.getType("OpIdWrapContext"),0)
-		constructor(ctx: CommonIdentifierContext) { copyFrom(ctx) }
-	}
-	open class JustIdContext : CommonIdentifierContext {
-		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
-		constructor(ctx: CommonIdentifierContext) { copyFrom(ctx) }
 	}
 
 	fun  commonIdentifier() : CommonIdentifierContext {
@@ -2624,19 +2610,19 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 482
 			errorHandler.sync(this)
 			when ( interpreter!!.adaptivePredict(_input!!,58,context) ) {
-			1 -> {_localctx = JustIdContext(_localctx)
+			1 -> {
 			enterOuterAlt(_localctx, 1)
 			if (true){
 			this.state = 479
 			match(ID) as Token
 			}}
-			2 -> {_localctx = OpIdContext(_localctx)
+			2 -> {
 			enterOuterAlt(_localctx, 2)
 			if (true){
 			this.state = 480
 			opIdWrap()
 			}}
-			3 -> {_localctx = AopIdContext(_localctx)
+			3 -> {
 			enterOuterAlt(_localctx, 3)
 			if (true){
 			this.state = 481
