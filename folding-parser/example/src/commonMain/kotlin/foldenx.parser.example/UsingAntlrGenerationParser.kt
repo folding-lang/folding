@@ -8,6 +8,11 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 fun usingAntlrGenerationParserTest(input: String = """
     package samples
 
+    [+] (a~Int b~Int) foreign Int `a + b`
+    [-] (a~Int b~Int) foreign Int `a - b`
+    [*] (a~Int b~Int) foreign Int `a * b`
+    [/] (a~Int b~Int) foreign Double `a / b`
+
     class Console {
         log (msg~String) Unit
     }
@@ -29,7 +34,7 @@ fun usingAntlrGenerationParserTest(input: String = """
 
     val root = parser.file()
 
-    val definitions = root.findDefinition()
+    val definitions = root.findFileCompo().mapNotNull { it.findDefinition() }
 
     println(definitions.joinToString("\n\n","=== Definitions ===\n\n","\n\n===================") {
         when {
