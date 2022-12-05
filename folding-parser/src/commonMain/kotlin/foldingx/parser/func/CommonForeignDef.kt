@@ -7,6 +7,6 @@ class CommonForeignDef(
     val id: String,
     val typeParamContext: FoldingParser.TypeParamContext?,
     val parameterContext: FoldingParser.ParameterContext?,
-    /** the return type of its func */ val typeExContext: FoldingParser.TypeExContext,
+    /** the return type of its func */ val typeExContext: FoldingParser.TypeExContext?,
     val foreignBodyContext: FoldingParser.ForeignBodyContext?
 ) : ICommonDef
