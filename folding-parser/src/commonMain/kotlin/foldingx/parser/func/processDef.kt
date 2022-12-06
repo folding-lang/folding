@@ -5,7 +5,9 @@ import foldingx.parser.identifier.processId
 
 
 fun processNativeDef(defContext: FoldingParser.DefContext) =
-    defContext.findJustDef()?.let { processJustDef(it)  to defContext.findInverseDefining().map { processInverseDef(it) } }
+    defContext.findJustDef()
+        ?.let(::processJustDef)
+        ?.let { c -> c to defContext.findInverseDefining().map { processInverseDef(c,it) } }
 
 fun processJustDef(justDefContext: FoldingParser.JustDefContext): CommonJustDef =
     CommonJustDef(
@@ -17,8 +19,11 @@ fun processJustDef(justDefContext: FoldingParser.JustDefContext): CommonJustDef 
         valueContext = justDefContext.findValue()
     )
 
-fun processInverseDef(inverseDefiningContext: FoldingParser.InverseDefiningContext): CommonInverseDef =
-    TODO("Not yet implemented")
+fun processInverseDef(parent: CommonJustDef, inverseDefiningContext: FoldingParser.InverseDefiningContext): CommonInverseDef =
+    CommonInverseDef(
+        resultId = inverseDefiningContext.ID()?.text ?: "r",
+        inverseDefCompoList = inverseDefiningContext.findInverseDefCompo()
+    )
 
 fun processForeignDef(foreignDefContext: FoldingParser.ForeignDefContext): CommonForeignDef =
     CommonForeignDef(
