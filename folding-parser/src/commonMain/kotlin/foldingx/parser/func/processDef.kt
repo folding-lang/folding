@@ -21,6 +21,7 @@ fun processJustDef(justDefContext: FoldingParser.JustDefContext): CommonJustDef 
 
 fun processInverseDef(parent: CommonJustDef, inverseDefiningContext: FoldingParser.InverseDefiningContext): CommonInverseDef =
     CommonInverseDef(
+        parent = parent,
         resultId = inverseDefiningContext.ID()?.text ?: "r",
         inverseDefCompoList = inverseDefiningContext.findInverseDefCompo()
     )
