@@ -1,13 +1,16 @@
 package foldingx.lighttranspiler
 
 import foldingx.parser.FoldingParser
+import foldingx.parser.func.CommonForeignDef
+import foldingx.parser.func.CommonInverseDef
+import foldingx.parser.func.CommonJustDef
 
 interface LightDefTranspiler {
     fun transpileDef(fdDefContext: FoldingParser.DefContext): String
 
-    fun processJustDef(fdJustDefContext: FoldingParser.JustDefContext): String
-    fun processInverseDefining(fdInverseDefiningContext: FoldingParser.InverseDefiningContext): String
-    fun processForeignDef(fdForeignDefContext: FoldingParser.ForeignDefContext): String
+    fun processJustDef(fdJustDefContext: CommonJustDef): String
+    fun processInverseDefining(fdInverseDefiningContext: CommonInverseDef): String
+    fun processForeignDef(fdForeignDefContext: CommonForeignDef): String
 
     fun processParameter(fdParameterContext: FoldingParser.ParameterContext): String
     fun processParameterFromValue(fdParameterFromValueContext: FoldingParser.ParameterFromValueContext): String
