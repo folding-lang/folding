@@ -2,7 +2,7 @@ package foldingx.lighttranspiler
 
 import foldingx.parser.FoldingParser
 
-interface LightClassTranspiler {
+interface LightClassTranspiler : LightDefTranspiler {
     fun transpileClass(fdClass_Context: FoldingParser.Class_Context): String
 
     fun processJustClass(fdJustClassContext: FoldingParser.JustClassContext): String

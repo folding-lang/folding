@@ -5,7 +5,7 @@ import foldingx.parser.func.CommonForeignDef
 import foldingx.parser.func.CommonInverseDef
 import foldingx.parser.func.CommonJustDef
 
-interface LightDefTranspiler {
+interface LightDefTranspiler : LightValueTranspiler {
     fun transpileDef(fdDefContext: FoldingParser.DefContext): String
 
     fun processJustDef(fdJustDefContext: CommonJustDef): String
