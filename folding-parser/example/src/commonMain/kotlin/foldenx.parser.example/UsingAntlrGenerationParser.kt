@@ -25,7 +25,7 @@ fun usingAntlrGenerationParserTest(input: String = """
     inverse r (T (#r - 2)/8)
 
     main Unit = do {
-        console:log(-6 |> ::myFunc)
+        console:log(-6 |> 'myFunc)
     }
 """.trimIndent()): FoldingParser.FileContext {
     val stream = CharStreams.fromString(input)
