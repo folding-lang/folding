@@ -12,7 +12,7 @@ fun usingAntlrGenerationParserTest(input: String = """
         log (msg~String) Unit
     }
 
-    [|>] T R (value~T func~ (T) -> R) R = #func[#value]
+    [|>] T R (value~T func~ (T) -> R) R = #func'(#value)
 
     console foreign Console `console`
 
