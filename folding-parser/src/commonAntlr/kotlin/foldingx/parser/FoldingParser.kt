@@ -3120,15 +3120,15 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			super.copyFrom(ctx)
 		}
 	}
+	open class CommonOpIdContext : CallingOpIdContext {
+		fun OPID() : TerminalNode? = getToken(FoldingParser.Tokens.OPID.id, 0)
+		constructor(ctx: CallingOpIdContext) { copyFrom(ctx) }
+	}
 	open class PrimitiveOpIdContext : CallingOpIdContext {
 		fun PLUS() : TerminalNode? = getToken(FoldingParser.Tokens.PLUS.id, 0)
 		fun MINUS() : TerminalNode? = getToken(FoldingParser.Tokens.MINUS.id, 0)
 		fun MULTIPLY() : TerminalNode? = getToken(FoldingParser.Tokens.MULTIPLY.id, 0)
 		fun DIVIDE() : TerminalNode? = getToken(FoldingParser.Tokens.DIVIDE.id, 0)
-		constructor(ctx: CallingOpIdContext) { copyFrom(ctx) }
-	}
-	open class CommmonOpIdContext : CallingOpIdContext {
-		fun OPID() : TerminalNode? = getToken(FoldingParser.Tokens.OPID.id, 0)
 		constructor(ctx: CallingOpIdContext) { copyFrom(ctx) }
 	}
 
@@ -3140,7 +3140,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 578
 			errorHandler.sync(this)
 			when (_input!!.LA(1)) {
-			OPID  ->  /*LL1AltBlock*/{_localctx = CommmonOpIdContext(_localctx)
+			OPID  ->  /*LL1AltBlock*/{_localctx = CommonOpIdContext(_localctx)
 			enterOuterAlt(_localctx, 1)
 			if (true){
 			this.state = 576
@@ -3186,13 +3186,13 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			super.copyFrom(ctx)
 		}
 	}
-	open class CommmonAopIdContext : CallingAopIdContext {
-		fun OPID() : TerminalNode? = getToken(FoldingParser.Tokens.OPID.id, 0)
-		constructor(ctx: CallingAopIdContext) { copyFrom(ctx) }
-	}
 	open class PrimitiveAopIdContext : CallingAopIdContext {
 		fun PLUS() : TerminalNode? = getToken(FoldingParser.Tokens.PLUS.id, 0)
 		fun MINUS() : TerminalNode? = getToken(FoldingParser.Tokens.MINUS.id, 0)
+		constructor(ctx: CallingAopIdContext) { copyFrom(ctx) }
+	}
+	open class CommonAopIdContext : CallingAopIdContext {
+		fun OPID() : TerminalNode? = getToken(FoldingParser.Tokens.OPID.id, 0)
 		constructor(ctx: CallingAopIdContext) { copyFrom(ctx) }
 	}
 
@@ -3204,7 +3204,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 			this.state = 582
 			errorHandler.sync(this)
 			when (_input!!.LA(1)) {
-			OPID  ->  /*LL1AltBlock*/{_localctx = CommmonAopIdContext(_localctx)
+			OPID  ->  /*LL1AltBlock*/{_localctx = CommonAopIdContext(_localctx)
 			enterOuterAlt(_localctx, 1)
 			if (true){
 			this.state = 580
