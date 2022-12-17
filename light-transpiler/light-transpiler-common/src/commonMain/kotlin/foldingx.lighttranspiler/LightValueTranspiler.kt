@@ -26,6 +26,7 @@ interface LightValueTranspiler {
 
     fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): String
     fun processArgEx(fdArgExContext: FoldingParser.ArgExContext): String
+    fun processInvoking(fdInvokingContext: FoldingParser.InvokingContext): String
 
     fun processParameterForLambda(fdParameterForLambdaContext: FoldingParser.ParameterForLambdaContext): String
     fun processParameterFromValueForLambda(fdParameterFromValueForLambdaContext: FoldingParser.ParameterFromValueForLambdaContext): String
