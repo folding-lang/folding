@@ -14,3 +14,11 @@ fun processId(idSource: FoldingParser.CommonIdentifierContext) = when {
         }
     else -> throw RuntimeException("'${idSource.text}' is invalid Id")
 }
+
+fun processOpId(text: String) = "OP_" + text.toCharArray().joinToString("_") {
+    it.code.toString(16)
+}
+
+fun processAopId(text: String) = "AOP_" + text.toCharArray().joinToString("_") {
+    it.code.toString(16)
+}
