@@ -45,7 +45,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processGetField(fdGetFieldContext: FoldingParser.GetFieldContext): String =
         "(${processValue(fdGetFieldContext.findValue()!!)}).${fdGetFieldContext.ID()!!.text}"
     override fun processCallMethod(fdCallMethodContext: FoldingParser.CallMethodContext): String =
-        "(${processValue(fdCallMethodContext.findValue()!!)})" + "${fdCallMethodContext.ID()!!.text}(" +
+        "(${processValue(fdCallMethodContext.findValue()!!)})." + "${fdCallMethodContext.ID()!!.text}(" +
                 (fdCallMethodContext.findArgValue()?.let { processArgValue(it) } ?: "") + ")"
     override fun processReflectedMethod(fdReflectedMethodContext: FoldingParser.ReflectedMethodContext): String =
         "(${processValue(fdReflectedMethodContext.findValue()!!)})::${fdReflectedMethodContext.ID()!!.text}"
@@ -89,7 +89,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                         "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
         } }
     override fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext): String =
-        fdDoExpressionContext.findDoBlock()!!.findCompo().joinToString("\n    ","{\n    ","\n}()") { when {
+        fdDoExpressionContext.findDoBlock()!!.findCompo().joinToString("\n","{\n") { when {
             it.findValue() != null -> processValue(it.findValue()!!)
             it.findFieldAssign() != null -> it.findFieldAssign()!!.let { that -> when(that) {
                 is FoldingParser.GlobalFieldAssignContext ->
@@ -102,7 +102,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             it.findReturning() != null -> "return " + processValue(it.findReturning()!!.findValue()!!)
 
             else -> throw RuntimeException("Invalid do-expression '${fdDoExpressionContext.text}'")
-        } }
+        } }.insertMargin(4) + "\n}()"
     override fun processJustLambda(fdJustLambdaContext: FoldingParser.JustLambdaContext): String {
         val lambdaContext = fdJustLambdaContext.findLambda()!!
         val (param,paramC) = lambdaContext.findParameterForLambda()?.let { p ->
@@ -110,9 +110,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                     p.findParameterFromValueForLambda()?.let { processParameterFromValueForLambda(it) }
         } ?: ("" to null)
         val primaryHead = "$param ->"
-        val primaryBody = ("\n"+(paramC ?: "")+"\n("+processValue(lambdaContext.findValue()!!)+")").insertMargin(4) + "\n"
+        val primaryBody = ("\n"+(paramC?.let { "$it\n" } ?: "")+
+                "("+processValue(lambdaContext.findValue()!!)+")").insertMargin(4) + "\n"
 
-        return "{ ${primaryHead + primaryBody} }"
+        return "{ ${primaryHead + primaryBody}}"
     }
     override fun processParenedValue(fdParenedValueContext: FoldingParser.ParenedValueContext): String =
         "(${processValue(fdParenedValueContext.findValue()!!)})"

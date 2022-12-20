@@ -21,24 +21,29 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     }
 
     override fun processJustDef(fdCommonJustDef: CommonJustDef): String {
-        val (tHead,tTail) = processTypeParam(fdCommonJustDef.typeParamContext!!)
+        val (tHead,tTail) = fdCommonJustDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+            " $h " to t
+        } } ?: (" " to "")
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
             processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
         } ?: ("()" to null)
-        val primaryHead = "fun $tHead ${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)}" +
+        val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
                 (tTail ?: "")
-        val primaryBody = ("{\n"+paramC+"\nreturn ("+processValue(fdCommonJustDef.valueContext!!)+")").insertMargin(4) + "\n}"
+        val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
+                "return ("+processValue(fdCommonJustDef.valueContext!!)+")").insertMargin(4) + "\n}"
 
         return primaryHead + primaryBody
     }
     override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef): String =
         TODO("Not Yet Implemented")
     override fun processForeignDef(fdCommonForeignDef: CommonForeignDef): String {
-        val (tHead,tTail) = processTypeParam(fdCommonForeignDef.typeParamContext!!)
+        val (tHead,tTail) = fdCommonForeignDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+            " $h " to t
+        } } ?: (" " to "")
         val (param,paramC) = fdCommonForeignDef.parameterContext?.let { p ->
             processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
         } ?: ("()" to null)
-        val primaryHead = "fun $tHead ${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)}" +
+        val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
                 (tTail ?: "")
         val foreignBody = fdCommonForeignDef.foreignBodyContext!!.let { when {
             it.RawString() != null -> it.RawString()!!.text.removeSurrounding("`")

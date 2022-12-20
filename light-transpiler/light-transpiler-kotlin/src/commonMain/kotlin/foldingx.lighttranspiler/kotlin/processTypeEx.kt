@@ -13,7 +13,7 @@ fun processTypeExSingle(fdTypeExSingleContext: FoldingParser.TypeExSingleContext
                 fdTypeExSingleContext.ID()!!.text +
                 (fdTypeExSingleContext.LPAREN()?.let { _ ->
                     fdTypeExSingleContext.findTypeEx().joinToString(",","<",">") { processTypeEx(it) }
-                } ?: "") + fdTypeExSingleContext
+                } ?: "")
     else fdTypeExSingleContext.findPrimitiveType()!!.text
 fun processTypeExFunc(fdTypeExFuncContext: FoldingParser.TypeExFuncContext): String =
     fdTypeExFuncContext.findTypeExParamEx().joinToString(",","(",")") {

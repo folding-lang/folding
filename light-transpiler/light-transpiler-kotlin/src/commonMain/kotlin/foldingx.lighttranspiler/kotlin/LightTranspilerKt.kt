@@ -14,8 +14,8 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext): String {
         val pkg = fdImportExContext.findPackage_()!!.text
         return fdImportExContext.findImportBody()?.findImportCompo()?.joinToString("\n") { compo ->
-            "$pkg.${compo.ID()!!.text}" + (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
-        } ?: "$pkg.*"
+            "import $pkg.${compo.ID()!!.text}" + (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
+        } ?: "import $pkg.*"
     }
     override fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext): String = when {
         fdFileCompoContext.findDefinition() != null -> processDefinition(fdFileCompoContext.findDefinition()!!)
