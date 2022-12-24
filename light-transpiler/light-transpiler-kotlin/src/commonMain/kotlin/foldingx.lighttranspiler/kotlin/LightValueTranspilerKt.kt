@@ -1,6 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightValueTranspiler
+import foldingx.lighttranspiler.exception.invalidCode
 import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.processAopId
 import foldingx.parser.identifier.processId
@@ -89,7 +90,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                         "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
         } }
     override fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext): String =
-        fdDoExpressionContext.findDoBlock()!!.findCompo().joinToString("\n","{\n") { when {
+        processDoBlock(fdDoExpressionContext.findDoBlock()!!)
+    fun processDoBlock(fdDoBlockContext: FoldingParser.DoBlockContext) =
+        fdDoBlockContext.findCompo().joinToString("\n","{\n") { when {
             it.findValue() != null -> processValue(it.findValue()!!)
             it.findFieldAssign() != null -> it.findFieldAssign()!!.let { that -> when(that) {
                 is FoldingParser.GlobalFieldAssignContext ->
@@ -101,7 +104,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             } }
             it.findReturning() != null -> "return " + processValue(it.findReturning()!!.findValue()!!)
 
-            else -> throw RuntimeException("Invalid do-expression '${fdDoExpressionContext.text}'")
+            else -> throw invalidCode("do expression",fdDoBlockContext)
         } }.insertMargin(4) + "\n}()"
     override fun processJustLambda(fdJustLambdaContext: FoldingParser.JustLambdaContext): String {
         val lambdaContext = fdJustLambdaContext.findLambda()!!
