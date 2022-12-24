@@ -5,11 +5,11 @@ import foldingx.parser.FoldingParser
 
 interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     override fun transpile(fdFileContext: FoldingParser.FileContext): String {
-        val namespace = fdFileContext.findNamespace()?.let { "package" + it.findPackage_()!!.text } ?: ""
+        val namespace = fdFileContext.findNamespace()?.let { "package " + it.findPackage_()!!.text } ?: ""
         val imports = fdFileContext.findImportEx().joinToString("\n") { processImportEx(it) }
         val allAnnotationDef = fdFileContext.findAnnotationDef().joinToString("\n") { processAnnotationDef(it) }
         val fileBody = fdFileContext.findFileCompo().joinToString("\n\n") { processFileCompo(it) }
-        return listOf(namespace,imports,allAnnotationDef,fileBody).joinToString("\n\n\n")
+        return listOf(namespace,imports,allAnnotationDef,fileBody).filter { it != "" }.joinToString("\n\n\n")
     }
     override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext): String {
         val pkg = fdImportExContext.findPackage_()!!.text

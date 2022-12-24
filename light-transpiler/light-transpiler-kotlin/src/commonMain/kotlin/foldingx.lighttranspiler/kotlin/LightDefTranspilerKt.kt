@@ -85,7 +85,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                 ?: throw RuntimeException("Can't find the foreign def targeting kotlin")
             else -> throw RuntimeException("Invalid foreign def '${fdCommonForeignDef.id}'")
         } }
-        val primaryBody = "{\n$paramC\nreturn ($foreignBody)".insertMargin(4) + "\n}"
+        val primaryBody = "{\n${paramC?.let { "$it\n" } ?: ""}return ($foreignBody)".insertMargin(4) + "\n}"
 
         return primaryHead + primaryBody
     }
