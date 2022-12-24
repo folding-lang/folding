@@ -34,8 +34,41 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
 
         return primaryHead + primaryBody
     }
-    override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef): String =
-        TODO("Not Yet Implemented")
+    override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef): String {
+        val idHead = "${fdCommonInverseDef.parent.id}_inverse"
+        val idTail = fdCommonInverseDef.inverseDefCompoList.mapIndexed { i,it -> when(it) {
+            is FoldingParser.OutputParamContext -> i.toString()
+            else -> ""
+        } }.joinToString("_","_")
+        val id = idHead + idTail
+
+        val (tHead,tTail) = fdCommonInverseDef.parent.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+            " $h " to t
+        } } ?: (" " to "")
+
+        val outputList = fdCommonInverseDef.inverseDefCompoList
+            .filterIsInstance<FoldingParser.OutputParamContext>()
+            .map { processValue(it.findValue()!!) to it.findTypeEx() }
+        val outputHead = "FdTuple${outputList.count()}<"+
+                outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
+        val output = outputList.joinToString(",","$outputHead(",")") { it.first }
+
+        val param = fdCommonInverseDef.inverseDefCompoList
+            .mapIndexed { i, it ->
+                if (it is FoldingParser.NecessaryParamContext)
+                    it.ID()!!.text to
+                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
+                else null
+            }
+            .filterNotNull().map { (pid,type) -> "$pid: $type" }
+        val primaryInput = fdCommonInverseDef.resultId + ": " + processTypeEx(fdCommonInverseDef.parent.typeExContext!!)
+
+        val primaryHead = "fun$tHead$id(${(listOf(primaryInput) + param).joinToString()}): $outputHead " +
+                (tTail ?: "")
+        val primaryBody = ("{\nreturn $output").insertMargin(4) + "\n}"
+
+        return primaryHead + primaryBody
+    }
     override fun processForeignDef(fdCommonForeignDef: CommonForeignDef): String {
         val (tHead,tTail) = fdCommonForeignDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
             " $h " to t
@@ -66,6 +99,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             "r$index" + ": " + processTypeEx(paramCExContext.findTypeEx()!!)
         }.joinToString(", ","(",")")
     }
+
     override fun processParameterFromValue(fdParameterFromValueContext: FoldingParser.ParameterFromValueContext): String =
         TODO("Not Yet Implemented")
 }
