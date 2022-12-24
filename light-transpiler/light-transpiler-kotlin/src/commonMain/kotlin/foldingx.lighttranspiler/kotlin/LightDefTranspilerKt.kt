@@ -12,9 +12,10 @@ import foldingx.parser.func.processForeignDef as processForeignDefRaw
 interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     override fun transpileDef(fdDefContext: FoldingParser.DefContext): String = when {
         fdDefContext.findJustDef() != null -> processJustDefRaw(fdDefContext.findJustDef()!!).let { p ->
-            processJustDef(p) + fdDefContext.findInverseDefining().joinToString("\n","\n") {
-                processInverseDefining(processInverseDefRaw(p,it))
-            }
+            processJustDef(p) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
+                ?.joinToString("\n", "\n") {
+                    processInverseDefining(processInverseDefRaw(p, it))
+                } ?: "")
         }
         fdDefContext.findForeignDef() != null -> processForeignDef(processForeignDefRaw(fdDefContext.findForeignDef()!!))
         else -> throw RuntimeException("Invalid def '${fdDefContext.text}'")

@@ -27,13 +27,13 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } ?: interfaceList
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", ",": ") ?: ""
 
-        val implList = (listOf(fdJustClassContext.findInherit()!!.findImpl()!!) + fdJustClassContext.findImpl())
-            .mapNotNull { it.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
+        val implList = (listOf(fdJustClassContext.findInherit()?.findImpl()) + fdJustClassContext.findImpl())
+            .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
         val vanillaDefList = fdJustClassContext.findDef().map { transpileDef(it) }
-        val defListText = (vanillaDefList + implList).joinToString("\n\n").insertMargin(4)
+        val defListText = (vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
 
         val primaryHead = "class ${fdJustClassContext.ID()!!.text}$tHead$constructor $inheritsText $tTail"
-        val primaryBody = "{\n$defListText\n}"
+        val primaryBody = "{$defListText\n}"
 
         return primaryHead + primaryBody
     }
