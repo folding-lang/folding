@@ -71,7 +71,25 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
 
         return primaryHead + primaryBody
     }
-    override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String
+    override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String {
+        val (tHead,tTail) = fdJustInterfaceContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
+            " $h " to t
+        } } ?: ("" to "")
+
+        val interfaceList = fdJustInterfaceContext.findImpl().map { processTypeEx(it.findTypeEx()!!) }
+        val inheritsText = interfaceList.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
+
+        val implList = fdJustInterfaceContext.findImpl()
+            .mapNotNull { it.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
+        val vanillaDefList = fdJustInterfaceContext.findDef().map { transpileDef(it) }
+        val defInInterfaceList = fdJustInterfaceContext.findDefInInterface().map { processDefInInterface(it) }
+        val defListText = (defInInterfaceList + vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
+
+        val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}$tHead$inheritsText $tTail"
+        val primaryBody = "{$defListText\n}"
+
+        return primaryHead + primaryBody
+    }
 
     override fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext): String {
         val fdCommonJustDef = CommonJustDef(
