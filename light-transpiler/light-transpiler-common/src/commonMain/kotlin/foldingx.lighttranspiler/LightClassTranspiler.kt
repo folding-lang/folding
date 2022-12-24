@@ -11,4 +11,6 @@ interface LightClassTranspiler : LightDefTranspiler {
     fun processJustMultiClass(fdJustMultiClassContext: FoldingParser.JustMultiClassContext): String
 
     fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext): String
+
+    fun processField(fdFieldContext: FoldingParser.FieldContext): String
 }
