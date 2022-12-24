@@ -38,6 +38,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         return primaryHead + primaryBody
     }
     override fun processJustMultiClass(fdJustMultiClassContext: FoldingParser.JustMultiClassContext): String
+    override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String
     override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String
 
     override fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext): String
