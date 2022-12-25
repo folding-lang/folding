@@ -9,7 +9,7 @@ fun usingAntlrGenerationParserTest(input: String = """
     package samples
 
     class Console {
-        log (msg~String) Unit
+        :log (msg~String) Unit
     }
 
     [|>] T R (value~T func~ (T) -> R) R = #func:(#value)
