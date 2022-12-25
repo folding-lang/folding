@@ -23,7 +23,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
 
     override fun processJustDef(fdCommonJustDef: CommonJustDef): String {
         val (tHead,tTail) = fdCommonJustDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
-            " $h " to "$t "
+            " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
             processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
@@ -44,7 +44,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         val id = idHead + idTail
 
         val (tHead,tTail) = fdCommonInverseDef.parent.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
-            " $h " to "$t "
+            " $h " to t?.let { "$t " }
         } } ?: (" " to "")
 
         val outputList = fdCommonInverseDef.inverseDefCompoList
@@ -72,7 +72,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     }
     override fun processForeignDef(fdCommonForeignDef: CommonForeignDef): String {
         val (tHead,tTail) = fdCommonForeignDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
-            " $h " to "$t "
+            " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonForeignDef.parameterContext?.let { p ->
             processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
