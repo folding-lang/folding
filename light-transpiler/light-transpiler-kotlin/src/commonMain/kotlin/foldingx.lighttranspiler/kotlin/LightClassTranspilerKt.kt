@@ -109,7 +109,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         typeParamContext: FoldingParser.TypeParamContext?
     ): String {
         val idHead = "${classId}_inverse"
-        val idTail =  (0..parameter.findParamEx().count()).joinToString("_","_")
+        val idTail =  (0 until parameter.findParamEx().count()).joinToString("_","_")
         val id = idHead + idTail
 
         val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
@@ -117,7 +117,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } } ?: (null to "")
 
         val outputList = parameter.findParamEx().map { "instance.${it.ID()!!.text}" to it.findTypeEx() }
-        val outputHead = "FdTuple${outputList.count()}<"+
+        val outputHead = "folding.FdTuple${outputList.count()}<"+
                 outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
         val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
