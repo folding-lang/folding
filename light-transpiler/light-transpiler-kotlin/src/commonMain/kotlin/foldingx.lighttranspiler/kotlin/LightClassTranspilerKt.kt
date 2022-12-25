@@ -20,7 +20,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             " $h " to t
         } } ?: ("" to "")
 
-        val constructor = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let { processParameter(it) } ?: "()"
+        val constructor = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let { processConstructorParameter(it) } ?: "()"
         val initialize = fdJustClassContext.findConstructorSelf()!!.findDoBlock()?.let {
             "\ninit " + processDoBlock(it).removeSuffix("()") + "\n"
         }?.insertMargin(4) ?: ""
@@ -31,15 +31,21 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } ?: interfaceList
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
 
+        val fieldList = fdJustClassContext.findField().map { processField(it) }
+
         val implList = (listOf(fdJustClassContext.findInherit()?.findImpl()) + fdJustClassContext.findImpl())
             .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
         val vanillaDefList = fdJustClassContext.findDef().map { transpileDef(it) }
-        val defListText = (vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
+        val compoListText = (fieldList + vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
 
         val primaryHead = "open class ${fdJustClassContext.ID()!!.text}$tHead$constructor$inheritsText $tTail"
-        val primaryBody = "{$initialize$defListText\n}"
+        val primaryBody = "{$initialize$compoListText\n}"
 
-        return primaryHead + primaryBody
+        val inverseFunctionText = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
+            makeClassInverse(fdJustClassContext.ID()!!.text, it, fdJustClassContext.findTypeParam())
+        }
+
+        return primaryHead + primaryBody + "\n" + inverseFunctionText
     }
     override fun processJustMultiClass(fdJustMultiClassContext: FoldingParser.JustMultiClassContext): String
     override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String {
@@ -48,7 +54,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } } ?: ("" to "")
 
         val constructor = fdJustAbstractClassContext.findConstructorSelf()?.let { c ->
-            c.findParameter()?.let { processParameter(it) } ?: "()"
+            c.findParameter()?.let { processConstructorParameter(it) } ?: "()"
         } ?: ""
         val initialize = fdJustAbstractClassContext.findConstructorSelf()?.findDoBlock()?.let {
             "\ninit " + processDoBlock(it).removeSuffix("()") + "\n"
@@ -60,16 +66,23 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } ?: interfaceList
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
 
+        val fieldList = fdJustAbstractClassContext.findField().map { processField(it) }
+
         val implList = (listOf(fdJustAbstractClassContext.findInherit()?.findImpl()) + fdJustAbstractClassContext.findImpl())
             .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
         val vanillaDefList = fdJustAbstractClassContext.findDef().map { transpileDef(it) }
         val defInInterfaceList = fdJustAbstractClassContext.findDefInInterface().map { processDefInInterface(it) }
-        val defListText = (defInInterfaceList + vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
+        val compoListText = (fieldList + defInInterfaceList + vanillaDefList + implList)
+            .joinToString("\n\n","\n").insertMargin(4)
 
         val primaryHead = "abstract class ${fdJustAbstractClassContext.ID()!!.text}$tHead$constructor$inheritsText $tTail"
-        val primaryBody = "{$initialize$defListText\n}"
+        val primaryBody = "{$initialize$compoListText\n}"
 
-        return primaryHead + primaryBody
+        val inverseFunctionText = fdJustAbstractClassContext.findConstructorSelf()?.findParameter()?.let {
+            makeClassInverse(fdJustAbstractClassContext.ID()!!.text, it, fdJustAbstractClassContext.findTypeParam())
+        }
+
+        return primaryHead + primaryBody + (inverseFunctionText?.let { "\n" + it } ?: "")
     }
     override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String {
         val (tHead,tTail) = fdJustInterfaceContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
@@ -83,12 +96,48 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             .mapNotNull { it.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
         val vanillaDefList = fdJustInterfaceContext.findDef().map { transpileDef(it) }
         val defInInterfaceList = fdJustInterfaceContext.findDefInInterface().map { processDefInInterface(it) }
-        val defListText = (defInInterfaceList + vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
+        val compoListText = (defInInterfaceList + vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
 
         val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}$tHead$inheritsText $tTail"
-        val primaryBody = "{$defListText\n}"
+        val primaryBody = "{$compoListText\n}"
 
         return primaryHead + primaryBody
+    }
+
+    fun makeClassInverse(
+        classId: String, parameter: FoldingParser.ParameterContext,
+        typeParamContext: FoldingParser.TypeParamContext?
+    ): String {
+        val idHead = "${classId}_inverse"
+        val idTail =  (0..parameter.findParamEx().count()).joinToString("_","_")
+        val id = idHead + idTail
+
+        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+            h to t
+        } } ?: (null to "")
+
+        val outputList = parameter.findParamEx().map { "instance.${it.ID()!!.text}" to it.findTypeEx() }
+        val outputHead = "FdTuple${outputList.count()}<"+
+                outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
+        val output = outputList.joinToString(",","$outputHead(",")") { it.first }
+
+        val primaryInput = "instance: $classId${tHead ?: ""}"
+
+        val primaryHead = "fun${tHead?.let { " $it " } ?: " "}$id($primaryInput): $outputHead " +
+                (tTail ?: "")
+        val primaryBody = ("{\nreturn $output").insertMargin(4) + "\n}"
+
+        return primaryHead + primaryBody
+    }
+
+    fun processConstructorParameter(fdParameterContext: FoldingParser.ParameterContext) = when {
+        fdParameterContext.findParameterFromValue() == null ->
+            fdParameterContext.findParamEx().joinToString(", ","(",")") {
+                (if (it.ELLIPSIS() == null) "val " else "vararg val ") + it.ID()!!.text + ": " + processTypeEx(it.findTypeEx()!!)
+            }
+        else -> fdParameterContext.findParameterFromValue()!!.findParamCEx().mapIndexed { index, paramCExContext ->
+            "r$index" + ": " + processTypeEx(paramCExContext.findTypeEx()!!)
+        }.joinToString(", ","(",")")
     }
 
     override fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext): String {
