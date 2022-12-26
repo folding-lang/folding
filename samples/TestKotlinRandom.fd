@@ -1,0 +1,6 @@
+import kotlin.random
+
+main Unit = do {
+    repeat(20 [i~Int]println(#i:toString + " : " + #Random:nextInt))
+    20 [] 20
+}

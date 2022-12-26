@@ -1,5 +1,15 @@
 rootProject.name = "folding"
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
+include("folding-generate")
+
 include("folding-parser")
 include("folding-parser:example")
 include("folding-parser:publish")
@@ -16,3 +26,16 @@ val lightTranspilerList =
             include("$lightTranspilerDirName:$it")
             it
         }
+
+
+val stdlibDirName = "folding-stdlib"
+include(stdlibDirName)
+val stdlibDir = file(stdlibDirName)
+val stdlibList =
+    stdlibDir
+        .list { dir, name -> name.contains("target") }
+        .map {
+            include("$stdlibDirName:$it")
+            it
+        }
+
