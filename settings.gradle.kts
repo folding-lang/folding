@@ -33,7 +33,7 @@ include(stdlibDirName)
 val stdlibDir = file(stdlibDirName)
 val stdlibList =
     stdlibDir
-        .list { dir, name -> name.contains("target") }
+        .list { dir, name -> name.contains("stdlib") }
         .map {
             include("$stdlibDirName:$it")
             it
