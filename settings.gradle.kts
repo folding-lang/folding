@@ -21,10 +21,19 @@ include(lightTranspilerDirName)
 val lightTranspilerDir = file(lightTranspilerDirName)
 val lightTranspilerList =
     lightTranspilerDir
-        .list { dir, name -> name.contains("transpiler") }
-        .map {
-            include("$lightTranspilerDirName:$it")
-            it
+        .listFiles { dir, name ->
+            name.contains("transpiler") && dir.isDirectory()
+        }
+        .map { dir, name ->
+            include("$lightTranspilerDirName:$name")
+            dir
+                .list { pDir, pName ->
+                    pName.contains("plugin") && pDir.isDirectory()
+                }
+                .map {
+                    include("$lightTranspilerDirName:$name:$it")
+                }
+            dir
         }
 
 
