@@ -24,7 +24,8 @@ val lightTranspilerList =
         .listFiles { dir, name ->
             name.contains("transpiler") && dir.isDirectory()
         }
-        .map { dir, name ->
+        .map { dir ->
+            val name = dir.name
             include("$lightTranspilerDirName:$name")
             dir
                 .list { pDir, pName ->
