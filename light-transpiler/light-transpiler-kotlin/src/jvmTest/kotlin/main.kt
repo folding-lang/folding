@@ -10,7 +10,7 @@ suspend fun main() {
             TODO("Not yet implemented")
         }
     }
-    val rawLexer = FoldingLexer(ANTLRFileStream.invoke("samples/TestFFI4JsConsole.fd"))
+    val rawLexer = FoldingLexer(ANTLRFileStream.invoke("folding-stdlib/src/main/folding/folding/FdTuples.fd"))
     val rawParser = FoldingParser(CommonTokenStream(rawLexer))
 
     transpiler.transpile(rawParser.file()).let(::println)
