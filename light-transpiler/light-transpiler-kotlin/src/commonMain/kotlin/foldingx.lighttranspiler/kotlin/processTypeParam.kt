@@ -9,6 +9,7 @@ fun processTypeParam(fdTypeParamContext: FoldingParser.TypeParamContext): Pair<S
     return head to tail
 }
 fun processTypeParamCompo(fdTypeParamCompoContext: FoldingParser.TypeParamCompoContext) =
-    fdTypeParamCompoContext.ID()!!.text.let { t ->
+    fdTypeParamCompoContext.ID()!!.text.let {
+        val t = it + "Class"
         t to fdTypeParamCompoContext.findTypeEx().map { "$t : ${processTypeEx(it)}" }
     }
