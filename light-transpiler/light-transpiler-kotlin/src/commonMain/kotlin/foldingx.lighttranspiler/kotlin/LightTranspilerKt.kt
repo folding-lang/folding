@@ -1,6 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightTranspiler
+import foldingx.lighttranspiler.exception.invalidCode
 import foldingx.parser.FoldingParser
 
 interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
@@ -14,7 +15,19 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext): String {
         val pkg = fdImportExContext.findPackage_()!!.text
         return fdImportExContext.findImportBody()?.findImportCompo()?.joinToString("\n") { compo ->
-            "import $pkg.${compo.ID()!!.text}" + (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
+            when {
+                compo.CLASS() == null ->
+                    "import $pkg.${compo.ID()!!.text}" +
+                            (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
+                compo.QUOTE().isEmpty() ->
+                    "import $pkg.${compo.ID()!!.text}" +
+                            (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "") +
+                            "\nimport $pkg.${compo.ID()!!.text}Class"
+                compo.QUOTE().isNotEmpty() ->
+                    "import $pkg.${compo.ID()!!.text}" +
+                            (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
+                else -> throw invalidCode("import",compo)
+            }
         } ?: "import $pkg.*"
     }
     override fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext): String = when {
