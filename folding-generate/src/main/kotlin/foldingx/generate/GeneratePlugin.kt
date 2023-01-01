@@ -4,7 +4,13 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 open class GeneratePlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        target.tasks.register("generateFdTuples",GenerateFdTuplesTask::class.java)
+    val myTasks: List<Class<out GeneratePluginTask>> = listOf(
+        GenerateFdTuplesTask::class.java
+    )
+    override fun apply(target: Project) = target.run {
+        myTasks.forEach {
+            val name = it.simpleName.removeSuffix("Task").replaceFirstChar { it.lowercase() }
+            tasks.register(name,it)
+        }
     }
 }

@@ -1,6 +1,5 @@
 package foldingx.generate
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
@@ -8,7 +7,7 @@ import org.gradle.kotlin.dsl.TaskContainerScope
 import org.gradle.kotlin.dsl.named
 import java.io.File
 
-open class GenerateFdTuplesTask : DefaultTask() {
+open class GenerateFdTuplesTask : GeneratePluginTask() {
     @Input lateinit var genFileName: String
     @Input lateinit var genDir: String
     @Input lateinit var namespace: String
