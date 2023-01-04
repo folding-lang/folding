@@ -25,18 +25,9 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             "\ninit " + processDoBlock(it).removeSuffix("()") + "\n"
         }?.insertMargin(4) ?: ""
 
-        val interfaceList = fdJustClassContext.findImpl().map { processTypeEx(it.findTypeEx()!!) }
-        val inherits = fdJustClassContext.findInherit()?.findImpl()?.findTypeEx()?.let { processTypeEx(it) }?.let {
-            listOf(it) + interfaceList
-        } ?: interfaceList
-        val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
-
-        val fieldList = fdJustClassContext.findField().map { processField(it) }
-
-        val implList = (listOf(fdJustClassContext.findInherit()?.findImpl()) + fdJustClassContext.findImpl())
-            .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
-        val vanillaDefList = fdJustClassContext.findDef().map { transpileDef(it) }
-        val compoListText = (fieldList + vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
+        val (inheritsText,compoListText) = fdJustClassContext.run {
+            makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),listOf())
+        }
 
         val primaryHead = "open class ${fdJustClassContext.ID()!!.text}Class$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{$initialize$compoListText\n}"
@@ -65,20 +56,9 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             "\ninit " + processDoBlock(it).removeSuffix("()") + "\n"
         }?.insertMargin(4) ?: ""
 
-        val interfaceList = fdJustAbstractClassContext.findImpl().map { processTypeEx(it.findTypeEx()!!) }
-        val inherits = fdJustAbstractClassContext.findInherit()?.findImpl()?.findTypeEx()?.let { processTypeEx(it) }?.let {
-            listOf(it) + interfaceList
-        } ?: interfaceList
-        val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
-
-        val fieldList = fdJustAbstractClassContext.findField().map { processField(it) }
-
-        val implList = (listOf(fdJustAbstractClassContext.findInherit()?.findImpl()) + fdJustAbstractClassContext.findImpl())
-            .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
-        val vanillaDefList = fdJustAbstractClassContext.findDef().map { transpileDef(it) }
-        val defInInterfaceList = fdJustAbstractClassContext.findDefInInterface().map { processDefInInterface(it) }
-        val compoListText = (fieldList + defInInterfaceList + vanillaDefList + implList)
-            .joinToString("\n\n","\n").insertMargin(4)
+        val (inheritsText,compoListText) = fdJustAbstractClassContext.run {
+            makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),findDefInInterface())
+        }
 
         val primaryHead = "abstract class ${fdJustAbstractClassContext.ID()!!.text}Class$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{$initialize$compoListText\n}"
@@ -94,14 +74,9 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             " $h " to (t ?: "")
         } } ?: ("" to "")
 
-        val interfaceList = fdJustInterfaceContext.findImpl().map { processTypeEx(it.findTypeEx()!!) }
-        val inheritsText = interfaceList.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
-
-        val implList = fdJustInterfaceContext.findImpl()
-            .mapNotNull { it.findImplBody()?.findDef() }.flatten().map { transpileDef(it) }
-        val vanillaDefList = fdJustInterfaceContext.findDef().map { transpileDef(it) }
-        val defInInterfaceList = fdJustInterfaceContext.findDefInInterface().map { processDefInInterface(it) }
-        val compoListText = (defInInterfaceList + vanillaDefList + implList).joinToString("\n\n","\n").insertMargin(4)
+        val (inheritsText,compoListText) = fdJustInterfaceContext.run {
+            makeClassPrimaryBody(getClassTranspilerKt(),listOf(),findDef(),null,findImpl(),findDefInInterface())
+        }
 
         val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}Class$tHead$inheritsText $tTail"
         val primaryBody = "{$compoListText\n}"
@@ -174,7 +149,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } ?: (" " to "")
         val param = fdCommonJustDef.parameterContext?.let { p -> processParameter(p) } ?: "()"
 
-        return "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
+        return "abstract fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
                 (tTail ?: "")
     }
 

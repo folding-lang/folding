@@ -122,8 +122,13 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         "(${processValue(fdParenedValueContext.findValue()!!)})"
 
     override fun processAnonymousClassObject(fdAnonymousClassObjectContext: FoldingParser.AnonymousClassObjectContext): String {
-        TODO("Not yet implemented")
+        val (i,c) = fdAnonymousClassObjectContext.run {
+            makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),listOf())
+        }
+        return "object$i" + "{$c".insertMargin(4) + "}"
     }
+
+    fun getClassTranspilerKt(): LightClassTranspilerKt
 
     override fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): String = when(fdArgValueContext) {
         is FoldingParser.PrimaryArgValueContext ->
@@ -176,6 +181,29 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     sealed class OpIdWrapper(val text: String) {
         class Common(text: String): OpIdWrapper(text)
         class Primitive(text: String): OpIdWrapper(text)
+    }
+
+    fun makeClassPrimaryBody(
+        classTranspilerKt: LightClassTranspilerKt,
+        fieldList: List<FoldingParser.FieldContext>, defList: List<FoldingParser.DefContext>,
+        inheritContext: FoldingParser.InheritContext?, implList: List<FoldingParser.ImplContext>,
+        defInInterfaceList: List<FoldingParser.DefInInterfaceContext>
+    ): Pair<String,String> {
+        val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!) }
+        val inherits = inheritContext?.findImpl()?.findTypeEx()?.let { processTypeEx(it) }?.let {
+            listOf(it) + interfaceList
+        } ?: interfaceList
+        val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
+
+        val fieldListText = fieldList.map { classTranspilerKt.processField(it) }
+
+        val implListText = (listOf(inheritContext?.findImpl()) + implList)
+            .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { classTranspilerKt.transpileDef(it) }
+        val vanillaDefList = defList.map { classTranspilerKt.transpileDef(it) }
+        val defInInterfaceListText = defInInterfaceList.map { classTranspilerKt.processDefInInterface(it) }
+        val compoListText = (fieldListText + defInInterfaceList + vanillaDefList + implListText).joinToString("\n\n","\n").insertMargin(4)
+
+        return inheritsText to compoListText
     }
 
 }
