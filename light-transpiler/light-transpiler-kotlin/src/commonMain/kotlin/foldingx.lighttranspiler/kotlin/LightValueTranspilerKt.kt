@@ -121,6 +121,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processParenedValue(fdParenedValueContext: FoldingParser.ParenedValueContext): String =
         "(${processValue(fdParenedValueContext.findValue()!!)})"
 
+    override fun processAnonymousClassObject(fdAnonymousClassObjectContext: FoldingParser.AnonymousClassObjectContext): String {
+        TODO("Not yet implemented")
+    }
+
     override fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): String = when(fdArgValueContext) {
         is FoldingParser.PrimaryArgValueContext ->
             fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
