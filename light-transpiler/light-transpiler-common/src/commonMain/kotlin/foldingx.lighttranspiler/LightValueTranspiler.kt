@@ -24,6 +24,8 @@ interface LightValueTranspiler {
     fun processJustLambda(fdJustLambdaContext: FoldingParser.JustLambdaContext): String
     fun processParenedValue(fdParenedValueContext: FoldingParser.ParenedValueContext): String
 
+    fun processAnonymousClassObject(fdAnonymousClassObjectContext: FoldingParser.AnonymousClassObjectContext): String
+
     fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): String
     fun processArgEx(fdArgExContext: FoldingParser.ArgExContext): String
     fun processInvoking(fdInvokingContext: FoldingParser.InvokingContext): String
