@@ -77,19 +77,12 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         "(${processValue(fdValueTypeCastingContext.findValue()!!)} " +
                 "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!)})"
     override fun processCallAopFunc(fdCallAopFuncContext: FoldingParser.CallAopFuncContext): String =
-        processCallingAopId(fdCallAopFuncContext.findCallingAopId()!!).let { when(it) {
-            is OpIdWrapper.Primitive -> "(${it.text}(${processValue(fdCallAopFuncContext.findValue()!!)}))"
-            is OpIdWrapper.Common -> "${it.text}(${processValue(fdCallAopFuncContext.findValue()!!)})"
-        } }
+        fdCallAopFuncContext.findCallingAopId()!!.text +
+                "(${processValue(fdCallAopFuncContext.findValue()!!)})"
     override fun processCallOpFunc(fdCallOpFuncContext: FoldingParser.CallOpFuncContext): String =
-        processCallingOpId(fdCallOpFuncContext.findCallingOpId()!!).let { when(it) {
-            is OpIdWrapper.Primitive ->
-                "${processValue(fdCallOpFuncContext.findValue(0)!!)} ${it.text} " +
-                        processValue(fdCallOpFuncContext.findValue(1)!!)
-            is OpIdWrapper.Common ->
-                "${it.text}(${processValue(fdCallOpFuncContext.findValue(0)!!)}," +
-                        "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
-        } }
+        fdCallOpFuncContext.findCallingOpId()!!.text +
+                "(${processValue(fdCallOpFuncContext.findValue(0)!!)}," +
+                "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
     override fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext): String =
         processDoBlock(fdDoExpressionContext.findDoBlock()!!)
     fun processDoBlock(fdDoBlockContext: FoldingParser.DoBlockContext) =
@@ -168,16 +161,6 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     fun processReference(fdReferenceContext: FoldingParser.ReferenceContext) =
         (fdReferenceContext.findPackage_()?.text?.let { "$it." } ?: "") +
                 processId(fdReferenceContext.findCommonIdentifier()!!)
-    fun processCallingOpId(fdCallingOpIdContext: FoldingParser.CallingOpIdContext) = when(fdCallingOpIdContext) {
-        is FoldingParser.PrimitiveOpIdContext -> OpIdWrapper.Primitive(fdCallingOpIdContext.text)
-        is FoldingParser.CommonOpIdContext -> OpIdWrapper.Common(processOpId(fdCallingOpIdContext.OPID()!!.text))
-        else -> throw RuntimeException("Invalid operator id '${fdCallingOpIdContext.text}")
-    }
-    fun processCallingAopId(fdCallingAopIdContext: FoldingParser.CallingAopIdContext) = when(fdCallingAopIdContext) {
-        is FoldingParser.PrimitiveAopIdContext -> OpIdWrapper.Primitive(fdCallingAopIdContext.text)
-        is FoldingParser.CommonAopIdContext -> OpIdWrapper.Common(processAopId(fdCallingAopIdContext.OPID()!!.text))
-        else -> throw RuntimeException("Invalid unary operator id '${fdCallingAopIdContext.text}")
-    }
 
     sealed class OpIdWrapper(val text: String) {
         class Common(text: String): OpIdWrapper(text)
