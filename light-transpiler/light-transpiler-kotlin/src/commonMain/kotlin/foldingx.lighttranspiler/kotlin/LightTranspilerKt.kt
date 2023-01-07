@@ -12,7 +12,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     ): List<FileWrapper> {
         val namespace = fdFileContextList.first().findNamespace()?.let { it.findPackage_()!!.text }
         val packagePath = namespace?.replace(".","/") ?: ""
-        val top = namespace?.let { "package \n\n" }
+        val top = namespace?.let { "package $namespace\n\n" }
 
         val importText = fdFileContextList.flatMap {
             it.findImportEx().joinToString("\n") { processImportEx(it) }.split("\n")
