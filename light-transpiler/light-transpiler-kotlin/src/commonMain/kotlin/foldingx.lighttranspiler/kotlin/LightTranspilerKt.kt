@@ -1,11 +1,62 @@
 package foldingx.lighttranspiler.kotlin
 
+import foldingx.lighttranspiler.FileWrapper
 import foldingx.lighttranspiler.LightTranspiler
 import foldingx.lighttranspiler.exception.invalidCode
 import foldingx.parser.FoldingParser
 
 interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
-    override fun transpile(fdFileContext: FoldingParser.FileContext): String {
+    override fun transpilePackage(
+        sourcesRoot: String,
+        fdFileContextList: List<FoldingParser.FileContext>
+    ): List<FileWrapper> {
+        val namespace = fdFileContextList.first().findNamespace()?.let { it.findPackage_()!!.text }
+        val packagePath = namespace?.replace(".","/") ?: ""
+        val top = namespace?.let { "package \n\n" }
+
+        val importText = fdFileContextList.flatMap {
+            it.findImportEx().joinToString("\n") { processImportEx(it) }.split("\n")
+        }.distinct().joinToString("\n")
+
+        val defList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findDef() } }
+        val annotationDefList = fdFileContextList.flatMap { it.findAnnotationDef() }
+        val globalFieldList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findField() } }
+        val classList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findClass_() } }
+
+        val classFiles = classList.map {
+            val classId = when(it) {
+                is FoldingParser.JustInterfaceContext -> it.ID()!!.text
+                is FoldingParser.JustClassContext -> it.ID()!!.text
+                is FoldingParser.JustAbstractClassContext -> it.ID()!!.text
+                else -> throw RuntimeException()
+            }
+            FileWrapper(
+                "$sourcesRoot/$packagePath",
+                "$classId.kt",
+                top + importText + "\n\n\n" + transpileClass(it)
+            )
+        }
+
+        val annotationDefFile = annotationDefList.map {
+            FileWrapper(
+                "$sourcesRoot/$packagePath",
+                it.ID()!!.text + ".kt",
+                top + importText + "\n\n\n" + processAnnotationDef(it)
+            )
+        }
+
+        val defaultFile = FileWrapper(
+            "$sourcesRoot/$packagePath",
+            "Default.kt",
+            top + importText +
+                    globalFieldList.joinToString("\n\n\n","\n\n") { processField(it) } +
+                    defList.joinToString("\n\n\n","\n\n") { processDef(it) }
+        )
+
+        return listOf(defaultFile) + annotationDefFile + classFiles
+    }
+
+    override fun transpileFile(fdFileContext: FoldingParser.FileContext): String {
         val namespace = fdFileContext.findNamespace()?.let { "package " + it.findPackage_()!!.text } ?: ""
         val imports = fdFileContext.findImportEx().joinToString("\n") { processImportEx(it) }
         val allAnnotationDef = fdFileContext.findAnnotationDef().joinToString("\n") { processAnnotationDef(it) }
