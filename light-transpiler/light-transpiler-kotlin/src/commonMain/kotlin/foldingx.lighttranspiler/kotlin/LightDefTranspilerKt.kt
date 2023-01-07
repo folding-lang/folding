@@ -43,9 +43,9 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef): String {
         val idHead = "${fdCommonInverseDef.parent.id}_inverse"
         val idTail = fdCommonInverseDef.inverseDefCompoList.mapIndexed { i,it -> when(it) {
-            is FoldingParser.OutputParamContext -> i.toString()
-            else -> ""
-        } }.joinToString("_","_")
+            is FoldingParser.OutputParamContext -> "_$i"
+            else -> "__"
+        } }.joinToString("")
         val id = idHead + idTail
 
         val (tHead,tTail) = fdCommonInverseDef.parent.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
