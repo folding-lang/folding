@@ -3,7 +3,8 @@ package foldingx.lighttranspiler
 import foldingx.parser.FoldingParser
 
 interface LightTranspiler : LightClassTranspiler {
-    fun transpile(fdFileContext: FoldingParser.FileContext): String
+    fun transpilePackage(sourcesRoot: String,fdFileContextList: List<FoldingParser.FileContext>): List<FileWrapper>
+    fun transpileFile(fdFileContext: FoldingParser.FileContext): String
     fun processImportEx(fdImportExContext: FoldingParser.ImportExContext): String
     fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext): String
     fun processDefinition(fdDefinitionContext: FoldingParser.DefinitionContext): String
