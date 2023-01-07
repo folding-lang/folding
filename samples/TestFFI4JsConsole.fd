@@ -9,7 +9,7 @@ class Console {
 console foreign Console `console`
 
 myFunc T ~ Calc(T) (x~T) T = (#x + 2) + (#x * 7)
-inverse r (T (#r - 2)/8)
+inverse r ((#r - 2)/8 ~T)
 
 main Unit = do {
     console:log(-6 |> 'myFunc)
