@@ -3,12 +3,6 @@ package foldingx.parser.func
 import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.processId
 
-
-fun processNativeDef(defContext: FoldingParser.DefContext) =
-    defContext.findJustDef()
-        ?.let(::processJustDef)
-        ?.let { c -> c to defContext.findInverseDefining().map { processInverseDef(c,it) } }
-
 fun processJustDef(justDefContext: FoldingParser.JustDefContext): CommonJustDef =
     CommonJustDef(
         annotationBlockContext = justDefContext.findAnnotationBlock(),
