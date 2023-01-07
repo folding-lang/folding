@@ -38,7 +38,10 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
                 "return ("+processValue(fdCommonJustDef.valueContext!!)+")").insertMargin(4) + "\n}"
 
-        return primaryHead + primaryBody
+        val annotation = fdCommonJustDef.annotationBlockContext
+            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        return annotation + primaryHead + primaryBody
     }
     override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef): String {
         val idHead = "${fdCommonInverseDef.parent.id}_inverse"
@@ -96,7 +99,10 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         } }
         val primaryBody = "{\n${paramC?.let { "$it\n" } ?: ""}return ($foreignBody)".insertMargin(4) + "\n}"
 
-        return primaryHead + primaryBody
+        val annotation = fdCommonForeignDef.annotationBlockContext
+            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        return annotation + primaryHead + primaryBody
     }
 
     override fun processParameter(fdParameterContext: FoldingParser.ParameterContext): String = when {

@@ -41,7 +41,10 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             fdJustClassContext.findTypeParam()
         )
 
-        return primaryHead + primaryBody + "\n" + constructFunctionText + "\n" + (inverseFunctionText ?: "")
+        val annotation = fdJustClassContext.findAnnotationBlock()
+            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        return annotation + primaryHead + primaryBody + "\n" + constructFunctionText + "\n" + (inverseFunctionText ?: "")
     }
     override fun processJustMultiClass(fdJustMultiClassContext: FoldingParser.JustMultiClassContext): String
     override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String {
@@ -67,7 +70,10 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassInverse(fdJustAbstractClassContext.ID()!!.text, it, fdJustAbstractClassContext.findTypeParam())
         }
 
-        return primaryHead + primaryBody + (inverseFunctionText?.let { "\n" + it } ?: "")
+        val annotation = fdJustAbstractClassContext.findAnnotationBlock()
+            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        return annotation + primaryHead + primaryBody + (inverseFunctionText?.let { "\n" + it } ?: "")
     }
     override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String {
         val (tHead,tTail) = fdJustInterfaceContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
@@ -81,7 +87,10 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}Class$tHead$inheritsText $tTail"
         val primaryBody = "{$compoListText\n}"
 
-        return primaryHead + primaryBody
+        val annotation = fdJustInterfaceContext.findAnnotationBlock()
+            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        return annotation + primaryHead + primaryBody
     }
 
     fun makeConstructFunction(
