@@ -53,10 +53,13 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         } } ?: (" " to "")
 
         val outputList = fdCommonInverseDef.inverseDefCompoList
-            .filterIsInstance<FoldingParser.OutputParamContext>()
-            .map { processValue(it.findValue()!!) to it.findTypeEx() }
+            .mapIndexed { i, it ->
+                if (it is FoldingParser.OutputParamContext)
+                    processValue(it.findValue()!!) to (it.findTypeEx() ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
+                else null
+            }.filterNotNull()
         val outputHead = "folding.FdTuple${outputList.count()}<"+
-                outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
+                outputList.joinToString(",") { (_,t) -> processTypeEx(t) } +">"
         val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
         val param = fdCommonInverseDef.inverseDefCompoList
