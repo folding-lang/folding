@@ -19,7 +19,7 @@ fun processJustDef(justDefContext: FoldingParser.JustDefContext): CommonJustDef 
         valueContext = justDefContext.findValue()
     )
 
-fun processInverseDef(parent: CommonJustDef, inverseDefiningContext: FoldingParser.InverseDefiningContext): CommonInverseDef =
+fun processInverseDef(parent: ICommonDef, inverseDefiningContext: FoldingParser.InverseDefiningContext): CommonInverseDef =
     CommonInverseDef(
         parent = parent,
         resultId = inverseDefiningContext.ID()?.text ?: "r",
