@@ -5,37 +5,37 @@ package folding
 [*] (x~Int y~Int) foreign Int `x * y` inverse r (~>x  #r / #x) inverse r (#r / #y  ~>y)
 [/] (x~Int y~Int) foreign Int `x / y` inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Int y~Int) foreign Int `x % y`
-[~ +] (x~Int) foreign Int `x` inverse r (r)
-[~ -] (x~Int) foreign Int `-x` inverse r (-r)
+[~ +] (x~Int) foreign Int `x` inverse r (#r)
+[~ -] (x~Int) foreign Int `-x` inverse r (-#r)
 
 [+] (x~Long y~Long) foreign Long `x + y` inverse r (~>x  #r - #x) inverse r (#r - #y  ~>y)
 [-] (x~Long y~Long) foreign Long `x - y` inverse r (~>x  #x - #r) inverse r (#r + #y  ~>y)
 [*] (x~Long y~Long) foreign Long `x * y` inverse r (~>x  #r / #x) inverse r (#r / #y  ~>y)
 [/] (x~Long y~Long) foreign Long `x / y` inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Long y~Long) foreign Long `x % y`
-[~ +] (x~Long) foreign Long `x` inverse r (r)
-[~ -] (x~Long) foreign Long `-x` inverse r (-r)
+[~ +] (x~Long) foreign Long `x` inverse r (#r)
+[~ -] (x~Long) foreign Long `-x` inverse r (-#r)
 
 [+] (x~Byte y~Byte) foreign Int `x + y` inverse r (~>x  #r - #x) inverse r (#r - #y  ~>y)
 [-] (x~Byte y~Byte) foreign Int `x - y` inverse r (~>x  #x - #r) inverse r (#r + #y  ~>y)
 [*] (x~Byte y~Byte) foreign Int `x * y` inverse r (~>x  #r / #x) inverse r (#r / #y  ~>y)
 [/] (x~Byte y~Byte) foreign Int `x / y` inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Byte y~Byte) foreign Int `x % y`
-[~ +] (x~Byte) foreign Int `x` inverse r (r)
-[~ -] (x~Byte) foreign Int `-x` inverse r (-r)
+[~ +] (x~Byte) foreign Int `x` inverse r (#r)
+[~ -] (x~Byte) foreign Int `-x` inverse r (-#r)
 
 [+] (x~Double y~Double) foreign Double `x + y` inverse r (~>x  #r - #x) inverse r (#r - #y  ~>y)
 [-] (x~Double y~Double) foreign Double `x - y` inverse r (~>x  #x - #r) inverse r (#r + #y  ~>y)
 [*] (x~Double y~Double) foreign Double `x * y` inverse r (~>x  #r / #x) inverse r (#r / #y  ~>y)
 [/] (x~Double y~Double) foreign Double `x / y` inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Double y~Double) foreign Double `x % y`
-[~ +] (x~Double) foreign Double `x` inverse r (r)
-[~ -] (x~Double) foreign Double `-x` inverse r (-r)
+[~ +] (x~Double) foreign Double `x` inverse r (#r)
+[~ -] (x~Double) foreign Double `-x` inverse r (-#r)
 
 [+] (x~Float y~Float) foreign Float `x + y` inverse r (~>x  #r - #x) inverse r (#r - #y  ~>y)
 [-] (x~Float y~Float) foreign Float `x - y` inverse r (~>x  #x - #r) inverse r (#r + #y  ~>y)
 [*] (x~Float y~Float) foreign Float `x * y` inverse r (~>x  #r / #x) inverse r (#r / #y  ~>y)
 [/] (x~Float y~Float) foreign Float `x / y` inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Float y~Float) foreign Float `x % y`
-[~ +] (x~Float) foreign Float `x` inverse r (r)
-[~ -] (x~Float) foreign Float `-x` inverse r (-r)
+[~ +] (x~Float) foreign Float `x` inverse r (#r)
+[~ -] (x~Float) foreign Float `-x` inverse r (-#r)
