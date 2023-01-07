@@ -9,7 +9,6 @@ import foldingx.parser.identifier.processId
 interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
     override fun transpileClass(fdClass_Context: FoldingParser.Class_Context): String = when(fdClass_Context) {
         is FoldingParser.JustClassContext -> processJustClass(fdClass_Context)
-        is FoldingParser.JustMultiClassContext -> processJustMultiClass(fdClass_Context)
         is FoldingParser.JustAbstractClassContext -> processJustAbstractClass(fdClass_Context)
         is FoldingParser.JustInterfaceContext -> processJustInterface(fdClass_Context)
         else -> throw invalidCode("class",fdClass_Context)
@@ -46,7 +45,6 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
 
         return annotation + primaryHead + primaryBody + "\n" + constructFunctionText + "\n" + (inverseFunctionText ?: "")
     }
-    override fun processJustMultiClass(fdJustMultiClassContext: FoldingParser.JustMultiClassContext): String
     override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String {
         val (tHead,tTail) = fdJustAbstractClassContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
             h to (t ?: "")
