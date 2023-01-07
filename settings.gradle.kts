@@ -8,8 +8,6 @@ pluginManagement {
     }
 }
 
-include("folding-generate")
-
 include("folding-parser")
 include("folding-parser:example")
 include("folding-parser:publish")
@@ -22,19 +20,13 @@ val lightTranspilerDir = file(lightTranspilerDirName)
 val lightTranspilerList =
     lightTranspilerDir
         .listFiles { dir, name ->
-            name.contains("transpiler") && dir.isDirectory()
+            name.contains("transpiler")
         }
-        .map { dir ->
-            val name = dir.name
+        .mapNotNull {
+            if (!it.isDirectory) return@mapNotNull null
+            val name = it.name
             include("$lightTranspilerDirName:$name")
-            dir
-                .list { pDir, pName ->
-                    pName.contains("plugin") && pDir.isDirectory()
-                }
-                .map {
-                    include("$lightTranspilerDirName:$name:$it")
-                }
-            dir
+            it
         }
 
 
@@ -43,9 +35,28 @@ include(stdlibDirName)
 val stdlibDir = file(stdlibDirName)
 val stdlibList =
     stdlibDir
-        .list { dir, name -> name.contains("stdlib") }
-        .map {
-            include("$stdlibDirName:$it")
+        .listFiles { dir, name ->
+            name.contains("stdlib")
+        }
+        .mapNotNull {
+            if (!it.isDirectory) return@mapNotNull null
+            val name = it.name
+            include("$stdlibDirName:$name")
+            it
+        }
+
+val pluginsDirName = "folding-plugins"
+include(pluginsDirName)
+val pluginsDir = file(pluginsDirName)
+val pluginsList =
+    pluginsDir
+        .listFiles { dir, name ->
+            name.contains("folding")
+        }
+        .mapNotNull {
+            if (!it.isDirectory) return@mapNotNull null
+            val name = it.name
+            include("$pluginsDirName:$name")
             it
         }
 
