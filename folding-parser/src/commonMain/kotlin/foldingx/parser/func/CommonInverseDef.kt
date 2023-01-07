@@ -6,4 +6,4 @@ class CommonInverseDef(
     val parent: CommonJustDef,
     val resultId: String,
     val inverseDefCompoList: List<FoldingParser.InverseDefCompoContext>
-) : ICommonDef
+)
