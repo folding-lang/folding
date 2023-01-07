@@ -77,10 +77,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         "(${processValue(fdValueTypeCastingContext.findValue()!!)} " +
                 "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!)})"
     override fun processCallAopFunc(fdCallAopFuncContext: FoldingParser.CallAopFuncContext): String =
-        fdCallAopFuncContext.findCallingAopId()!!.text +
+        processAopId(fdCallAopFuncContext.findCallingAopId()!!.text) +
                 "(${processValue(fdCallAopFuncContext.findValue()!!)})"
     override fun processCallOpFunc(fdCallOpFuncContext: FoldingParser.CallOpFuncContext): String =
-        fdCallOpFuncContext.findCallingOpId()!!.text +
+        processOpId(fdCallOpFuncContext.findCallingOpId()!!.text) +
                 "(${processValue(fdCallOpFuncContext.findValue(0)!!)}," +
                 "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
     override fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext): String =
@@ -175,7 +175,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     ): Pair<String,String> {
         val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!) }
         val inherits = inheritContext?.findImpl()?.findTypeEx()?.let { processTypeEx(it) }?.let {
-            listOf(it) + interfaceList
+            listOf(it + (inheritContext.findArgValue()?.let { "(${processArgValue(it)})" } ?: "()")) + interfaceList
         } ?: interfaceList
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
 
