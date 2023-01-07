@@ -61,7 +61,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                     processValue(it.findValue()!!) to (it.findTypeEx() ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
                 else null
             }.filterNotNull()
-        val outputHead = "folding.FdTuple${outputList.count()}<"+
+        val outputHead = "folding.FdTuple${outputList.count()}Class<"+
                 outputList.joinToString(",") { (_,t) -> processTypeEx(t) } +">"
         val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
