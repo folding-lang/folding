@@ -17,7 +17,12 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                     processInverseDefining(processInverseDefRaw(p, it))
                 } ?: "")
         }
-        fdDefContext.findForeignDef() != null -> processForeignDef(processForeignDefRaw(fdDefContext.findForeignDef()!!))
+        fdDefContext.findForeignDef() != null -> processForeignDefRaw(fdDefContext.findForeignDef()!!).let { p ->
+            processForeignDef(p) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
+                ?.joinToString("\n", "\n") {
+                    processInverseDefining(processInverseDefRaw(p, it))
+                } ?: "")
+        }
         else -> throw RuntimeException("Invalid def '${fdDefContext.text}'")
     }
 
