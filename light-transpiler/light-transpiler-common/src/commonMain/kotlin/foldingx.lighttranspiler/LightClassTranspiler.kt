@@ -8,7 +8,6 @@ interface LightClassTranspiler : LightDefTranspiler {
     fun processJustClass(fdJustClassContext: FoldingParser.JustClassContext): String
     fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String
     fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String
-    fun processJustMultiClass(fdJustMultiClassContext: FoldingParser.JustMultiClassContext): String
 
     fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext): String
 
