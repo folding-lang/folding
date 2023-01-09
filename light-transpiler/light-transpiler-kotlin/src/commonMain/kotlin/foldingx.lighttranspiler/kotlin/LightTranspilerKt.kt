@@ -23,19 +23,23 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
         val globalFieldList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findField() } }
         val classList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findClass_() } }
 
-        val classFiles = classList.map {
+        val (classFiles,constructFuncTexts) = classList.map {
             val classId = when(it) {
                 is FoldingParser.JustInterfaceContext -> it.ID()!!.text
                 is FoldingParser.JustClassContext -> it.ID()!!.text
                 is FoldingParser.JustAbstractClassContext -> it.ID()!!.text
                 else -> throw RuntimeException()
             }
+            val transpiled = transpileClass(it)
+            val classText = transpiled.substringBeforeLast("/** folding class constructor function */\n")
+            val constructText = "/** folding class constructor function */\n" +
+                    transpiled.substringAfterLast("/** folding class constructor function */\n")
             FileWrapper(
                 "$sourcesRoot/$packagePath",
                 "$classId.kt",
-                top + importText + "\n\n\n" + transpileClass(it)
-            )
-        }
+                top + importText + "\n\n\n" + classText
+            ) to constructText
+        }.unzip()
 
         val annotationDefFile = annotationDefList.map {
             FileWrapper(
@@ -49,8 +53,9 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             "$sourcesRoot/$packagePath",
             "Default.kt",
             top + importText +
-                    globalFieldList.joinToString("\n\n\n","\n\n") { processField(it) } +
-                    defList.joinToString("\n\n\n","\n\n") { processDef(it) }
+                    globalFieldList.joinToString("\n\n","\n\n\n") { processField(it) } +
+                    constructFuncTexts.joinToString("\n\n","\n\n\n") +
+                    defList.joinToString("\n\n","\n\n\n") { processDef(it) }
         )
 
         return listOf(defaultFile) + annotationDefFile + classFiles
