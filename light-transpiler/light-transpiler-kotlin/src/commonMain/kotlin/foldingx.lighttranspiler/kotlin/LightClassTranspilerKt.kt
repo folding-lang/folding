@@ -101,7 +101,8 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         val (param,paramC) = parameter?.let { p ->
             processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
         } ?: ("()" to null)
-        val primaryHead = "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +
+        val primaryHead = "/** folding class constructor function */\n" +
+                "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +
                 (tTail ?: "")
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
                 "return ${classId}Class${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
