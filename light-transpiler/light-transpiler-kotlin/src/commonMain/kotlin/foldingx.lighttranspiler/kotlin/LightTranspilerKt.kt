@@ -70,13 +70,14 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     }
     override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext): String {
         val pkg = fdImportExContext.findPackage_()!!.text
+        val importNestId = fdImportExContext.findImportNest()?.let { "." + it.ID()!!.text }
         return fdImportExContext.findImportBody()?.findImportCompo()?.joinToString("\n") { compo ->
             when {
                 compo.CLASS() == null ->
-                    "import $pkg.${compo.ID()!!.text}" +
+                    "import $pkg${importNestId ?: ""}.${compo.ID()!!.text}" +
                             (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
                 compo.QUOTE().isEmpty() ->
-                    "import $pkg.${compo.ID()!!.text}" +
+                    "import $pkg${importNestId ?: ""}.${compo.ID()!!.text}" +
                             (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "") +
                             "\nimport $pkg.${compo.ID()!!.text}Class"
                 compo.QUOTE().isNotEmpty() ->
@@ -84,7 +85,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                             (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
                 else -> throw invalidCode("import",compo)
             }
-        } ?: "import $pkg.*"
+        } ?: ((importNestId?.let { "import $pkg$it.*\n" } ?: "") + "import $pkg.*")
     }
     override fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext): String = when {
         fdFileCompoContext.findDefinition() != null -> processDefinition(fdFileCompoContext.findDefinition()!!)
