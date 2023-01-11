@@ -15,7 +15,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
         val top = namespace?.let { "package $namespace\n\n" }
 
         val importText = fdFileContextList.flatMap {
-            it.findImportEx().joinToString("\n") { processImportEx(it) }.split("\n")
+            it.findImportEx().flatMap { processImportEx(it).split("\n") }
         }.distinct().joinToString("\n")
 
         val defList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findDef() } }
@@ -63,7 +63,9 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
 
     override fun transpileFile(fdFileContext: FoldingParser.FileContext): String {
         val namespace = fdFileContext.findNamespace()?.let { "package " + it.findPackage_()!!.text } ?: ""
-        val imports = fdFileContext.findImportEx().joinToString("\n") { processImportEx(it) }
+        val imports = fdFileContext.findImportEx()
+            .flatMap { processImportEx(it).split("\n") }
+            .distinct().joinToString("\n")
         val allAnnotationDef = fdFileContext.findAnnotationDef().joinToString("\n") { processAnnotationDef(it) }
         val fileBody = fdFileContext.findFileCompo().joinToString("\n\n") { processFileCompo(it) }
         return listOf(namespace,imports,allAnnotationDef,fileBody).filter { it != "" }.joinToString("\n\n\n")
