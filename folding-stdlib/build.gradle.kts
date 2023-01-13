@@ -1,4 +1,4 @@
-import foldingx.generate.generateFdTuples
+import foldingx.generate.gradle.generateFdTuples
 
 plugins {
     kotlin("jvm")
@@ -10,7 +10,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("foldingx:folding-generate:1.0-SNAPSHOT")
+        classpath("io.github.folding-lang:folding-generate:1.0-SNAPSHOT")
     }
 }
 
