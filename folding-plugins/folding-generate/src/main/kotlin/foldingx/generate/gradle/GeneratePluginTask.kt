@@ -1,4 +1,4 @@
-package foldingx.generate
+package foldingx.generate.gradle
 
 import org.gradle.api.DefaultTask
 

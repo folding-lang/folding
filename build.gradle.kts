@@ -3,6 +3,7 @@ plugins {
 }
 
 allprojects {
+    group = "io.github.folding-lang"
     repositories {
         mavenLocal()
         mavenCentral()
