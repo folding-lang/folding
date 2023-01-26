@@ -3,7 +3,6 @@ package foldingx.lighttranspiler.kotlin.gradle
 import foldingx.gradle.base.FoldingBasePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
 
 open class LightTranspilerKtPlugin : Plugin<Project> {
     val myTasks: List<Class<out LightTranspilerKtPluginTask>> = listOf(
@@ -18,6 +17,8 @@ open class LightTranspilerKtPlugin : Plugin<Project> {
             val name = it.simpleName.removeSuffix("Task").replaceFirstChar { it.lowercase() }
             tasks.register(name,it)
         }
+
+        
 
     }
 }

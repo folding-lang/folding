@@ -1,6 +1,9 @@
 package foldingx.lighttranspiler.kotlin.gradle
 
 import foldingx.gradle.base.folding
+import foldingx.lighttranspiler.kotlin.DefaultLightTranspilerKt
+import foldingx.lighttranspiler.kotlin.LightClassTranspilerKt
+import foldingx.lighttranspiler.kotlin.LightTranspilerKt
 import foldingx.parser.FoldingLexer
 import foldingx.parser.FoldingParser
 import org.antlr.v4.kotlinruntime.CharStreams
@@ -15,6 +18,7 @@ open class LightTranspileFoldingToKotlinTask : LightTranspilerKtPluginTask() {
 
     @TaskAction
     fun task() {
+        val transpiler = DefaultLightTranspilerKt
         val sourceSets = project.folding.sourcesSets.filter { it.target?.equals("kotlin") ?: true  }
         sourceSets.forEach { set ->
             val inputPath = "src/${set.name}/folding"
@@ -23,24 +27,27 @@ open class LightTranspileFoldingToKotlinTask : LightTranspilerKtPluginTask() {
             val inputDir = File(inputPath)
             if (!inputDir.exists()) return
 
-            val outputDir = File(outputPath)
-
             val files = inputDir.walk()
             val fileContextsByPackage = files
                 .filterNot { it.isDirectory }
                 .map {
-                    FoldingParser(CommonTokenStream(FoldingLexer(CharStreams.fromFileName(it.readText())))).file()
+                    FoldingParser(CommonTokenStream(FoldingLexer(CharStreams.fromString(it.readText())))).file()
                 }
                 .groupBy { it.findNamespace()?.findPackage_()?.text }
 
             val transpiledList = fileContextsByPackage.values.flatMap {
-                LightTranspilerKtInstance.transpilePackage(outputPath,it)
+                transpiler.transpilePackage(outputPath,it)
             }
-            val transpiledDirs = transpiledList.map { it.dirText }.distinct().map {
-                File(it).apply { mkdirs() }
+            val transpiledDirsToTranspiled = transpiledList.map {
+                File(it.dirText).apply { mkdirs() } to it
             }
-            val transpileFiles = transpiledList.map {
-                val file = File(it.dirText + File.separator + it.name)
+            File(outputPath).mkdir()
+            println("Pass!_2")
+            val transpileFiles = transpiledDirsToTranspiled.map { (dir,it) ->
+                val file = File(dir,it.name)
+                dir.mkdir()
+                println(dir.path)
+                println(file.path)
                 file.createNewFile()
                 file.writeText(it.content)
                 file

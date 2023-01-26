@@ -21,7 +21,7 @@ fun main() {
 
     val fileWrapperList = transpiler.transpilePackage(sourceRoot,fileContextList)
 
-    val outputSourceRoot = "folding-stdlib/folding-stdlib-kotlin/src/commonMain/kotlin"
+    val outputSourceRoot = "folding-stdlib/src/main/kotlin"
     val outputFileList = fileWrapperList.map {
         File(it.dirText.replace(sourceRoot,outputSourceRoot)).mkdirs()
         File(it.dirText.replace(sourceRoot,outputSourceRoot) + "/${it.name}").apply {

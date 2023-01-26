@@ -185,4 +185,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         }
         else -> throw RuntimeException("Invalid field '${fdFieldContext.text}'")
     }
+
+
+    override fun getClassTranspilerKt(): LightClassTranspilerKt = this
 }

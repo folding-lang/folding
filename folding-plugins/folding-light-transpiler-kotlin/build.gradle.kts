@@ -1,4 +1,4 @@
-version = "1.0-SNAPSHOT"
+version = project(":light-transpiler:light-transpiler-kotlin").version
 
 dependencies {
     implementation(project(":folding-plugins:folding-base"))
@@ -10,7 +10,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("foldingLightTranspilerKt") {
-            id = "folding.lighttranspiler.kotlin"
+            id = "io.github.folding-lang.folding.lighttranspiler.kotlin"
             implementationClass = "foldingx.lighttranspiler.kotlin.gradle.LightTranspilerKtPlugin"
         }
     }

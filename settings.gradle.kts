@@ -5,12 +5,12 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         mavenLocal()
+        maven(url="https://jitpack.io")
     }
 }
 
 include("folding-parser")
 include("folding-parser:example")
-include("folding-parser:publish")
 
 include("folding-parserx")
 
