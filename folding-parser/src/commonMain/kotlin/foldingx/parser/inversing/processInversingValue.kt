@@ -13,11 +13,11 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
 
     return invSeqList.flatMap { invSeq ->
         if (value is FoldingParser.OutputOfInversingContext) {
-            return@flatMap listOf(invSeq + CallWrapper(value.ID()?.text ?: "?", mutableListOf(), 0))
+            return@flatMap listOf(invSeq + CallWrapper(value.ID()?.text ?: "?", listOf(), -1))
         }
 
 
-        val id = when (value) {
+        val idPre = when (value) {
             is FoldingParser.CallFunctionContext -> processId(value.findReference()!!.findCommonIdentifier()!!)
             is FoldingParser.CallAopFuncContext -> processAopId(value.findCallingAopId()!!.text)
             is FoldingParser.CallOpFuncContext -> processOpId(value.findCallingOpId()!!.text)
@@ -33,6 +33,11 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
             is FoldingParser.CallOpFuncContext -> value.findValue()
             else -> throw RuntimeException()
         }
+
+        val id = idPre + "_inverse" + values.mapIndexed { i, it ->
+            if (isInverseValue(it)) "_$i"
+            else "__"
+        }.joinToString("")
 
         val invValues = values.filter { isInverseValue(it) }
         val justValues = values - invValues.toSet()

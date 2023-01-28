@@ -6,6 +6,7 @@ import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.processAopId
 import foldingx.parser.identifier.processId
 import foldingx.parser.identifier.processOpId
+import foldingx.parser.inversing.processInverseValue
 
 interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processValue(fdValueContext: FoldingParser.ValueContext): String = when(fdValueContext) {
@@ -24,6 +25,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.ValueTypeCastingContext -> processValueTypeCasting(fdValueContext)
         is FoldingParser.CallAopFuncContext -> processCallAopFunc(fdValueContext)
         is FoldingParser.CallOpFuncContext -> processCallOpFunc(fdValueContext)
+        is FoldingParser.LetExpressionContext -> processLetExpression(fdValueContext)
         is FoldingParser.DoExpressionContext -> processDoExpression(fdValueContext)
         is FoldingParser.JustLambdaContext -> processJustLambda(fdValueContext)
         is FoldingParser.ParenedValueContext -> processParenedValue(fdValueContext)
@@ -60,19 +62,11 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processTakeNull(fdTakeNullContext: FoldingParser.TakeNullContext): String =
         "((${processValue(fdTakeNullContext.findValue(0)!!)}) ?: (${processValue(fdTakeNullContext.findValue(1)!!)}))"
     override fun processIfExpression(fdIfExpressionContext: FoldingParser.IfExpressionContext): String =
-        fdIfExpressionContext.findIf_else()!!.let { if_else -> when(if_else) {
-            is FoldingParser.DirectJudgeContext ->
-                "(if (" + processValue(if_else.findValue(0)!!) + ") (" +
-                        processValue(if_else.findValue(1)!!) + ") else (" +
-                        processValue(if_else.findValue(2)!!) + "))"
-            is FoldingParser.BindingJudgeContext ->
-                "(${processValue(if_else.findValue(0)!!)}).let { " + (if_else.ID()?.text?.let { "$it -> " } ?: "") +
-                        "if (" + processValue(if_else.findValue(1)!!) + ") (" +
-                        processValue(if_else.findValue(2)!!) + ") else (" +
-                        processValue(if_else.findValue(3)!!) + ") }"
-
-            else -> throw RuntimeException("Invalid if-expression '${fdIfExpressionContext.text}'")
-        } }
+        fdIfExpressionContext.findIf_else()!!.let { ifElse ->
+                "(if (" + processValue(ifElse.findValue(0)!!) + ") (" +
+                        processValue(ifElse.findValue(1)!!) + ") else (" +
+                        processValue(ifElse.findValue(2)!!) + "))"
+        }
     override fun processValueTypeCasting(fdValueTypeCastingContext: FoldingParser.ValueTypeCastingContext): String =
         "(${processValue(fdValueTypeCastingContext.findValue()!!)} " +
                 "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!)})"
@@ -112,6 +106,14 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
         return "{ ${primaryHead + primaryBody}}"
     }
+
+    override fun processLetExpression(fdLetExpressionContext: FoldingParser.LetExpressionContext): String {
+        val (boundPre,bindTarget,value) = fdLetExpressionContext.findLet_binding()!!.findValue()
+        val bindTargetReferId = "r" + bindTarget.position.toString().map { it.code.toString(16) }.joinToString("")
+        val bounds = processInverse(boundPre,bindTargetReferId).map { (id,inv) -> "val $id = ($inv)" }.joinToString("")
+        return "{ $bindTargetReferId -> \n$bounds\n${processValue(value)}".insertMargin(4)+"\n}(${processValue(bindTarget)})"
+    }
+
     override fun processParenedValue(fdParenedValueContext: FoldingParser.ParenedValueContext): String =
         "(${processValue(fdParenedValueContext.findValue()!!)})"
 
@@ -162,10 +164,6 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         (fdReferenceContext.findPackage_()?.text?.let { "$it." } ?: "") +
                 processId(fdReferenceContext.findCommonIdentifier()!!)
 
-    sealed class OpIdWrapper(val text: String) {
-        class Common(text: String): OpIdWrapper(text)
-        class Primitive(text: String): OpIdWrapper(text)
-    }
 
     fun makeClassPrimaryBody(
         classTranspilerKt: LightClassTranspilerKt,
@@ -189,5 +187,14 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
         return inheritsText to compoListText
     }
+
+    fun processInverse(targetValue: FoldingParser.ValueContext, inputValueId: String) =
+        processInverseValue(targetValue, listOf()).map {
+            it.last().id to it.dropLast(1).fold(inputValueId) { acc, callWrapper ->
+                callWrapper.id + "($acc" + callWrapper.args.joinToString(", ",", ",")") {
+                    processValue(it)
+                } + "._${callWrapper.inverseIndex}"
+            }
+        }
 
 }
