@@ -5,7 +5,7 @@ import foldingx.parser.identifier.processAopId
 import foldingx.parser.identifier.processId
 import foldingx.parser.identifier.processOpId
 
-fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List<CallWrapper>>): List<List<CallWrapper>> {
+fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List<CallWrapper>> = listOf(listOf())): List<List<CallWrapper>> {
     if (value is FoldingParser.ParenedValueContext)
         return processInverseValue(value.findValue()!!,invSeqList)
 
@@ -52,6 +52,8 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
 fun isInverseValue(value: FoldingParser.ValueContext): Boolean {
     if (value is FoldingParser.ParenedValueContext)
         return isInverseValue(value.findValue()!!)
+    if (value is FoldingParser.OutputOfInversingContext)
+        return true
     if (!(         value is FoldingParser.CallFunctionContext
                 || value is FoldingParser.CallAopFuncContext
                 || value is FoldingParser.CallOpFuncContext)

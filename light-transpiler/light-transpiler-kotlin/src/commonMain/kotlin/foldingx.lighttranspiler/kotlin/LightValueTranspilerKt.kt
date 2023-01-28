@@ -109,8 +109,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
     override fun processLetExpression(fdLetExpressionContext: FoldingParser.LetExpressionContext): String {
         val (boundPre,bindTarget,value) = fdLetExpressionContext.findLet_binding()!!.findValue()
-        val bindTargetReferId = "r" + bindTarget.position.toString().map { it.code.toString(16) }.joinToString("")
-        val bounds = processInverse(boundPre,bindTargetReferId).map { (id,inv) -> "val $id = ($inv)" }.joinToString("")
+        val bindTargetReferId = "r" + (bindTarget.position?.let { "${it.start.line},${it.start.column}" } ?: "null")
+            .map { it.code.toString(32) }.joinToString("")
+        val bounds = processInverse(boundPre, bindTargetReferId).joinToString("\n") { (id, inv) -> "val $id = ($inv)" }
         return "{ $bindTargetReferId -> \n$bounds\n${processValue(value)}".insertMargin(4)+"\n}(${processValue(bindTarget)})"
     }
 
@@ -194,11 +195,11 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     }
 
     fun processInverse(targetValue: FoldingParser.ValueContext, inputValueId: String) =
-        processInverseValue(targetValue, listOf()).map {
+        processInverseValue(targetValue).map {
             it.last().id to it.dropLast(1).fold(inputValueId) { acc, callWrapper ->
-                callWrapper.id + "($acc" + callWrapper.args.joinToString(", ",", ",")") {
+                callWrapper.id + (callWrapper.args.map {
                     processValue(it)
-                } + "._${callWrapper.inverseIndex}"
+                } + acc).joinToString(", ","(",")") + "._${callWrapper.inverseIndex}"
             }
         }
 
