@@ -13,7 +13,7 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
 
     return invSeqList.flatMap { invSeq ->
         if (value is FoldingParser.OutputOfInversingContext) {
-            return@flatMap listOf(invSeq + CallWrapper(value.ID()?.text ?: "?", listOf(), -1))
+            return@flatMap listOf(invSeq + CallWrapper(value.ID()?.text ?: "?", listOf(), listOf(), -1))
         }
 
 
@@ -42,9 +42,13 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
         val invValues = values.filter { isInverseValue(it) }
         val justValues = values - invValues.toSet()
 
+        val typeArgs = (value as? FoldingParser.CallFunctionContext)?.let {
+            (it.findArgValue()!! as FoldingParser.PrimaryArgValueContext).findTypeEx()
+        } ?: listOf()
+
 
         invValues.flatMapIndexed { i, it ->
-            processInverseValue(it,listOf(invSeq + CallWrapper(id,justValues,i)))
+            processInverseValue(it,listOf(invSeq + CallWrapper(id,typeArgs,justValues,i)))
         }
     }
 }

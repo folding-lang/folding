@@ -197,9 +197,13 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     fun processInverse(targetValue: FoldingParser.ValueContext, inputValueId: String) =
         processInverseValue(targetValue).map {
             it.last().id to it.dropLast(1).fold(inputValueId) { acc, callWrapper ->
-                callWrapper.id + (callWrapper.args.map {
-                    processValue(it)
-                } + acc).joinToString(", ","(",")") + "._${callWrapper.inverseIndex}"
+                callWrapper.id +
+                        (callWrapper.typeArgs.takeIf { it.isNotEmpty() }?.joinToString(",","<",">") {
+                            processTypeEx(it)
+                        } ?: "") +
+                        (callWrapper.args.map {
+                            processValue(it)
+                        } + acc).joinToString(", ","(",")") + "._${callWrapper.inverseIndex}"
             }
         }
 
