@@ -116,5 +116,10 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     }
 
     override fun processParameterFromValue(fdParameterFromValueContext: FoldingParser.ParameterFromValueContext): String =
-        TODO("Not Yet Implemented")
+        fdParameterFromValueContext.findParamCEx().flatMapIndexed { i, it ->
+            val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
+            processInverse(it.findValue()!!,id).map { (invId,invValue) ->
+                "val $invId: ${processTypeEx(it.findTypeEx()!!)} = ($invValue)"
+            }
+        }.joinToString("\n")
 }

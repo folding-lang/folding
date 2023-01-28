@@ -157,7 +157,12 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             }.joinToString(", ","(",")")
         }
     override fun processParameterFromValueForLambda(fdParameterFromValueForLambdaContext: FoldingParser.ParameterFromValueForLambdaContext): String =
-        TODO("Not Yet Implemented")
+        fdParameterFromValueForLambdaContext.findParamCEx().flatMapIndexed { i, it ->
+            val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
+            processInverse(it.findValue()!!,id).map { (invId,invValue) ->
+                "val $invId: ${processTypeEx(it.findTypeEx()!!)} = ($invValue)"
+            }
+        }.joinToString("\n")
 
 
     fun processReference(fdReferenceContext: FoldingParser.ReferenceContext) =
