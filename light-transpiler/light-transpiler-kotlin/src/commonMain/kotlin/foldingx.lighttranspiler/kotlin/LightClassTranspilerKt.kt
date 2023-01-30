@@ -85,10 +85,17 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}Class$tHead$inheritsText $tTail"
         val primaryBody = "{$compoListText\n}"
 
+        val factoryFunction = if (fdJustInterfaceContext.findDefInInterface().isEmpty())
+            makeFactoryFunction(
+                fdJustInterfaceContext.ID()!!.text,
+                fdJustInterfaceContext.findTypeParam()
+            )
+        else null
+
         val annotation = fdJustInterfaceContext.findAnnotationBlock()
             ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
 
-        return annotation + primaryHead + primaryBody
+        return annotation + primaryHead + primaryBody + (factoryFunction?.let { "\n"+it } ?: "")
     }
 
     fun makeConstructFunction(
@@ -106,6 +113,23 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
                 (tTail ?: "")
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
                 "return ${classId}Class${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
+
+        return primaryHead + primaryBody
+    }
+
+    fun makeFactoryFunction(
+        classId: String,
+        typeParamContext: FoldingParser.TypeParamContext?
+    ): String {
+        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+            h to t?.let { "$t " }
+        } } ?: (null to "")
+        val primaryHead = "/** folding class constructor function */\n" +
+                "fun${tHead?.let { " $it " } ?: " "}${classId}(): ${classId}Class${tHead ?: ""} " +
+                (tTail ?: "")
+        val primaryBody = ("{\n"+
+                "return (object : ${classId}Class${tHead ?: ""} {})").insertMargin(4) + "\n}"
+        object : LightTranspilerKt {}
 
         return primaryHead + primaryBody
     }
