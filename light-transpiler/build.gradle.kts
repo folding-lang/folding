@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform")
     `maven-publish`
 }
 val prefix = "light-transpiler"
