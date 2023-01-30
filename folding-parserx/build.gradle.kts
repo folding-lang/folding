@@ -1,14 +1,12 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform")
 }
 
 kotlin {
     jvm()
-    js {
+    js(BOTH) {
         browser {}
         nodejs {}
-        useCommonJs()
-        binaries.executable()
     }
     linuxX64("linux") {
         binaries {

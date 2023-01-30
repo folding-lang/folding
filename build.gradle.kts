@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20" apply false
+    kotlin("multiplatform") version "1.8.0" apply false
 }
 
 allprojects {

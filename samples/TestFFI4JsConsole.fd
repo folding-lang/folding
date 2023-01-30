@@ -1,7 +1,7 @@
 package samples
 
 class Console {
-    :log (msg~String) Unit
+    :log (msg~String) Unit = "Not Yet Implemented"
 }
 
 [|>] T R (value~T func~ (T) -> R) R = #func:(#value)

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform")
     `maven-publish`
 }
 
@@ -47,7 +47,6 @@ kotlin {
                 api(kotlin("stdlib-common"))
                 api("$antlrGroup:antlr-kotlin-runtime:$antlrVersion")
             }
-            kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
 
         val commonMain by getting {
