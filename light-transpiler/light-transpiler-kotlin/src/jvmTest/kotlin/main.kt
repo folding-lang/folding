@@ -1,3 +1,4 @@
+import foldingx.lighttranspiler.kotlin.DefaultLightTranspilerKt
 import foldingx.lighttranspiler.kotlin.LightClassTranspilerKt
 import foldingx.lighttranspiler.kotlin.LightTranspilerKt
 import foldingx.parser.FoldingLexer
@@ -7,9 +8,7 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 import java.io.File
 
 fun main() {
-    val transpiler = object : LightTranspilerKt {
-        override fun getClassTranspilerKt(): LightClassTranspilerKt = this
-    }
+    val transpiler = DefaultLightTranspilerKt
 //    val rawLexer = FoldingLexer(ANTLRFileStream.invoke("folding-stdlib/src/main/folding/folding/Number.fd"))
 //    val rawParser = FoldingParser(CommonTokenStream(rawLexer))
     val sourceRoot = "samples"
