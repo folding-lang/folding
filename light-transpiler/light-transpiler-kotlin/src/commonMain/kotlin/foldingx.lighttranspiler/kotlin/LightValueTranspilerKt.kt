@@ -186,8 +186,8 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         val fieldListText = fieldList.map { classTranspilerKt.processField(it) }
 
         val implListText = (listOf(inheritContext?.findImpl()) + implList)
-            .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { "override " + classTranspilerKt.transpileDef(it) }
-        val vanillaDefList = defList.map { classTranspilerKt.transpileDef(it) }
+            .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { "open override " + classTranspilerKt.transpileDef(it) }
+        val vanillaDefList = defList.map { "open " + classTranspilerKt.transpileDef(it) }
         val defInInterfaceListText = defInInterfaceList.map { classTranspilerKt.processDefInInterface(it) }
         val compoListText = (fieldListText + defInInterfaceListText + vanillaDefList + implListText).joinToString("\n\n","\n").insertMargin(4)
 
