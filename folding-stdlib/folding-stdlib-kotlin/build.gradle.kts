@@ -1,4 +1,6 @@
 import foldingx.gradle.base.folding
+import foldingx.lighttranspiler.kotlin.gradle.LightTranspileFoldingToKotlinTask
+import foldingx.lighttranspiler.kotlin.gradle.lightTranspileFoldingToKotlinToAll
 
 plugins {
     kotlin("multiplatform")
@@ -7,7 +9,6 @@ plugins {
 
 dependencies {
     commonMainImplementation(kotlin("stdlib-common"))
-    commonMainImplementation(project(":folding-stdlib:folding-stdlib-common"))
 }
 
 folding {
@@ -40,7 +41,7 @@ kotlin {
 }
 
 publishing {
-    repositories {
+    /*repositories {
         mavenLocal()
     }
     publications {
@@ -79,5 +80,5 @@ publishing {
                 }
             }
         }
-    }
+    }*/
 }

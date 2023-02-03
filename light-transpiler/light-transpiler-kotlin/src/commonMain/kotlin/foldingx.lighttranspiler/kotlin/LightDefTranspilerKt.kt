@@ -10,6 +10,8 @@ import foldingx.parser.func.processInverseDef as processInverseDefRaw
 import foldingx.parser.func.processForeignDef as processForeignDefRaw
 
 interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
+    fun getCurrentTranspilingPackage(): String?
+
     override fun transpileDef(fdDefContext: FoldingParser.DefContext): String = when {
         fdDefContext.findJustDef() != null -> processJustDefRaw(fdDefContext.findJustDef()!!).let { p ->
             processJustDef(p) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
@@ -35,11 +37,12 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
                 (tTail ?: "")
-        val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
-                "return ("+processValue(fdCommonJustDef.valueContext!!)+")").insertMargin(4) + "\n}"
 
         val annotation = fdCommonJustDef.annotationBlockContext
             ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
+                "return ("+processValue(fdCommonJustDef.valueContext!!)+")").insertMargin(4) + "\n}"
 
         return annotation + primaryHead + primaryBody
     }
@@ -90,17 +93,23 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
                 (tTail ?: "")
-        val foreignBody = fdCommonForeignDef.foreignBodyContext!!.let { when {
+
+        val annotation = fdCommonForeignDef.annotationBlockContext
+            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        val foreignBody = fdCommonForeignDef.foreignBodyContext?.let { when {
             it.RawString() != null -> it.RawString()!!.text.removeSurrounding("`")
             it.LBRACE() != null -> it.findForeignElement().find { it.findForeignPlatform()!!.text == "kotlin" }
                 ?.RawString()?.text?.removeSurrounding("`")
                 ?: throw RuntimeException("Can't find the foreign def targeting kotlin")
             else -> throw RuntimeException("Invalid foreign def '${fdCommonForeignDef.id}'")
-        } }
-        val primaryBody = "{\n${paramC?.let { "$it\n" } ?: ""}return ($foreignBody)".insertMargin(4) + "\n}"
+        } } ?: (
+                (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
+                        "implfd.kotlin." + fdCommonForeignDef.id +
+                        tHead.removePrefix(" ").removeSuffix(" ") + param.replace(":"," as")
+                )
 
-        val annotation = fdCommonForeignDef.annotationBlockContext
-            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+        val primaryBody = "{\n${paramC?.let { "$it\n" } ?: ""}return ($foreignBody)".insertMargin(4) + "\n}"
 
         return annotation + primaryHead + primaryBody
     }

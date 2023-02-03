@@ -129,7 +129,6 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
                 (tTail ?: "")
         val primaryBody = ("{\n"+
                 "return (object : ${classId}Class${tHead ?: ""} {})").insertMargin(4) + "\n}"
-        object : LightTranspilerKt {}
 
         return primaryHead + primaryBody
     }

@@ -6,6 +6,9 @@ import foldingx.lighttranspiler.exception.invalidCode
 import foldingx.parser.FoldingParser
 
 interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
+    var currentPackage: String?
+    override fun getCurrentTranspilingPackage(): String? = currentPackage
+
     override fun transpilePackage(
         sourcesRoot: String,
         fdFileContextList: List<FoldingParser.FileContext>
@@ -18,7 +21,10 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             it.findImportEx().flatMap { processImportEx(it).split("\n") }
         }.distinct().joinToString("\n")
 
-        val defList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findDef() } }
+        val defList = fdFileContextList.flatMap {
+            currentPackage = it.findNamespace()?.findPackage_()?.text
+            it.findFileCompo().mapNotNull { it.findDefinition()?.findDef() }
+        }
         val annotationDefList = fdFileContextList.flatMap { it.findAnnotationDef() }
         val globalFieldList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findField() } }
         val classList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findClass_() } }

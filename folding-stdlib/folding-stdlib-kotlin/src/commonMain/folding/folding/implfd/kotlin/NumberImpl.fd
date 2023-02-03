@@ -1,0 +1,41 @@
+package folding.implfd.kotlin
+
+[+] (x~Int y~Int) foreign Int `x + y`
+[-] (x~Int y~Int) foreign Int `x - y`
+[*] (x~Int y~Int) foreign Int `x * y`
+[/] (x~Int y~Int) foreign Int `x / y`
+[%] (x~Int y~Int) foreign Int `x % y`
+[~ +] (x~Int) foreign Int `x`
+[~ -] (x~Int) foreign Int `-x`
+
+[+] (x~Long y~Long) foreign Long `x + y`
+[-] (x~Long y~Long) foreign Long `x - y`
+[*] (x~Long y~Long) foreign Long `x * y`
+[/] (x~Long y~Long) foreign Long `x / y`
+[%] (x~Long y~Long) foreign Long `x % y`
+[~ +] (x~Long) foreign Long `x`
+[~ -] (x~Long) foreign Long `-x`
+
+[+] (x~Byte y~Byte) foreign Int `x + y`
+[-] (x~Byte y~Byte) foreign Int `x - y`
+[*] (x~Byte y~Byte) foreign Int `x * y`
+[/] (x~Byte y~Byte) foreign Int `x / y`
+[%] (x~Byte y~Byte) foreign Int `x % y`
+[~ +] (x~Byte) foreign Byte `x`
+[~ -] (x~Byte) foreign Int `-x`
+
+[+] (x~Double y~Double) foreign Double `x + y`
+[-] (x~Double y~Double) foreign Double `x - y`
+[*] (x~Double y~Double) foreign Double `x * y`
+[/] (x~Double y~Double) foreign Double `x / y`
+[%] (x~Double y~Double) foreign Double `x % y`
+[~ +] (x~Double) foreign Double `x`
+[~ -] (x~Double) foreign Double `-x`
+
+[+] (x~Float y~Float) foreign Float `x + y`
+[-] (x~Float y~Float) foreign Float `x - y`
+[*] (x~Float y~Float) foreign Float `x * y`
+[/] (x~Float y~Float) foreign Float `x / y`
+[%] (x~Float y~Float) foreign Float `x % y`
+[~ +] (x~Float) foreign Float `x`
+[~ -] (x~Float) foreign Float `-x`

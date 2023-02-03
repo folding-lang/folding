@@ -1,28 +1,54 @@
 package foldingx.lighttranspiler.kotlin.gradle
 
+import foldingx.gradle.base.FoldingSourceSet
 import foldingx.gradle.base.folding
 import foldingx.lighttranspiler.kotlin.DefaultLightTranspilerKt
-import foldingx.lighttranspiler.kotlin.LightClassTranspilerKt
-import foldingx.lighttranspiler.kotlin.LightTranspilerKt
 import foldingx.parser.FoldingLexer
 import foldingx.parser.FoldingParser
 import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.TaskContainerScope
 import org.gradle.kotlin.dsl.named
 import java.io.File
+import javax.inject.Inject
 
-open class LightTranspileFoldingToKotlinTask : LightTranspilerKtPluginTask() {
+internal fun generateOutputSpecs(project: Project): List<OutputSpec> {
+    val sourceSets = project.folding.sourcesSets.filter { it.target?.equals("kotlin") ?: true  }
+    val outputDirs = sourceSets.flatMap { it.outputDirs }.distinct()
+    return outputDirs.map { outputDir ->
+        OutputSpec(outputDir,sourceSets.filter { it.outputDirs.contains(outputDir) })
+    }
+}
+
+internal fun File.makeAllDirsForce(): Boolean {
+    if (exists()) return false
+
+    return if (mkdir()) true
+    else {
+        File(path.split(File.separator).dropLast(1).joinToString(File.separator)).makeAllDirsForce()
+        mkdir()
+    }
+}
+
+open class LightTranspileFoldingToKotlinToAllTask : LightTranspilerKtPluginTask() {
+    @TaskAction
+    fun task() {
+
+    }
+}
+
+open class LightTranspileFoldingToKotlinTask @Inject constructor (private val outputPath: String, private val sourcesSets: List<FoldingSourceSet>) : LightTranspilerKtPluginTask() {
 
     @TaskAction
     fun task() {
         val transpiler = DefaultLightTranspilerKt
-        val sourceSets = project.folding.sourcesSets.filter { it.target?.equals("kotlin") ?: true  }
+        val sourceSets = sourcesSets.filter { it.target?.equals("kotlin") ?: true  }
         sourceSets.forEach { set ->
-            val inputPath = "src/${set.name}/folding"
-            val outputPath = "src/${set.name}/kotlin"
+            val inputPath = set.sourceDir + "/folding"
+            val outputPath = this.outputPath + "/kotlin"
 
             val inputDir = File(inputPath)
             if (!inputDir.exists()) return
@@ -39,14 +65,13 @@ open class LightTranspileFoldingToKotlinTask : LightTranspilerKtPluginTask() {
                 transpiler.transpilePackage(outputPath,it)
             }
             val transpiledDirsToTranspiled = transpiledList.map {
-                File(it.dirText).apply { mkdirs() } to it
+                File(it.dirText)
+                File(it.dirText) to it
             }
-            File(outputPath).mkdir()
-            println("Pass!_2")
+
             val transpileFiles = transpiledDirsToTranspiled.map { (dir,it) ->
                 val file = File(dir,it.name)
-                dir.mkdir()
-                println(dir.path)
+                dir.makeAllDirsForce()
                 println(file.path)
                 file.createNewFile()
                 file.writeText(it.content)
@@ -57,5 +82,5 @@ open class LightTranspileFoldingToKotlinTask : LightTranspilerKtPluginTask() {
 
 }
 
-val TaskContainerScope.lightTranspileFoldingToKotlin: TaskProvider<LightTranspileFoldingToKotlinTask>
-    get() = named<LightTranspileFoldingToKotlinTask>("lightTranspileFoldingToKotlin")
+val TaskContainerScope.lightTranspileFoldingToKotlinToAll: TaskProvider<LightTranspileFoldingToKotlinToAllTask>
+    get() = named<LightTranspileFoldingToKotlinToAllTask>("lightTranspileFoldingToKotlinToAll")

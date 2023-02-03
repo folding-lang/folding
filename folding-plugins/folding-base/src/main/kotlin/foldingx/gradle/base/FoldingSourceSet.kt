@@ -4,5 +4,7 @@ import org.gradle.api.Named
 
 open class FoldingSourceSet(private val name: String): Named {
     var target: String? = null
+    var sourceDir = "src/$name"
+    var outputDirs = mutableListOf("src/$name")
     override fun getName(): String = name
 }
