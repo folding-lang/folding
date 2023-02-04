@@ -71,7 +71,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                     defList.joinToString("\n\n","\n\n\n") { processDef(it) }
         )
 
-        return listOf(defaultFile) + annotationDefFile + classFiles
+        return listOf(defaultFile) + annotationDefFile + typeAliasFile + classFiles
     }
 
     override fun transpileFile(fdFileContext: FoldingParser.FileContext): String {
