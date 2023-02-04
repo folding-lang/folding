@@ -11,4 +11,5 @@ interface LightTranspiler : LightClassTranspiler {
     fun processDef(fdDefContext: FoldingParser.DefContext): String
     fun processClass(fdClass_Context: FoldingParser.Class_Context): String
     fun processAnnotationDef(fdAnnotationDefContext: FoldingParser.AnnotationDefContext): String
+    fun processTypeAlias(fdTypeAliasContext: FoldingParser.TypeAliasContext): String
 }
