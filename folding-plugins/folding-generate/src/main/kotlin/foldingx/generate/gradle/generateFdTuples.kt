@@ -34,7 +34,7 @@ fun genFdTuplesUntil(number: Int) = (1..number).joinToString("\n") { genFdTuple(
 
 fun genFdTuple(number: Int): String {
     val range = 0 until number
-    val typeParam = range.joinToString(" ") { "T$it" }
+    val typeParam = range.joinToString(" ","(",")") { "T$it" }
     val param = range.joinToString(" ","(",")") { "_$it~T$it" }
     return "class FdTuple$number $typeParam { $param }"
 }
