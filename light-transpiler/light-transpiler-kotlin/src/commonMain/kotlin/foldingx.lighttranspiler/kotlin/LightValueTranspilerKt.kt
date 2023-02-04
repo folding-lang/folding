@@ -18,6 +18,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.GetFieldContext -> processGetField(fdValueContext)
         is FoldingParser.CallMethodContext -> processCallMethod(fdValueContext)
         is FoldingParser.ReflectedMethodContext -> processReflectedMethod(fdValueContext)
+        is FoldingParser.CallFunctionLikeMethodContext -> processCallFunctionLikeMethod(fdValueContext)
         is FoldingParser.InvokeValueContext -> processInvokeValue(fdValueContext)
         is FoldingParser.SimpleIfContext -> processSimpleIf(fdValueContext)
         is FoldingParser.TakeNullContext -> processTakeNull(fdValueContext)
@@ -53,6 +54,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                 (fdCallMethodContext.findArgValue()?.let { processArgValue(it) } ?: "") + ")"
     override fun processReflectedMethod(fdReflectedMethodContext: FoldingParser.ReflectedMethodContext): String =
         "(${processValue(fdReflectedMethodContext.findValue()!!)})::${fdReflectedMethodContext.ID()!!.text}"
+    override fun processCallFunctionLikeMethod(fdCallFunctionLikeMethodContext: FoldingParser.CallFunctionLikeMethodContext): String =
+        fdCallFunctionLikeMethodContext.ID()!!.text + "(" +
+                processValue(fdCallFunctionLikeMethodContext.findValue()!!) +
+                (fdCallFunctionLikeMethodContext.findArgValue()?.let { ", " + processArgValue(it) } ?: "") + ")"
     override fun processInvokeValue(fdInvokeValueContext: FoldingParser.InvokeValueContext): String =
         "(${processValue(fdInvokeValueContext.findValue()!!)}).invoke(" +
                 (fdInvokeValueContext.findInvoking()?.let { processInvoking(it) } ?: "") + ")"
