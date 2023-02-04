@@ -2109,7 +2109,6 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 		fun COLON() : TerminalNode? = getToken(FoldingParser.Tokens.COLON.id, 0)
 		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
 		fun findArgValue() : ArgValueContext? = getRuleContext(solver.getType("ArgValueContext"),0)
-		fun DOUBLECOLON() : TerminalNode? = getToken(FoldingParser.Tokens.DOUBLECOLON.id, 0)
 		constructor(ctx: ValueContext) { copyFrom(ctx) }
 	}
 	open class TakeNullContext : ValueContext {
@@ -2142,6 +2141,13 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 	}
 	open class CallFunctionContext : ValueContext {
 		fun findReference() : ReferenceContext? = getRuleContext(solver.getType("ReferenceContext"),0)
+		fun findArgValue() : ArgValueContext? = getRuleContext(solver.getType("ArgValueContext"),0)
+		constructor(ctx: ValueContext) { copyFrom(ctx) }
+	}
+	open class CallFunctionLikeMethodContext : ValueContext {
+		fun findValue() : ValueContext? = getRuleContext(solver.getType("ValueContext"),0)
+		fun DOUBLECOLON() : TerminalNode? = getToken(FoldingParser.Tokens.DOUBLECOLON.id, 0)
+		fun ID() : TerminalNode? = getToken(FoldingParser.Tokens.ID.id, 0)
 		fun findArgValue() : ArgValueContext? = getRuleContext(solver.getType("ArgValueContext"),0)
 		constructor(ctx: ValueContext) { copyFrom(ctx) }
 	}
@@ -2538,7 +2544,7 @@ class FoldingParser(input: TokenStream) : Parser(input) {
 					match(ID) as Token
 					}}
 					8 -> {if (true){
-					_localctx = CallMethodContext(ValueContext(_parentctx, _parentState))
+					_localctx = CallFunctionLikeMethodContext(ValueContext(_parentctx, _parentState))
 					pushNewRecursionContext(_localctx, _startState, Rules.RULE_value.id)
 					this.state = 507
 					if (!(precpred(context!!, 11))) throw FailedPredicateException(this, "precpred(context!!, 11)")
