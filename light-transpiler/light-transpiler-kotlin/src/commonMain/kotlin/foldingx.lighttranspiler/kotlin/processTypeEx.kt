@@ -19,7 +19,13 @@ fun processTypeExSingle(fdTypeExSingleContext: FoldingParser.TypeExSingleContext
                 (fdTypeExSingleContext.LPAREN()?.let { _ ->
                     fdTypeExSingleContext.findTypeEx().joinToString(",","<",">") { processTypeEx(it) }
                 } ?: "")
-    else fdTypeExSingleContext.findPrimitiveType()!!.text
+    else
+        when {
+            fdTypeExSingleContext.findPrimitiveType()!!.ARRAY() != null ->
+                "Array<${processTypeEx(fdTypeExSingleContext.findPrimitiveType()!!.findTypeEx()!!)}>"
+            else ->
+                fdTypeExSingleContext.findPrimitiveType()!!.text
+        }
 fun processTypeExFunc(fdTypeExFuncContext: FoldingParser.TypeExFuncContext): String =
     fdTypeExFuncContext.findTypeExParamEx().joinToString(",","(",")") {
         val pure = processTypeEx(it.findTypeEx()!!)
