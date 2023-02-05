@@ -1,0 +1,9 @@
+package folding.collections.implfd.kotlin
+
+
+
+get T (array~Array(T) index~Int) T = #array:get(#index)
+
+set T (array~Array(T) index~Int element~T) T =
+    let ->? = #array:set(#index #element)
+    #array::get(#index)
