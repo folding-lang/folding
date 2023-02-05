@@ -117,7 +117,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         val bindTargetReferId = "r" + (bindTarget.position?.let { "${it.start.line},${it.start.column}" } ?: "null")
             .map { it.code.toString(32) }.joinToString("")
         val bounds = processInverse(boundPre, bindTargetReferId).joinToString("\n") { (id, inv) -> "val $id = ($inv)" }
-        return "{ $bindTargetReferId -> \n$bounds\n${processValue(value)}".insertMargin(4)+"\n}(${processValue(bindTarget)})"
+        return "{\nval $bindTargetReferId = ${processValue(bindTarget)}\n$bounds\n${processValue(value)}".insertMargin(4)+"\n}()"
     }
 
     override fun processParenedValue(fdParenedValueContext: FoldingParser.ParenedValueContext): String =

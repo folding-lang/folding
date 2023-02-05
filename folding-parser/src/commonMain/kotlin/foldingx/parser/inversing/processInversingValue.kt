@@ -50,7 +50,7 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
         invValues.flatMapIndexed { i, it ->
             processInverseValue(it,listOf(invSeq + CallWrapper(id,typeArgs,justValues,i)))
         }
-    }
+    }.filter { it.last().id != "?" }
 }
 
 fun isInverseValue(value: FoldingParser.ValueContext): Boolean {
