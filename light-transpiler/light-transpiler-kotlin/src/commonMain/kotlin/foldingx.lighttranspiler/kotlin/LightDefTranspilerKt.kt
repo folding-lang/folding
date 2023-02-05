@@ -101,7 +101,6 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             it.RawString() != null -> it.RawString()!!.text.removeSurrounding("`")
             it.LBRACE() != null -> it.findForeignElement().find { it.findForeignPlatform()!!.text == "kotlin" }
                 ?.RawString()?.text?.removeSurrounding("`")
-                ?: throw RuntimeException("Can't find the foreign def targeting kotlin")
             else -> throw RuntimeException("Invalid foreign def '${fdCommonForeignDef.id}'")
         } } ?: (
                 (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
