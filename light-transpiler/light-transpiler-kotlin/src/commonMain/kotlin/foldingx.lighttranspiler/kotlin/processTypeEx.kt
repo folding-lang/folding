@@ -21,8 +21,6 @@ fun processTypeExSingle(fdTypeExSingleContext: FoldingParser.TypeExSingleContext
                 } ?: "")
     else
         when {
-            fdTypeExSingleContext.findPrimitiveType()!!.ARRAY() != null ->
-                "Array<${processTypeEx(fdTypeExSingleContext.findPrimitiveType()!!.findTypeEx()!!)}>"
             else ->
                 fdTypeExSingleContext.findPrimitiveType()!!.text
         }
