@@ -2,6 +2,11 @@ package folding.collections.implfd.kotlin
 
 
 
+typealias Array(T) = 'Array'(T)
+
+
+array T (elements~Array(T)) Array(T) = elements
+
 get T (array~Array(T) index~Int) T = #array:get(#index)
 
 set T (array~Array(T) index~Int element~T) T =

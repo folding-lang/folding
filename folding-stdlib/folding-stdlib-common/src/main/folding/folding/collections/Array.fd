@@ -1,5 +1,11 @@
 package folding.collections
 
+import folding
+
+
+typealias Array(T) foreign
+
+
 array T (element0~T) Array(T) = array{#element0}
 inverse (#result::get(0))
 
@@ -15,7 +21,8 @@ inverse (#result::get(0) #result::get(1) #result::get(2) #result::get(3))
 array T (element0~T element1~T element2~T element3~T element4~T) Array(T) = array{#element0 #element1 #element2 #element3 #element4}
 inverse (#result::get(0) #result::get(1) #result::get(2) #result::get(3) #result::get(4))
 
-array T (elements~Array(T)) Array(T) = #elements
+
+array T (elements~Array(T)) foreign Array(T)
 
 get T (array~Array(T) index~Int) foreign T
 set T (array~Array(T) index~Int element~T) foreign T
