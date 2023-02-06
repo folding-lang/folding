@@ -136,7 +136,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.PrimaryArgValueContext ->
             fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
         is FoldingParser.SingleListArgValueContext ->
-            fdArgValueContext.findValue().joinToString(",") { processValue(it) }
+            fdArgValueContext.findValue().joinToString(",","array(",")") { processValue(it) }
 
         else -> throw RuntimeException("Invalid invoke '${fdArgValueContext.text}'")
     }
@@ -145,7 +145,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             "${fdArgExContext.ID()?.text?.let { "$it = " } ?: ""}${processValue(fdArgExContext.findValue()!!)}"
         is FoldingParser.MultiArgContext ->
             (fdArgExContext.ID()?.text?.let { "$it = " } ?: "*") +
-                    fdArgExContext.findValue().joinToString(",","arrayOf(",")") { processValue(it) }
+                    fdArgExContext.findValue().joinToString(",","array(",")") { processValue(it) }
 
         else -> throw RuntimeException("Invalid argument '${fdArgExContext.text}'")
     }
