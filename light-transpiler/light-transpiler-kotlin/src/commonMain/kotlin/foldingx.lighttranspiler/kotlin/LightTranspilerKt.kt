@@ -140,7 +140,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             }
 
             else -> (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
-                    "implfd.kotlin." + fdTypeAliasContext.ID()!!.text +
+                    "implfd.kotlin." + fdTypeAliasContext.ID()!!.text + "Class" +
                     (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "")
         }
 }
