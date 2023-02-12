@@ -37,8 +37,12 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             } + "Class"
             val transpiled = transpileClass(it)
             val classText = transpiled.substringBeforeLast("/** folding class constructor function */\n")
-            val constructText = "/** folding class constructor function */\n" +
-                    transpiled.substringAfterLast("/** folding class constructor function */\n")
+            val constructText =
+                if (transpiled.contains("/** folding class constructor function */\n"))
+                    "/** folding class constructor function */\n" +
+                            transpiled.substringAfterLast("/** folding class constructor function */\n")
+                else ""
+
             FileWrapper(
                 "$sourcesRoot/$packagePath",
                 "$classId.kt",
