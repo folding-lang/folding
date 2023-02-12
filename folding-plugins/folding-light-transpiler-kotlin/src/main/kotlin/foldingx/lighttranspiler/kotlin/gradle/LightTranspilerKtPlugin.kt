@@ -22,16 +22,15 @@ open class LightTranspilerKtPlugin : Plugin<Project> {
     }
 
     private fun registerTasks(target: Project) {
-        target.afterEvaluate {
-            generatedOutputSpecs = generateOutputSpecs(target)
-
+        mySimpleTasks.forEach {
+            val name = it.simpleName.removeSuffix("Task").replaceFirstChar { it.lowercase() }
+            target.tasks.register(name,it)
+        }
+        target.folding.sourcesSets.actions += {
+            generatedOutputSpecs = generateOutputSpecs(target.folding.sourcesSets.toList() + it)
             registerGeneratedTranspilingTasks(target)
-
-            mySimpleTasks.forEach {
-                val name = it.simpleName.removeSuffix("Task").replaceFirstChar { it.lowercase() }
-                target.tasks.register(name,it)
-            }
-
+        }
+        target.afterEvaluate {
             target.tasks {
                 lightTranspileFoldingToKotlinToAll {
                     project.tasks.filterIsInstance<LightTranspileFoldingToKotlinTask>().forEach {
@@ -49,7 +48,15 @@ open class LightTranspilerKtPlugin : Plugin<Project> {
                     .replace("/","_")
                     .replace("\\","_")
                     .replace(":","_")}"
-            target.tasks.create(name,LightTranspileFoldingToKotlinTask::class.java,it.outputPath,it.sourceSets)
+            val task = target.tasks
+                .filterIsInstance<LightTranspileFoldingToKotlinTask>()
+                .find { it.name == name }
+            if (task != null)
+                target.tasks.create(name,LightTranspileFoldingToKotlinTask::class.java,it.outputPath,it.sourceSets)
+            else {
+                target.tasks.removeIf { it.name == name }
+                target.tasks.create(name,LightTranspileFoldingToKotlinTask::class.java,it.outputPath,it.sourceSets)
+            }
         }
     }
 }

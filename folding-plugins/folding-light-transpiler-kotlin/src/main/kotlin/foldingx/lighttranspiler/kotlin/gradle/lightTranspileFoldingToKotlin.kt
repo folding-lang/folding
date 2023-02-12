@@ -1,13 +1,11 @@
 package foldingx.lighttranspiler.kotlin.gradle
 
 import foldingx.gradle.base.FoldingSourceSet
-import foldingx.gradle.base.folding
 import foldingx.lighttranspiler.kotlin.DefaultLightTranspilerKt
 import foldingx.parser.FoldingLexer
 import foldingx.parser.FoldingParser
 import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
-import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.TaskContainerScope
@@ -15,11 +13,11 @@ import org.gradle.kotlin.dsl.named
 import java.io.File
 import javax.inject.Inject
 
-internal fun generateOutputSpecs(project: Project): List<OutputSpec> {
-    val sourceSets = project.folding.sourcesSets.filter { it.target?.equals("kotlin") ?: true  }
-    val outputDirs = sourceSets.flatMap { it.outputDirs }.distinct()
+internal fun generateOutputSpecs(sourcesSets: List<FoldingSourceSet>): List<OutputSpec> {
+    val sourcesSetsFiltered = sourcesSets.filter { it.target?.equals("kotlin") ?: true  }
+    val outputDirs = sourcesSetsFiltered.flatMap { it.outputDirs }.distinct()
     return outputDirs.map { outputDir ->
-        OutputSpec(outputDir,sourceSets.filter { it.outputDirs.contains(outputDir) })
+        OutputSpec(outputDir,sourcesSetsFiltered.filter { it.outputDirs.contains(outputDir) })
     }
 }
 

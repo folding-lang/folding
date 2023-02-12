@@ -7,7 +7,7 @@ open class FoldingBasePlugin : Plugin<Project> {
     override fun apply(target: Project) = target.run {
         val foldingSourceSetContainer = container(FoldingSourceSet::class.java)
         val extension = FoldingExtension.create(this)
-        extension.sourcesSets = foldingSourceSetContainer
+        extension.sourcesSets = FoldingSourceSetContainer(foldingSourceSetContainer)
         Unit
     }
 }

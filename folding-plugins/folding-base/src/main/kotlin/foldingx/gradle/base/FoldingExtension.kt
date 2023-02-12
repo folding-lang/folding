@@ -4,7 +4,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
 open class FoldingExtension(project: Project) {
-    lateinit var sourcesSets: NamedDomainObjectContainer<FoldingSourceSet>
+    lateinit var sourcesSets: FoldingSourceSetContainer
 
     companion object {
         val name = "folding"
