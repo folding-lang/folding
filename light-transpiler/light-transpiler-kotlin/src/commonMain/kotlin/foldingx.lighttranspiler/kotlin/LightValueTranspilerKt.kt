@@ -91,7 +91,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                 is FoldingParser.GlobalFieldAssignContext ->
                     "${that.ID()!!.text} = ${processValue(that.findValue()!!)}"
                 is FoldingParser.ObjectFieldAssignContext ->
-                    "(${processValue(that.findValue(0)!!)})${that.ID()!!.text} = ${processValue(that.findValue(1)!!)}"
+                    "(${processValue(that.findValue(0)!!)}).${that.ID()!!.text} = ${processValue(that.findValue(1)!!)}"
 
                 else -> throw RuntimeException("Invalid field assigning '${that.text}'")
             } }
@@ -178,9 +178,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
     fun makeClassPrimaryBody(
         classTranspilerKt: LightClassTranspilerKt,
-        fieldList: List<FoldingParser.FieldContext>, defList: List<FoldingParser.DefContext>,
-        inheritContext: FoldingParser.InheritContext?, implList: List<FoldingParser.ImplContext>,
-        defInInterfaceList: List<FoldingParser.DefInInterfaceContext>
+        fieldList: List<FoldingParser.FieldContext> = listOf(), defList: List<FoldingParser.DefContext> = listOf(),
+        inheritContext: FoldingParser.InheritContext? = null, implList: List<FoldingParser.ImplContext> = listOf(),
+        defInInterfaceList: List<FoldingParser.DefInInterfaceContext> = listOf(),
+        fieldInInterfaceList: List<FoldingParser.FieldInInterfaceContext> = listOf()
     ): Pair<String,String> {
         val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!) }
         val inherits = inheritContext?.findImpl()?.findTypeEx()?.let { processTypeEx(it) }?.let {
@@ -189,12 +190,21 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
 
         val fieldListText = fieldList.map { classTranspilerKt.processField(it) }
+        val abstractFieldList = fieldInInterfaceList.map {
+            val id = it.findFieldNotInit()!!.ID()!!.text
+            val typeEx = processTypeEx(it.findFieldNotInit()!!.findTypeEx()!!)
+            val keyword =
+                if (it.findFieldNotInit()!!.MUTABLE() == null) "val" else "var"
+            "abstract $keyword $id: $typeEx"
+        }
 
         val implListText = (listOf(inheritContext?.findImpl()) + implList)
             .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { "open override " + classTranspilerKt.transpileDef(it) }
         val vanillaDefList = defList.map { "open " + classTranspilerKt.transpileDef(it) }
         val defInInterfaceListText = defInInterfaceList.map { classTranspilerKt.processDefInInterface(it) }
-        val compoListText = (fieldListText + defInInterfaceListText + vanillaDefList + implListText).joinToString("\n\n","\n").insertMargin(4)
+
+        val compoListText =
+            (abstractFieldList + fieldListText + defInInterfaceListText + vanillaDefList + implListText).joinToString("\n\n","\n").insertMargin(4)
 
         return inheritsText to compoListText
     }

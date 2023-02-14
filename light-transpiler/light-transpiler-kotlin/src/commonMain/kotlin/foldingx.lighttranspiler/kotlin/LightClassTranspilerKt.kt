@@ -79,7 +79,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } } ?: ("" to "")
 
         val (inheritsText,compoListText) = fdJustInterfaceContext.run {
-            makeClassPrimaryBody(getClassTranspilerKt(),listOf(),findDef(),null,findImpl(),findDefInInterface())
+            makeClassPrimaryBody(getClassTranspilerKt(),listOf(),findDef(),null,findImpl(),findDefInInterface(),findFieldInInterface())
         }
 
         val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}Class$tHead$inheritsText $tTail"
