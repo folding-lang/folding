@@ -21,15 +21,15 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
 
         val constructor = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let { processConstructorParameter(it) } ?: "()"
         val initialize = fdJustClassContext.findConstructorSelf()!!.findDoBlock()?.let {
-            "\ninit " + processDoBlock(it).removeSuffix("()") + "\n"
-        }?.insertMargin(4) ?: ""
+            "\ninit " + processDoBlock(it).removeSuffix("()")
+        } ?: ""
 
         val (inheritsText,compoListText) = fdJustClassContext.run {
             makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),listOf())
         }
 
         val primaryHead = "open class ${fdJustClassContext.ID()!!.text}Class$tHead$constructor$inheritsText $tTail"
-        val primaryBody = "{$initialize$compoListText\n}"
+        val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
             makeClassInverse(fdJustClassContext.ID()!!.text, it, fdJustClassContext.findTypeParam())
@@ -54,15 +54,15 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             c.findParameter()?.let { processConstructorParameter(it) } ?: "()"
         } ?: ""
         val initialize = fdJustAbstractClassContext.findConstructorSelf()?.findDoBlock()?.let {
-            "\ninit " + processDoBlock(it).removeSuffix("()") + "\n"
-        }?.insertMargin(4) ?: ""
+            "\ninit " + processDoBlock(it).removeSuffix("()")
+        } ?: ""
 
         val (inheritsText,compoListText) = fdJustAbstractClassContext.run {
             makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),findDefInInterface())
         }
 
         val primaryHead = "abstract class ${fdJustAbstractClassContext.ID()!!.text}Class$tHead$constructor$inheritsText $tTail"
-        val primaryBody = "{$initialize$compoListText\n}"
+        val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = fdJustAbstractClassContext.findConstructorSelf()?.findParameter()?.let {
             makeClassInverse(fdJustAbstractClassContext.ID()!!.text, it, fdJustAbstractClassContext.findTypeParam())
@@ -191,12 +191,12 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         fdFieldContext.findFieldNotInit() != null -> if (fdFieldContext.findFieldNotInit()!!.findTypeEx()!!.QM() == null)
             fdFieldContext.findFieldNotInit()!!.let {
                 if (it.MUTABLE() != null) """
-                   |private ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!)}? = null
+                   |private var ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!)}? = null
                    |var ${it.ID()!!.text}: ${processTypeEx(it.findTypeEx()!!)}
                    |    get() = ${it.ID()!!.text}_field ?: throw RuntimeException("The field '${it.ID()!!.text}' has not been initialized")
                    |    set(value) { ${it.ID()!!.text}_field = value }""".trimMargin()
                 else """
-                   |private ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!)}? = null
+                   |private var ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!)}? = null
                    |var ${it.ID()!!.text}: ${processTypeEx(it.findTypeEx()!!)}
                    |    get() = ${it.ID()!!.text}_field ?: throw RuntimeException("The field '${it.ID()!!.text}' has not been initialized")
                    |    set(value) {

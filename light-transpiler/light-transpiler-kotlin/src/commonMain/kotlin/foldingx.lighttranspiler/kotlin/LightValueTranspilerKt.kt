@@ -127,7 +127,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         val (i,c) = fdAnonymousClassObjectContext.run {
             makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),listOf())
         }
-        return "object$i {$c\n}"
+        return "object$i {$c".insertMargin(4)+"}"
     }
 
     fun getClassTranspilerKt(): LightClassTranspilerKt
@@ -198,13 +198,21 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             "abstract $keyword $id: $typeEx"
         }
 
-        val implListText = (listOf(inheritContext?.findImpl()) + implList)
+        val implDefListText = (listOf(inheritContext?.findImpl()) + implList)
             .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { "open override " + classTranspilerKt.transpileDef(it) }
+        val implFieldListText = (listOf(inheritContext?.findImpl()) + implList)
+            .mapNotNull { it?.findImplBody()?.findField() }.flatten().map {
+                val parts = classTranspilerKt.processField(it).split("\n", limit = 2)
+                val mainPart = "open override " + parts.last()
+                val privatePart = parts.takeIf { it.count() == 2 }?.first()
+
+                (privatePart?.let { it + "\n" } ?: "") + mainPart
+            }
         val vanillaDefList = defList.map { "open " + classTranspilerKt.transpileDef(it) }
         val defInInterfaceListText = defInInterfaceList.map { classTranspilerKt.processDefInInterface(it) }
 
         val compoListText =
-            (abstractFieldList + fieldListText + defInInterfaceListText + vanillaDefList + implListText).joinToString("\n\n","\n").insertMargin(4)
+            (abstractFieldList + fieldListText + implFieldListText + defInInterfaceListText + vanillaDefList + implDefListText).joinToString("\n\n","\n")
 
         return inheritsText to compoListText
     }
