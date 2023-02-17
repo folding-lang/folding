@@ -144,7 +144,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     }
     override fun processArgEx(fdArgExContext: FoldingParser.ArgExContext): String = when(fdArgExContext) {
         is FoldingParser.SingleArgContext ->
-            "${fdArgExContext.ID()?.text?.let { "$it = " } ?: ""}${processValue(fdArgExContext.findValue()!!)}"
+            "${fdArgExContext.ID()?.text?.let { "$it = " } ?: ""}${if (fdArgExContext.ELLIPSIS() != null) "*" else ""}${processValue(fdArgExContext.findValue()!!)}"
         is FoldingParser.MultiArgContext ->
             (fdArgExContext.ID()?.text?.let { "$it = " } ?: "*") +
                     fdArgExContext.findValue().joinToString(",","array(",")") { processValue(it) }
