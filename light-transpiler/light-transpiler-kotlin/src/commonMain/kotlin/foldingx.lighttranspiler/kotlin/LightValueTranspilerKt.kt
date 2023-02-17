@@ -103,7 +103,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         val lambdaContext = fdJustLambdaContext.findLambda()!!
         val (param,paramC) = lambdaContext.findParameterForLambda()?.let { p ->
             processParameterForLambda(p) to
-                    p.findParameterFromValueForLambda()?.let { processParameterFromValueForLambda(it) }
+                    p.findParameterFromValueForLambda()?.let {
+                        mateParamAndParamCExes(p.findParamEx(), processParameterFromValueForLambda(it))
+                    }
         } ?: ("" to null)
         val primaryHead = "$param ->"
         val primaryBody = ("\n"+(paramC?.let { "$it\n" } ?: "")+
@@ -160,14 +162,12 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                 }
             else -> fdParameterForLambdaContext.findParameterFromValueForLambda()!!.findParamCEx().mapIndexed { index, paramCExContext ->
                 "r$index" + ": " + processTypeEx(paramCExContext.findTypeEx()!!)
-            }.joinToString(", ","(",")")
+            }.joinToString(", ","","")
         }
     override fun processParameterFromValueForLambda(fdParameterFromValueForLambdaContext: FoldingParser.ParameterFromValueForLambdaContext): String =
         fdParameterFromValueForLambdaContext.findParamCEx().flatMapIndexed { i, it ->
             val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
-            processInverse(it.findValue()!!,id).map { (invId,invValue) ->
-                "val $invId: ${processTypeEx(it.findTypeEx()!!)} = ($invValue)"
-            }
+            processInverse(it.findValue()!!,id).map { (invId,invValue) -> invValue }
         }.joinToString("\n")
 
 

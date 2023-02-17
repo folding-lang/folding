@@ -33,7 +33,9 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
-            processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
+            processParameter(p) to p.findParameterFromValue()?.let {
+                mateParamAndParamCExes(p.findParamEx(), processParameterFromValue(it))
+            }
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
                 (tTail ?: "")
@@ -61,7 +63,9 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         val outputList = fdCommonInverseDef.inverseDefCompoList
             .mapIndexed { i, it ->
                 if (it is FoldingParser.OutputParamContext)
-                    processValue(it.findValue()!!) to (it.findTypeEx() ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
+                    processValue(it.findValue()!!) to (it.findTypeEx()
+                        ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)?.findTypeEx()
+                        ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx().last().findTypeEx()!!)
                 else null
             }.filterNotNull()
         val outputHead = "folding.FdTuple${outputList.count()}Class<"+
@@ -89,7 +93,9 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonForeignDef.parameterContext?.let { p ->
-            processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
+            processParameter(p) to p.findParameterFromValue()?.let {
+                mateParamAndParamCExes(p.findParamEx(), processParameterFromValue(it))
+            }
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
                 (tTail ?: "")
@@ -126,8 +132,6 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     override fun processParameterFromValue(fdParameterFromValueContext: FoldingParser.ParameterFromValueContext): String =
         fdParameterFromValueContext.findParamCEx().flatMapIndexed { i, it ->
             val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
-            processInverse(it.findValue()!!,id).map { (invId,invValue) ->
-                "val $invId: ${processTypeEx(it.findTypeEx()!!)} = ($invValue)"
-            }
+            processInverse(it.findValue()!!,id).map { (invId,invValue) -> invValue }
         }.joinToString("\n")
 }
