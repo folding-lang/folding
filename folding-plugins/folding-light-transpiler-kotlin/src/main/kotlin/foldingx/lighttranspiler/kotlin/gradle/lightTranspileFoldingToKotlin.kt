@@ -96,7 +96,7 @@ open class LightTranspileFoldingToKotlinTask @Inject constructor (private val ou
             }
         val exceptionMessage = messages.joinToString(
             "\n  ",
-            "Syntax Error have detected!===\n  ",
+            "Syntax Error have detected!\n=========\n  ",
             "\n========="
         )
         throw RuntimeException(exceptionMessage)
