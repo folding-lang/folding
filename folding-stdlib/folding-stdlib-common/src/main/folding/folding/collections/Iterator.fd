@@ -1,0 +1,18 @@
+package folding.collections
+
+import folding
+
+
+typealias Iterator(T) foreign
+
+next T (iterator~Iterator(T)) foreign T
+hasNext T (iterator~Iterator(T)) foreign Boolean
+
+
+typealias MutableIterator(T) foreign
+expect {
+    impl Iterator(T)
+}
+
+remove T (iterator~MutableIterator(T)) foreign Unit
+

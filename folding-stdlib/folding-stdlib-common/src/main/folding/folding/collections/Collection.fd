@@ -1,0 +1,66 @@
+package folding.collections
+
+import folding
+
+
+typealias Iterable(T) foreign
+
+iterator T (iterable~Iterable(T)) foreign Iterator(T)
+
+
+typealias MutableIterable(T) foreign
+expect {
+    impl Iterable(T)
+}
+
+mutableIterator T (mutableIterable~MutableIterable(T)) foreign MutableIterator(T)
+
+
+typealias Collection(T) foreign
+expect {
+    impl Iterable(T)
+}
+
+size T (collection~Collection(T)) foreign Int
+contains T (collection~Collection(T) element~T) foreign Boolean
+
+
+typealias MutableCollection(T) foreign
+expect {
+    impl MutableIterable(T)
+    impl Collection(T)
+}
+
+add T (mutableCollection~MutableCollection(T) element~T) foreign Boolean
+remove T (mutableCollection~MutableCollection(T) element~T) foreign Boolean
+
+
+typealias List(T) foreign
+expect {
+    impl Collection(T)
+}
+
+get T (list~List(T) index~Int) foreign T
+
+
+typealias MutableList(T) foreign
+expect {
+    impl MutableCollection(T)
+    impl List(T)
+}
+
+set T (mutableList~MutableList(T) index~Int element~T) foreign T
+
+
+typealias Set(T) foreign
+expect {
+    impl Collection(T)
+}
+
+
+typealias MutableSet(T) foreign
+expect {
+    impl MutableCollection(T)
+    impl Set(T)
+}
+

@@ -1,0 +1,12 @@
+package folding.collections.kotlin
+
+import folding
+import folding.collections
+
+
+// asKotlin T (that~Iterable(T)) Iterable(T) = #that
+// asKotlin T (that~Collection(T)) Collection(T) = #that
+// asKotlin T (that~MutableIterable(T)) MutableIterable(T) = #that
+// asKotlin T (that~MutableCollection(T)) MutableCollection(T) = #that
+
+

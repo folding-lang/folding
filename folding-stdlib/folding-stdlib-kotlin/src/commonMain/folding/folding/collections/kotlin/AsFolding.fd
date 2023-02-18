@@ -1,0 +1,22 @@
+package folding.collections.kotlin
+
+import folding
+import folding.collections
+
+
+asFolding T (that~kotlin.collections.'Iterable'(T)) Iterable(T) = DelegateKotlinIterable(#that)
+asFolding T (that~kotlin.collections.'MutableIterable'(T)) MutableIterable(T) = DelegateKotlinMutableIterable(#that)
+asFolding T (that~kotlin.collections.'Collection'(T)) Collection(T) = DelegateKotlinCollection(#that)
+asFolding T (that~kotlin.collections.'MutableCollection'(T)) MutableCollection(T) = DelegateKotlinMutableCollection(#that)
+asFolding T (that~kotlin.collections.'List'(T)) List(T) = DelegateKotlinList(#that)
+asFolding T (that~kotlin.collections.'MutableList'(T)) MutableList(T) = DelegateKotlinMutableList(#that)
+asFolding T (that~kotlin.collections.'Set'(T)) Set(T) = DelegateKotlinSet(#that)
+asFolding T (that~kotlin.collections.'MutableSet'(T)) MutableSet(T) = DelegateKotlinMutableSet(#that)
+
+
+asFolding T (that~kotlin.collections.'Iterator'(T)) Iterator(T) = DelegateKotlinIterator(#that)
+asFolding T (that~kotlin.collections.'MutableIterator'(T)) MutableIterator(T) = DelegateKotlinMutableIterator(#that)
+
+
+asFolding K V (that~kotlin.collections.'Map'(K V)) Map(K V) = DelegateKotlinMap(#that)
+asFolding K V (that~kotlin.collections.'MutableMap'(K V)) MutableMap(K V) = DelegateKotlinMutableMap(#that)

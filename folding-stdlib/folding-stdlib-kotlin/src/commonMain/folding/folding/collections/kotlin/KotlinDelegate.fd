@@ -1,0 +1,144 @@
+package folding.collections.kotlin
+
+import folding
+import folding.collections
+
+
+class DelegateKotlinIterable(T) {
+    (kotlinIterable~kotlin.collections.'Iterable'(T))
+    impl Iterable(T) {
+        :iterator kotlin.collections.'Iterator'(T) = #kotlinIterable:iterator
+    }
+}
+
+class DelegateKotlinMutableIterable(T) {
+    (kotlinMutableIterable~kotlin.collections.'MutableIterable'(T))
+    impl MutableIterable(T) {
+        :iterator kotlin.collections.'MutableIterator'(T) = #kotlinMutableIterable:iterator
+    }
+}
+
+class DelegateKotlinCollection(T) {
+    (kotlinCollection~kotlin.collections.'Collection'(T))
+    inherit (#kotlinCollection) impl DelegateKotlinIterable(T)
+    impl Collection(T) {
+        :#size Int = #kotlinCollection:#size
+        :isEmpty Boolean = #kotlinCollection:isEmpty
+        :contains (element~T) Boolean = #kotlinCollection:contains(#element)
+        :containsAll (elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinCollection:containsAll(#elements)
+    }
+}
+
+class DelegateKotlinMutableCollection(T) {
+    (kotlinMutableCollection~kotlin.collections.'MutableCollection'(T))
+    inherit (#kotlinMutableCollection) impl DelegateKotlinMutableIterable(T)
+    impl MutableCollection(T) {
+        :#size Int = #kotlinMutableCollection:#size
+        :isEmpty Boolean = #kotlinMutableCollection:isEmpty
+        :contains (element~T) Boolean = #kotlinMutableCollection:contains(#element)
+        :containsAll (elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinMutableCollection:containsAll(#elements)
+
+        :add (element~T) Boolean = #kotlinMutableCollection:add(#element)
+        :remove (element~T) Boolean = #kotlinMutableCollection:remove(#element)
+        :addAll (elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinMutableCollection:addAll(#elements)
+        :removeAll (elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinMutableCollection:removeAll(#elements)
+        :retainAll (elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinMutableCollection:retainAll(#elements)
+        :clear Unit = #kotlinMutableCollection:clear
+    }
+}
+
+class DelegateKotlinList(T) {
+    (kotlinList~kotlin.collections.'List'(T))
+    inherit (#kotlinList) impl DelegateKotlinCollection(T)
+    impl List(T) {
+        :get (index~Int) T = #kotlinList:get(#index)
+        :indexOf (element~T) Int = #kotlinList:indexOf(#element)
+        :lastIndexOf (element~T) Int = #kotlinList:indexOf(#element)
+        :listIterator kotlin.collections.'ListIterator'(T) = #kotlinList:listIterator
+        :listIterator (index~Int) kotlin.collections.'ListIterator'(T) = #kotlinList:listIterator(#index)
+        :subList (fromIndex~Int toIndex~Int) kotlin.collections.'List'(T) = #kotlinList:subList(#fromIndex #toIndex)
+    }
+}
+
+class DelegateKotlinMutableList(T) {
+    (kotlinMutableList~kotlin.collections.'MutableList'(T))
+    inherit (#kotlinMutableList) impl DelegateKotlinMutableCollection(T)
+    impl MutableList(T) {
+        :get (index~Int) T = #kotlinMutableList:get(#index)
+        :indexOf (element~T) Int = #kotlinMutableList:indexOf(#element)
+        :lastIndexOf (element~T) Int = #kotlinMutableList:indexOf(#element)
+        :listIterator kotlin.collections.'MutableListIterator'(T) = #kotlinMutableList:listIterator
+        :listIterator (index~Int) kotlin.collections.'MutableListIterator'(T) = #kotlinMutableList:listIterator(#index)
+        :subList (fromIndex~Int toIndex~Int) kotlin.collections.'MutableList'(T) = #kotlinMutableList:subList(#fromIndex #toIndex)
+
+        :addAll (index~Int elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinMutableList:addAll(#index #elements)
+        :set (index~Int element~T) T = #kotlinMutableList:set(#index #element)
+        :add (index~Int element~T) Unit = #kotlinMutableList:add(#index #element)
+        :removeAt (index~Int) T = #kotlinMutableList:removeAt(#index)
+    }
+}
+
+
+class DelegateKotlinSet(T) {
+    (kotlinSet~kotlin.collections.'Set'(T))
+    inherit (#kotlinSet) impl DelegateKotlinCollection(T)
+    impl Set(T)
+}
+
+class DelegateKotlinMutableSet(T) {
+    (kotlinMutableSet~kotlin.collections.'MutableSet'(T))
+    inherit (#kotlinMutableSet) impl DelegateKotlinMutableCollection(T)
+    impl MutableSet(T)
+}
+
+
+class DelegateKotlinMap(K V) {
+    (kotlinMap~kotlin.collections.'Map'(K V))
+    impl Map(K V) {
+        :#size Int = #kotlinMap:#size
+        :#keys kotlin.collections.'Set'(K) = #kotlinMap:#keys
+        :#values kotlin.collections.'Collection'(V) = #kotlinMap:#values
+        :#entries kotlin.collections.'Set'(kotlin.collections.Map.'Entry'(K V)) = #kotlinMap:#entries
+
+        :isEmpty Boolean = #kotlinMap:isEmpty
+        :containsKey (key~K) Boolean = #kotlinMap:containsKey(#key)
+        :containsValue (value~V) Boolean = #kotlinMap:containsValue(#value)
+        :get (key~K) V? = #kotlinMap:get(#key)
+    }
+}
+
+class DelegateKotlinMutableMap(K V) {
+    (kotlinMutableMap~kotlin.collections.'MutableMap'(K V))
+    inherit (#kotlinMutableMap) impl DelegateKotlinMap(K V)
+    impl MutableMap(K V) {
+        :#keys kotlin.collections.'MutableSet'(K) = #kotlinMutableMap:#keys
+        :#values kotlin.collections.'MutableCollection'(V) = #kotlinMutableMap:#values
+        :#entries kotlin.collections.'MutableSet'(kotlin.collections.MutableMap.'MutableEntry'(K V)) = #kotlinMutableMap:#entries
+
+        :put (key~K value~V) V? = #kotlinMutableMap:put(#key #value)
+        :remove (key~K) V? = #kotlinMutableMap:remove(#key)
+        :putAll (it~kotlin.collections.'Map'([~K] V)) Unit = #kotlinMutableMap:putAll(#it)
+        :clear Unit = #kotlinMutableMap:clear
+    }
+}
+
+
+class DelegateKotlinIterator(T) {
+    (kotlinIterator~kotlin.collections.'Iterator'(T))
+    impl Iterator(T) {
+        :next T = #kotlinIterator:next
+        :hasNext Boolean = #kotlinIterator:hasNext
+    }
+}
+
+class DelegateKotlinMutableIterator(T) {
+    (kotlinMutableIterator~kotlin.collections.'MutableIterator'(T))
+    inherit (#kotlinMutableIterator) impl DelegateKotlinIterator(T)
+    impl MutableIterator(T) {
+        :remove Unit = #kotlinMutableIterator:remove
+    }
+}
+
+
+
+

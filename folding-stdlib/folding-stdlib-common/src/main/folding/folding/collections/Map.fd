@@ -1,0 +1,23 @@
+package folding.collections
+
+import folding
+
+
+typealias Map(K V) foreign
+typealias MutableMap(K V) foreign
+expect {
+    impl Map(K V)
+}
+
+class MapEntry(K V) { (key~K value~V) }
+
+
+get K V (map~Map(K V) key~K) foreign V?
+put K V (mutableMap~MutableMap(K V) key~K value~V) foreign V?
+
+
+[=>] K V (key~K value~V) MapEntry(K V) = MapEntry(#key #value)
+
+mapOf K V (mapEntries~Array(MapEntry(K V))) foreign Map(K V)
+mutableMapOf K V (mapEntries~Array(MapEntry(K V))) foreign MutableMap(K V)
+

@@ -1,0 +1,17 @@
+package folding
+
+import folding
+
+
+class Equatable {
+    :equalsTo (other~Any) Boolean
+}
+
+
+[==] (x~Equatable y~Any) Boolean = #x:equalsTo(#y)
+[==] (x~Any y~Any) foreign Boolean
+
+
+
+[===] (x~Any y~Any) foreign Boolean
+

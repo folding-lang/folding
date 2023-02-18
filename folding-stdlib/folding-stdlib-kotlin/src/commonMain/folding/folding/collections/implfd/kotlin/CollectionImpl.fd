@@ -1,0 +1,70 @@
+package folding.collections.implfd.kotlin
+
+import folding
+import folding.collections
+import folding.collections.kotlin
+
+
+abstract class Iterable(T) {
+    impl kotlin.collections.'Iterable'(T)
+}
+
+iterator T (iterable~Iterable(T)) Iterator(T) = #iterable:iterator::asFolding
+
+
+abstract class MutableIterable(T) {
+    impl Iterable(T)
+    impl kotlin.collections.'MutableIterable'(T)
+}
+
+mutableIterator T (mutableIterable~MutableIterable(T)) MutableIterator(T) = #mutableIterable:iterator::asFolding
+
+
+abstract class Collection(T) {
+    impl Iterable(T)
+    impl kotlin.collections.'Collection'(T)
+}
+
+size T (collection~Collection(T)) Int = #collection:#size
+contains T (collection~Collection(T) element~T) Boolean = #collection:contains(#element)
+
+
+abstract class MutableCollection(T) {
+    impl Collection(T)
+    impl MutableIterable(T)
+    impl kotlin.collections.'MutableCollection'(T)
+}
+
+add T (mutableCollection~MutableCollection(T) element~T) Boolean = #mutableCollection:add(#element)
+remove T (mutableCollection~MutableCollection(T) element~T) Boolean = #mutableCollection:remove(#element)
+
+
+abstract class List(T) {
+    impl Collection(T)
+    impl kotlin.collections.'List'(T)
+}
+
+get T (list~List(T) index~Int) T = #list:get(#index)
+
+
+abstract class MutableList(T) {
+    impl List(T)
+    impl MutableCollection(T)
+    impl kotlin.collections.'MutableList'(T)
+}
+
+set T (mutableList~MutableList(T) index~Int element~T) T = #mutableList:set(#index #element)
+
+
+abstract class Set(T) {
+    impl Collection(T)
+    impl kotlin.collections.'Set'(T)
+}
+
+
+abstract class MutableSet(T) {
+    impl MutableCollection(T)
+    impl Set(T)
+    impl kotlin.collections.'Set'(T)
+}
+

@@ -1,0 +1,10 @@
+package folding.collections
+
+import folding
+
+
+//TODO: create collection utility such as list(), mutableList(), map(), fold() ...etc.
+
+
+
+

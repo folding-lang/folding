@@ -1,0 +1,9 @@
+package folding.implfd.kotlin
+
+
+
+typealias Any = kotlin.'Any'
+    toString (obj~Any) String = #obj:toString
+
+unit foreign Unit `Unit`
+
