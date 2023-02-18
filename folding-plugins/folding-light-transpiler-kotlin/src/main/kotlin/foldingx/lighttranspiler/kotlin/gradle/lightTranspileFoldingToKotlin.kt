@@ -4,6 +4,8 @@ import foldingx.gradle.base.FoldingSourceSet
 import foldingx.lighttranspiler.kotlin.DefaultLightTranspilerKt
 import foldingx.parser.FoldingLexer
 import foldingx.parser.FoldingParser
+import foldingx.parser.util.SimpleErrorListener
+import org.antlr.v4.kotlinruntime.ANTLRErrorListener
 import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.gradle.api.tasks.TaskAction
@@ -48,6 +50,8 @@ open class LightTranspileFoldingToKotlinTask @Inject constructor (private val ou
             val inputPath = set.sourceDir + "/folding"
             val outputPath = this.outputPath + "/kotlin"
 
+            val syntaxErrorListenerList = mutableListOf<SimpleErrorListener>()
+
             val inputDir = File(inputPath)
             if (!inputDir.exists()) return
 
@@ -55,9 +59,15 @@ open class LightTranspileFoldingToKotlinTask @Inject constructor (private val ou
             val fileContextsByPackage = files
                 .filterNot { it.isDirectory }
                 .map {
-                    FoldingParser(CommonTokenStream(FoldingLexer(CharStreams.fromString(it.readText())))).file()
+                    val parser = FoldingParser(CommonTokenStream(FoldingLexer(CharStreams.fromString(it.readText()))))
+                    val listener = SimpleErrorListener(it.name)
+                    syntaxErrorListenerList += listener
+                    parser.addErrorListener(listener)
+                    parser.file()
                 }
                 .groupBy { it.findNamespace()?.findPackage_()?.text }
+
+            if (syntaxErrorListenerList.any { it.syntaxErrorCount > 0 }) handleSyntaxErrors(syntaxErrorListenerList)
 
             val transpiledList = fileContextsByPackage.values.flatMap {
                 transpiler.transpilePackage(outputPath,it)
@@ -76,6 +86,20 @@ open class LightTranspileFoldingToKotlinTask @Inject constructor (private val ou
                 file
             }
         }
+    }
+
+    fun handleSyntaxErrors(listeners: List<SimpleErrorListener>): Nothing {
+        val messages = listeners
+            .flatMap { it.messages }
+            .onEach {
+                println(it)
+            }
+        val exceptionMessage = messages.joinToString(
+            "\n  ",
+            "Syntax Error have detected!===\n  ",
+            "\n========="
+        )
+        throw RuntimeException(exceptionMessage)
     }
 
 }
