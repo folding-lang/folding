@@ -83,7 +83,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         }
 
         val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}Class$tHead$inheritsText $tTail"
-        val primaryBody = "{$compoListText\n}"
+        val primaryBody = "{$compoListText".insertMargin(4)+"\n}"
 
         val factoryFunction = if (
             fdJustInterfaceContext.findDefInInterface().isEmpty()
