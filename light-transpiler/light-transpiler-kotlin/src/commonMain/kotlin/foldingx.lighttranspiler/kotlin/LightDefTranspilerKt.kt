@@ -112,7 +112,8 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         } } ?: (
                 (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
                         "implfd.kotlin." + fdCommonForeignDef.id +
-                        tHead.removePrefix(" ").removeSuffix(" ") + param.replace(":"," as")
+                        tHead.removePrefix(" ").removeSuffix(" ") +
+                        param.replace(":"," as").replace("vararg","*")
                 )
 
         val primaryBody = "{\n${paramC?.let { "$it\n" } ?: ""}return ($foreignBody)".insertMargin(4) + "\n}"
