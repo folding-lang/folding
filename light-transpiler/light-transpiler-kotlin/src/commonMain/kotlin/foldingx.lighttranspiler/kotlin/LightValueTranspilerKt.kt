@@ -1,7 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightValueTranspiler
-import foldingx.lighttranspiler.exception.invalidCode
+import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.processAopId
 import foldingx.parser.identifier.processId
@@ -97,7 +97,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             } }
             it.findReturning() != null -> "return " + processValue(it.findReturning()!!.findValue()!!)
 
-            else -> throw invalidCode("do expression",fdDoBlockContext)
+            else -> throw InvalidCode("do expression",fdDoBlockContext)
         } }.insertMargin(4) + "\n}()"
     override fun processJustLambda(fdJustLambdaContext: FoldingParser.JustLambdaContext): String {
         val lambdaContext = fdJustLambdaContext.findLambda()!!

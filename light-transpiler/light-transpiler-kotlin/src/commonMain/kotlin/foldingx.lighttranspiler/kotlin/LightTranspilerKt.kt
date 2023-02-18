@@ -2,7 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.FileWrapper
 import foldingx.lighttranspiler.LightTranspiler
-import foldingx.lighttranspiler.exception.invalidCode
+import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
 
 interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
@@ -104,7 +104,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                 compo.QUOTE().isNotEmpty() ->
                     "import $pkg.${compo.ID()!!.text}" +
                             (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
-                else -> throw invalidCode("import",compo)
+                else -> throw InvalidCode("import",compo)
             }
         } ?: ((importNestId?.let { "import $pkg$it.*\n" } ?: "") + "import $pkg.*")
     }

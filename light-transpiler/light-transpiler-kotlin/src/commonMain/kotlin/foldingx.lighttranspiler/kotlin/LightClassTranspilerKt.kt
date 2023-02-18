@@ -1,7 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightClassTranspiler
-import foldingx.lighttranspiler.exception.invalidCode
+import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
 import foldingx.parser.func.CommonJustDef
 import foldingx.parser.identifier.processId
@@ -11,7 +11,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         is FoldingParser.JustClassContext -> processJustClass(fdClass_Context)
         is FoldingParser.JustAbstractClassContext -> processJustAbstractClass(fdClass_Context)
         is FoldingParser.JustInterfaceContext -> processJustInterface(fdClass_Context)
-        else -> throw invalidCode("class",fdClass_Context)
+        else -> throw InvalidCode("class",fdClass_Context)
     }
 
     override fun processJustClass(fdJustClassContext: FoldingParser.JustClassContext): String {
