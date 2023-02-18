@@ -16,10 +16,10 @@ package folding
 [~ +] (x~Long) foreign Long inverse r (#r)
 [~ -] (x~Long) foreign Long inverse r (-#r)
 
-[+] (x~Byte y~Byte) foreign Int inverse r (~>x  (#r - #x(~Int))(~Byte)) inverse r ((#r - #y(~Int))(~Byte)  ~>y)
-[-] (x~Byte y~Byte) foreign Int inverse r (~>x  (#x(~Int) - #r)(~Byte)) inverse r ((#r + #y(~Int))(~Byte)  ~>y)
-[*] (x~Byte y~Byte) foreign Int inverse r (~>x  (#r / #x(~Int))(~Byte)) inverse r ((#r / #y(~Int))(~Byte)  ~>y)
-[/] (x~Byte y~Byte) foreign Int inverse r (~>x  (#x(~Int) / #r)(~Byte)) inverse r ((#r * #y(~Int))(~Byte)  ~>y)
+[+] (x~Byte y~Byte) foreign Int inverse r (~>x  (#r - #x::asInt)::asByte) inverse r ((#r - #y::asInt)::asByte  ~>y)
+[-] (x~Byte y~Byte) foreign Int inverse r (~>x  (#x::asInt - #r)::asByte) inverse r ((#r + #y::asInt)::asByte  ~>y)
+[*] (x~Byte y~Byte) foreign Int inverse r (~>x  (#r / #x::asInt)::asByte) inverse r ((#r / #y::asInt)::asByte  ~>y)
+[/] (x~Byte y~Byte) foreign Int inverse r (~>x  (#x::asInt / #r)::asByte) inverse r ((#r * #y::asInt)::asByte  ~>y)
 [%] (x~Byte y~Byte) foreign Int
 [~ +] (x~Byte) foreign Byte inverse r (#r)
 [~ -] (x~Byte) foreign Int
