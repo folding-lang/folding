@@ -33,7 +33,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                 is FoldingParser.JustInterfaceContext -> it.ID()!!.text
                 is FoldingParser.JustClassContext -> it.ID()!!.text
                 is FoldingParser.JustAbstractClassContext -> it.ID()!!.text
-                else -> throw RuntimeException()
+                else -> throw InvalidCode("class",it)
             } + "Class"
             val transpiled = transpileClass(it)
             val classText = transpiled.substringBeforeLast("/** folding class constructor function */\n")
@@ -111,12 +111,12 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     override fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext): String = when {
         fdFileCompoContext.findDefinition() != null -> processDefinition(fdFileCompoContext.findDefinition()!!)
         fdFileCompoContext.findField() != null -> processField(fdFileCompoContext.findField()!!)
-        else -> throw RuntimeException("Invalid fileCompo '${fdFileCompoContext.text}'")
+        else -> throw InvalidCode("fileCompo",fdFileCompoContext)
     }
     override fun processDefinition(fdDefinitionContext: FoldingParser.DefinitionContext): String = when {
         fdDefinitionContext.findDef() != null -> processDef(fdDefinitionContext.findDef()!!)
         fdDefinitionContext.findClass_() != null -> processClass(fdDefinitionContext.findClass_()!!)
-        else -> throw RuntimeException("Invalid definition '${fdDefinitionContext.text}'")
+        else -> throw InvalidCode("definition",fdDefinitionContext)
     }
     override fun processDef(fdDefContext: FoldingParser.DefContext): String = transpileDef(fdDefContext)
     override fun processClass(fdClass_Context: FoldingParser.Class_Context): String = transpileClass(fdClass_Context)

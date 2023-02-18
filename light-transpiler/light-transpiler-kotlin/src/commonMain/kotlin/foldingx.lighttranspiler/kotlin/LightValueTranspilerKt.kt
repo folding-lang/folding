@@ -32,7 +32,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.ParenedValueContext -> processParenedValue(fdValueContext)
         is FoldingParser.AnonymousClassObjectContext -> processAnonymousClassObject(fdValueContext)
 
-        else -> throw RuntimeException("Invalid value '${fdValueContext.text}'")
+        else -> throw InvalidCode("value",fdValueContext)
     }
 
     override fun processJustDefaultValue(fdJustDefaultValueContext: FoldingParser.JustDefaultValueContext): String =
@@ -93,7 +93,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                 is FoldingParser.ObjectFieldAssignContext ->
                     "(${processValue(that.findValue(0)!!)}).${that.ID()!!.text} = ${processValue(that.findValue(1)!!)}"
 
-                else -> throw RuntimeException("Invalid field assigning '${that.text}'")
+                else -> throw InvalidCode("field assigning",that)
             } }
             it.findReturning() != null -> "return " + processValue(it.findReturning()!!.findValue()!!)
 
@@ -140,7 +140,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.SingleListArgValueContext ->
             fdArgValueContext.findValue().joinToString(",","array(",")") { processValue(it) }
 
-        else -> throw RuntimeException("Invalid invoke '${fdArgValueContext.text}'")
+        else -> throw InvalidCode("invoke",fdArgValueContext)
     }
     override fun processArgEx(fdArgExContext: FoldingParser.ArgExContext): String = when(fdArgExContext) {
         is FoldingParser.SingleArgContext ->
@@ -149,7 +149,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             (fdArgExContext.ID()?.text?.let { "$it = " } ?: "*") +
                     fdArgExContext.findValue().joinToString(",","array(",")") { processValue(it) }
 
-        else -> throw RuntimeException("Invalid argument '${fdArgExContext.text}'")
+        else -> throw InvalidCode("argument",fdArgExContext)
     }
     override fun processInvoking(fdInvokingContext: FoldingParser.InvokingContext): String =
         fdInvokingContext.findValue().joinToString(",") { processValue(it) }

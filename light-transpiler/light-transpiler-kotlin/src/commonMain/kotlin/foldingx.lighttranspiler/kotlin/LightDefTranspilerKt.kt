@@ -1,6 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightDefTranspiler
+import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
 import foldingx.parser.func.CommonForeignDef
 import foldingx.parser.func.CommonInverseDef
@@ -25,7 +26,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                     processInverseDefining(processInverseDefRaw(p, it))
                 } ?: "")
         }
-        else -> throw RuntimeException("Invalid def '${fdDefContext.text}'")
+        else -> throw InvalidCode("def",fdDefContext)
     }
 
     override fun processJustDef(fdCommonJustDef: CommonJustDef): String {
@@ -107,7 +108,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             it.RawString() != null -> it.RawString()!!.text.removeSurrounding("`")
             it.LBRACE() != null -> it.findForeignElement().find { it.findForeignPlatform()!!.text == "kotlin" }
                 ?.RawString()?.text?.removeSurrounding("`")
-            else -> throw RuntimeException("Invalid foreign def '${fdCommonForeignDef.id}'")
+            else -> throw InvalidCode("foreign def",null)
         } } ?: (
                 (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
                         "implfd.kotlin." + fdCommonForeignDef.id +

@@ -203,13 +203,14 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
                    |        if (${it.ID()!!.text}_field != null) ${it.ID()!!.text}_field = value
                    |        else throw RuntimeException("The field '${it.ID()!!.text}' was already initialized")
                    |    }""".trimMargin()
-            } else throw RuntimeException("Invalid field type '${fdFieldContext.findFieldNotInit()!!.text}': " +
-                "not initialized field type must be non-nullable")
+            } else throw InvalidCode("field type",fdFieldContext.findFieldNotInit(),
+            "not initialized field type must be non-nullable"
+            )
         fdFieldContext.findFieldSetted() != null -> fdFieldContext.findFieldSetted()!!.let {
             val keyword = if (it.MUTABLE() != null) "var" else "val"
             "$keyword ${it.ID()!!.text} ${it.findTypeEx()?.let { t -> ": " + processTypeEx(t) } ?: ""} = ${processValue(it.findValue()!!)}"
         }
-        else -> throw RuntimeException("Invalid field '${fdFieldContext.text}'")
+        else -> throw InvalidCode("field",fdFieldContext)
     }
 
 

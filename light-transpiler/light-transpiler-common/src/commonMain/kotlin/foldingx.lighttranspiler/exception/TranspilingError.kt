@@ -8,7 +8,7 @@ fun ParserRuleContext.getPositionText() = try {
     position!!.start.let { (l,c) -> "$l:$c" }
 } catch (e: Exception) { "" }
 
-class InvalidCode(kind: String, context: ParserRuleContext) :
+class InvalidCode(kind: String, context: ParserRuleContext?, additionalMessage: String? = null) :
     TranspilingError(
-        "Invalid $kind ${context.getPositionText()} '${context.text}'"
+        "Invalid $kind ${context?.getPositionText() ?: ""} ${additionalMessage?.let { ": $it" } ?: ""} ${context?.text?.let { "'$it'" } ?: ""}"
     )
