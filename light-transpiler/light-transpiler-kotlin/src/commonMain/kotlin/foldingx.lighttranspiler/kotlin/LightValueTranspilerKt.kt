@@ -75,6 +75,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processValueTypeCasting(fdValueTypeCastingContext: FoldingParser.ValueTypeCastingContext): String =
         "(${processValue(fdValueTypeCastingContext.findValue()!!)} " +
                 "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!)})"
+    override fun processCallAopFuncBack(fdCallAopFuncBackContext: FoldingParser.CallAopFuncBackContext): String =
+        processAopId(fdCallAopFuncBackContext.findCallingAopId()!!.text) +
+                "(${processValue(fdCallAopFuncBackContext.findValue()!!)})"
     override fun processCallAopFunc(fdCallAopFuncContext: FoldingParser.CallAopFuncContext): String =
         processAopId(fdCallAopFuncContext.findCallingAopId()!!.text) +
                 "(${processValue(fdCallAopFuncContext.findValue()!!)})"
@@ -82,6 +85,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         processOpId(fdCallOpFuncContext.findCallingOpId()!!.text) +
                 "(${processValue(fdCallOpFuncContext.findValue(0)!!)}," +
                 "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
+    override fun processTypeCheck(fdTypeCheckContext: FoldingParser.TypeCheckContext): String =
+        "(" + processValue(fdTypeCheckContext.findValue()!!) +
+                " is " + processTypeEx(fdTypeCheckContext.findTypeEx()!!) + ")"
     override fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext): String =
         processDoBlock(fdDoExpressionContext.findDoBlock()!!)
     fun processDoBlock(fdDoBlockContext: FoldingParser.DoBlockContext) =

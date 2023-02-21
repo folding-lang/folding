@@ -19,8 +19,10 @@ interface LightValueTranspiler {
     fun processTakeNull(fdTakeNullContext: FoldingParser.TakeNullContext): String
     fun processIfExpression(fdIfExpressionContext: FoldingParser.IfExpressionContext): String
     fun processValueTypeCasting(fdValueTypeCastingContext: FoldingParser.ValueTypeCastingContext): String
+    fun processCallAopFuncBack(fdCallAopFuncBackContext: FoldingParser.CallAopFuncBackContext): String
     fun processCallAopFunc(fdCallAopFuncContext: FoldingParser.CallAopFuncContext): String
     fun processCallOpFunc(fdCallOpFuncContext: FoldingParser.CallOpFuncContext): String
+    fun processTypeCheck(fdTypeCheckContext: FoldingParser.TypeCheckContext): String
     fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext): String
     fun processLetExpression(fdLetExpressionContext: FoldingParser.LetExpressionContext): String
     fun processJustLambda(fdJustLambdaContext: FoldingParser.JustLambdaContext): String
