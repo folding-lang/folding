@@ -1,30 +1,30 @@
 package folding
 
 
-asInt (x~Long) foreign Int
-asInt (x~Byte) foreign Int
-asInt (x~Double) foreign Int
-asInt (x~Float) foreign Int
+toInt (x~Long) foreign Int
+toInt (x~Byte) foreign Int
+toInt (x~Double) foreign Int
+toInt (x~Float) foreign Int
 
-asLong (x~Int) foreign Long
-asLong (x~Byte) foreign Long
-asLong (x~Double) foreign Long
-asLong (x~Float) foreign Long
+toLong (x~Int) foreign Long
+toLong (x~Byte) foreign Long
+toLong (x~Double) foreign Long
+toLong (x~Float) foreign Long
 
-asByte (x~Int) foreign Byte
-asByte (x~Long) foreign Byte
-asByte (x~Double) foreign Byte
-asByte (x~Float) foreign Byte
+toByte (x~Int) foreign Byte
+toByte (x~Long) foreign Byte
+toByte (x~Double) foreign Byte
+toByte (x~Float) foreign Byte
 
-asDouble (x~Int) foreign Double
-asDouble (x~Long) foreign Double
-asDouble (x~Byte) foreign Double
-asDouble (x~Float) foreign Double
+toDouble (x~Int) foreign Double
+toDouble (x~Long) foreign Double
+toDouble (x~Byte) foreign Double
+toDouble (x~Float) foreign Double
 
-asFloat (x~Int) foreign Float
-asFloat (x~Long) foreign Float
-asFloat (x~Byte) foreign Float
-asFloat (x~Double) foreign Float
+toFloat (x~Int) foreign Float
+toFloat (x~Long) foreign Float
+toFloat (x~Byte) foreign Float
+toFloat (x~Double) foreign Float
 
 
 

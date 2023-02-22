@@ -3,30 +3,30 @@ package folding.implfd.kotlin
 import folding
 
 
-asInt (x~Long) Int = #x:toInt
-asInt (x~Byte) Int = #x:toInt
-asInt (x~Double) Int = #x:toInt
-asInt (x~Float) Int = #x:toInt
+toInt (x~Long) Int = #x:toInt
+toInt (x~Byte) Int = #x:toInt
+toInt (x~Double) Int = #x:toInt
+toInt (x~Float) Int = #x:toInt
 
-asLong (x~Int) Long = #x:toLong
-asLong (x~Byte) Long = #x:toLong
-asLong (x~Double) Long = #x:toLong
-asLong (x~Float) Long = #x:toLong
+toLong (x~Int) Long = #x:toLong
+toLong (x~Byte) Long = #x:toLong
+toLong (x~Double) Long = #x:toLong
+toLong (x~Float) Long = #x:toLong
 
-asByte (x~Int) Byte = #x:toByte
-asByte (x~Long) Byte = #x:toByte
-asByte (x~Double) Byte = #x:toInt:toByte
-asByte (x~Float) Byte = #x:toInt:toByte
+toByte (x~Int) Byte = #x:toByte
+toByte (x~Long) Byte = #x:toByte
+toByte (x~Double) Byte = #x:toInt:toByte
+toByte (x~Float) Byte = #x:toInt:toByte
 
-asDouble (x~Int) Double = #x:toDouble
-asDouble (x~Long) Double = #x:toDouble
-asDouble (x~Byte) Double = #x:toDouble
-asDouble (x~Float) Double = #x:toDouble
+toDouble (x~Int) Double = #x:toDouble
+toDouble (x~Long) Double = #x:toDouble
+toDouble (x~Byte) Double = #x:toDouble
+toDouble (x~Float) Double = #x:toDouble
 
-asFloat (x~Int) Float = #x:toFloat
-asFloat (x~Long) Float = #x:toFloat
-asFloat (x~Byte) Float = #x:toFloat
-asFloat (x~Double) Float = #x:toFloat
+toFloat (x~Int) Float = #x:toFloat
+toFloat (x~Long) Float = #x:toFloat
+toFloat (x~Byte) Float = #x:toFloat
+toFloat (x~Double) Float = #x:toFloat
 
 
 
