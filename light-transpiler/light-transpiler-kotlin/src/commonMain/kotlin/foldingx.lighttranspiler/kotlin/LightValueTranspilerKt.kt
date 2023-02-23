@@ -92,21 +92,31 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                 " is " + processTypeEx(fdTypeCheckContext.findTypeEx()!!) + ")"
     override fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext): String =
         processDoBlock(fdDoExpressionContext.findDoBlock()!!)
-    fun processDoBlock(fdDoBlockContext: FoldingParser.DoBlockContext) =
-        fdDoBlockContext.findCompo().joinToString("\n","{\n") { when {
-            it.findValue() != null -> processValue(it.findValue()!!)
-            it.findFieldAssign() != null -> it.findFieldAssign()!!.let { that -> when(that) {
-                is FoldingParser.GlobalFieldAssignContext ->
-                    "${that.ID()!!.text} = ${processValue(that.findValue()!!)}"
-                is FoldingParser.ObjectFieldAssignContext ->
-                    "(${processValue(that.findValue(0)!!)}).${that.ID()!!.text} = ${processValue(that.findValue(1)!!)}"
+    fun processDoBlock(fdDoBlockContext: FoldingParser.DoBlockContext): String {
+        var isReturned = false
+        return fdDoBlockContext.findCompo().joinToString("\n", "{\n") {
+            when {
+                isReturned -> ""
+                it.findValue() != null -> processValue(it.findValue()!!) + ";folding.unit()"
+                it.findFieldAssign() != null -> it.findFieldAssign()!!.let { that ->
+                    when (that) {
+                        is FoldingParser.GlobalFieldAssignContext ->
+                            "${that.ID()!!.text} = ${processValue(that.findValue()!!)}"
+                        is FoldingParser.ObjectFieldAssignContext ->
+                            "(${processValue(that.findValue(0)!!)}).${that.ID()!!.text} = ${processValue(that.findValue(1)!!)}"
 
-                else -> throw InvalidCode("field assigning",that)
-            } }
-            it.findReturning() != null -> "return " + processValue(it.findReturning()!!.findValue()!!)
+                        else -> throw InvalidCode("field assigning", that)
+                    }
+                }
+                it.findReturning() != null -> {
+                    isReturned = true
+                    processValue(it.findReturning()!!.findValue()!!)
+                }
 
-            else -> throw InvalidCode("do expression",fdDoBlockContext)
-        } }.insertMargin(4) + "\n}()"
+                else -> throw InvalidCode("do expression", fdDoBlockContext)
+            }
+        }.insertMargin(4) + "\n}()"
+    }
     override fun processJustLambda(fdJustLambdaContext: FoldingParser.JustLambdaContext): String {
         val lambdaContext = fdJustLambdaContext.findLambda()!!
         val (param,paramC) = lambdaContext.findParameterForLambda()?.let { p ->
