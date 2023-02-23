@@ -12,9 +12,6 @@ abstract class MutableMap(K V) {
     impl kotlin.collections.'MutableMap'(K V)
 }
 
-get K V (map~Map(K V) key~K) V? = #map:get(#key)
-put K V (mutableMap~MutableMap(K V) key~K value~V) V? = #mutableMap:put(#key #value)
-
 
 mapOf K V (mapEntries~Array(MapEntry(K V))) Map(K V) =
     kotlin.collections.mapOf(...#mapEntries:map(

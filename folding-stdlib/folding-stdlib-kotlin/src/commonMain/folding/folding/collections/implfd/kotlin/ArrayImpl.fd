@@ -8,6 +8,10 @@ import folding.collections.kotlin
 typealias Array(T) = kotlin.'Array'(T)
 
 
+ArrayOfNulls T (size~Int) foreign Array(T?) `kotlin.arrayOfNulls<TClass>(size)`
+
+
+
 get T (array~Array(T) index~Int) T = #array:get(#index)
 
 set T (array~Array(T) index~Int element~T) T =

@@ -4,15 +4,18 @@ import folding
 
 
 typealias Iterator(T) foreign
+expect {
+    :getNext T
+    :hasNext Boolean
+}
 
-next T (iterator~Iterator(T)) foreign T
-hasNext T (iterator~Iterator(T)) foreign Boolean
+next T (iterator~Iterator(T)) T = #iterator:getNext
+hasNext (iterator~Iterator([?])) Boolean = #iterator:hasNext
 
 
 typealias MutableIterator(T) foreign
 expect {
+    :remove Unit
     impl Iterator(T)
 }
-
-remove T (iterator~MutableIterator(T)) foreign Unit
 

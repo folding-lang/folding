@@ -4,52 +4,56 @@ import folding
 
 
 typealias Iterable(T) foreign
+expect {
+    :getIterator Iterator(T)
+}
 
-iterator T (iterable~Iterable(T)) foreign Iterator(T)
+iterator T (iterable~Iterable(T)) Iterator(T) = #iterable:getIterator
 
 
 typealias MutableIterable(T) foreign
 expect {
+    :mutableIterator MutableIterator(T)
+
     impl Iterable(T)
 }
-
-mutableIterator T (mutableIterable~MutableIterable(T)) foreign MutableIterator(T)
 
 
 typealias Collection(T) foreign
 expect {
+    :length Int
+    :contains T (element~T) Boolean
+
     impl Iterable(T)
 }
-
-size T (collection~Collection(T)) foreign Int
-contains T (collection~Collection(T) element~T) foreign Boolean
 
 
 typealias MutableCollection(T) foreign
 expect {
+    :add (element~T) Boolean
+    :remove (element~T) Boolean
+
     impl MutableIterable(T)
     impl Collection(T)
 }
 
-add T (mutableCollection~MutableCollection(T) element~T) foreign Boolean
-remove T (mutableCollection~MutableCollection(T) element~T) foreign Boolean
-
 
 typealias List(T) foreign
 expect {
+    :get (index~Int) T
+
     impl Collection(T)
 }
-
-get T (list~List(T) index~Int) foreign T
 
 
 typealias MutableList(T) foreign
 expect {
+    :add (index~Int element~T) Unit
+    :set (index~Int element~T) T
+
     impl MutableCollection(T)
     impl List(T)
 }
-
-set T (mutableList~MutableList(T) index~Int element~T) foreign T
 
 
 typealias Set(T) foreign

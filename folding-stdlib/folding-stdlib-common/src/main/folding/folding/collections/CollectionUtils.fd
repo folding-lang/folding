@@ -5,27 +5,94 @@ import folding
 
 
 List T (elements... ~T) foreign List([~T])
-inverse (#result::get(0))
-inverse (#result::get(0) #result::get(1))
-inverse (#result::get(0) #result::get(1) #result::get(2))
-inverse (#result::get(0) #result::get(1) #result::get(2) #result::get(3))
-inverse (#result::get(0) #result::get(1) #result::get(2) #result::get(3) #result::get(4))
+inverse (#result:get(0))
+inverse (#result:get(0) #result:get(1))
+inverse (#result:get(0) #result:get(1) #result:get(2))
+inverse (#result:get(0) #result:get(1) #result:get(2) #result:get(3))
+inverse (#result:get(0) #result:get(1) #result:get(2) #result:get(3) #result:get(4))
 
 MutableList T (elements... ~T) foreign MutableList(T)
-inverse (#result::get(0))
-inverse (#result::get(0) #result::get(1))
-inverse (#result::get(0) #result::get(1) #result::get(2))
-inverse (#result::get(0) #result::get(1) #result::get(2) #result::get(3))
-inverse (#result::get(0) #result::get(1) #result::get(2) #result::get(3) #result::get(4))
+inverse (#result:get(0))
+inverse (#result:get(0) #result:get(1))
+inverse (#result:get(0) #result:get(1) #result:get(2))
+inverse (#result:get(0) #result:get(1) #result:get(2) #result:get(3))
+inverse (#result:get(0) #result:get(1) #result:get(2) #result:get(3) #result:get(4))
 
 
 Set T (elements... ~T) foreign Set([~T])
 MutableSet T (elements... ~T) foreign MutableSet(T)
 
 
+makeArray T (iterator~Iterator(T) dest~Array(T?) index~Int) Array(T) =
+    if (#iterator::hasNext) do {
+        #dest::set(#index #iterator::next)
+        return #iterator::makeArray(#dest #index+1)
+    }
+    else #dest(~Array(T))
+toArray T (collection~Collection(T)) Array(T) =
+    #collection::iterator::makeArray(ArrayOfNulls@T(#collection:length) 0)
 
 
-//fold T R (iterable~Iterable([~T]) initial~R operation~(R T)->R) foreign R
+
+
+makeMutableCollection T C~MutableCollection([T~]) (iterator~Iterator(T) dest~C) C =
+    if (#iterator::hasNext) do {
+        #dest:add(#iterator::next)
+        return #iterator::makeMutableCollection(#dest)
+    }
+    else #dest
+
+
+
+toMutableList T (iterable~Iterable(T)) MutableList(T) =
+    #iterable::iterator::makeMutableCollection(MutableList)
+toList T (iterable~Iterable(T)) List(T) = #iterable::toMutableList
+
+toMutableSet T (iterable~Iterable(T)) MutableSet(T) =
+    #iterable::iterator::makeMutableCollection(MutableSet)
+toSet T (iterable~Iterable(T)) Set(T) = #iterable::toMutableSet
+
+
+removeAt T (mutableList~MutableList(T) index~Int) Boolean =
+    #mutableList:remove(#mutableList:get(#index))
+
+
+head T (iterable~Iterable(T)) T = #iterable::iterator::next
+last T (iterable~Iterable(T)) T =
+    let ->result = #iterable::toMutableList
+    #result:get(#result:length - 1)
+tail T (iterable~Iterable(T)) List(T) =
+    let ->result = #iterable::toMutableList
+    do { #result:remove(#result::head) return #result }
+init T (iterable~Iterable(T)) List(T) =
+    let ->result = #iterable::toMutableList
+    do { #result:remove(#iterable::last) return #result }
+
+
+[+:] T (element~T list~List(T)) List(T) =
+    let ->result = #list::toMutableList
+    do { #result:add(0 #element) return #result }
+inverse (#result::head #result::tail)
+
+[:+] T (list~List(T) element~T) List(T) =
+    let ->result = #list::toMutableList
+    do { #result:add(#element) return #result }
+inverse (#result::init #result::last)
+
+[++] T (list~List(T) otherList~List(T)) List(T) =
+    if (#list:length == 0) #otherList else
+    let ->head +: ->tail = #list
+    #head +: (#tail ++ #otherList)
+
+
+
+
+
+fold T R (iterable~Iterable([~T]) initial~R operation~(R T)->R) R =
+    let ->head +: ->tail = #iterable::toList
+    let ->accumulator = #operation:(#initial #head)
+    #tail::fold(#accumulator #operation)
+
 
 
 

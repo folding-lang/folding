@@ -6,27 +6,26 @@ import folding.collections.kotlin
 
 
 abstract class Iterable(T) {
+    :getIterator Iterator(T) = #this:iterator::asFolding
+
     impl kotlin.collections.'Iterable'(T)
 }
 
-iterator T (iterable~Iterable(T)) Iterator(T) = #iterable:iterator::asFolding
-
 
 abstract class MutableIterable(T) {
+    :mutableIterator MutableIterator(T) = #this:iterator::asFolding
+
     impl Iterable(T)
     impl kotlin.collections.'MutableIterable'(T)
 }
 
-mutableIterator T (mutableIterable~MutableIterable(T)) MutableIterator(T) = #mutableIterable:iterator::asFolding
-
 
 abstract class Collection(T) {
+    :length Int = #this:#size
+
     impl Iterable(T)
     impl kotlin.collections.'Collection'(T)
 }
-
-size T (collection~Collection(T)) Int = #collection:#size
-contains T (collection~Collection(T) element~T) Boolean = #collection:contains(#element)
 
 
 abstract class MutableCollection(T) {
@@ -35,16 +34,11 @@ abstract class MutableCollection(T) {
     impl kotlin.collections.'MutableCollection'(T)
 }
 
-add T (mutableCollection~MutableCollection(T) element~T) Boolean = #mutableCollection:add(#element)
-remove T (mutableCollection~MutableCollection(T) element~T) Boolean = #mutableCollection:remove(#element)
-
 
 abstract class List(T) {
     impl Collection(T)
     impl kotlin.collections.'List'(T)
 }
-
-get T (list~List(T) index~Int) T = #list:get(#index)
 
 
 abstract class MutableList(T) {
@@ -52,8 +46,6 @@ abstract class MutableList(T) {
     impl MutableCollection(T)
     impl kotlin.collections.'MutableList'(T)
 }
-
-set T (mutableList~MutableList(T) index~Int element~T) T = #mutableList:set(#index #element)
 
 
 abstract class Set(T) {

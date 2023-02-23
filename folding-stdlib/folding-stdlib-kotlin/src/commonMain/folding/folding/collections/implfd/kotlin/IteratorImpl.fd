@@ -6,19 +6,15 @@ import folding.collections.kotlin
 
 
 abstract class Iterator(T) {
+    :getNext T = #this:next
     impl kotlin.collections.'Iterator'(T)
 }
-
-next T (iterator~Iterator(T)) T = #iterator:next
-hasNext T (iterator~Iterator(T)) Boolean = #iterator:hasNext
 
 
 abstract class MutableIterator(T) {
     impl kotlin.collections.'MutableIterator'(T)
     impl Iterator(T)
 }
-
-remove T (iterator~MutableIterator(T)) Unit = #iterator:remove
 
 
 
