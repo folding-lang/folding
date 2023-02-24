@@ -45,7 +45,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         "::" + processReference(fdReflectedContext.findReference()!!)
     override fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String =
         "${processReference(fdCallFunctionContext.findReference()!!)}"+
-                fdCallFunctionContext.findArgValue().let { when (it) {
+                (fdCallFunctionContext.findArgValue()?.let { when (it) {
                     is FoldingParser.PrimaryArgValueContext ->
                         if (it.findTypeEx().isNotEmpty())
                             it.findTypeEx().joinToString(",","<",">") {
@@ -59,7 +59,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                             }
                         else ""
                     else -> throw InvalidCode("type argument",it)
-                } } + "(" +
+                } } ?: "") + "(" +
                 (fdCallFunctionContext.findArgValue()?.let { processArgValue(it) } ?: "") + ")"
     override fun processUseForeignClass(fdUseForeignClassContext: FoldingParser.UseForeignClassContext): String =
         "${processReference(fdUseForeignClassContext.findReference()!!)}(" +
