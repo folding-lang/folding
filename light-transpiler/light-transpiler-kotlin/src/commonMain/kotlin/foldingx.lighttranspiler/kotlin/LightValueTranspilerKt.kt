@@ -11,6 +11,7 @@ import foldingx.parser.inversing.processInverseValue
 interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processValue(fdValueContext: FoldingParser.ValueContext): String = when(fdValueContext) {
         is FoldingParser.JustDefaultValueContext -> processJustDefaultValue(fdValueContext)
+        is FoldingParser.NullContext -> processNull(fdValueContext)
         is FoldingParser.ReflectedContext -> processReflected(fdValueContext)
         is FoldingParser.CallFunctionContext -> processCallFunction(fdValueContext)
         is FoldingParser.UseForeignClassContext -> processUseForeignClass(fdValueContext)
@@ -39,6 +40,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
     override fun processJustDefaultValue(fdJustDefaultValueContext: FoldingParser.JustDefaultValueContext): String =
         fdJustDefaultValueContext.text
+    override fun processNull(fdNullContext: FoldingParser.NullContext): String = "null"
     override fun processReflected(fdReflectedContext: FoldingParser.ReflectedContext): String =
         "::" + processReference(fdReflectedContext.findReference()!!)
     override fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String =
@@ -154,9 +156,13 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
     override fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): String = when(fdArgValueContext) {
         is FoldingParser.PrimaryArgValueContext ->
-            fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
+            if (fdArgValueContext.findTypeEx().isNotEmpty()) fdArgValueContext.findTypeEx().joinToString(",","<",">") {
+                processTypeEx(it)
+            } else "" + fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
         is FoldingParser.SingleListArgValueContext ->
-            fdArgValueContext.findValue().joinToString(",","array(",")") { processValue(it) }
+            if (fdArgValueContext.findTypeEx().isNotEmpty()) fdArgValueContext.findTypeEx().joinToString(",","<",">") {
+                processTypeEx(it)
+            } else "" + fdArgValueContext.findValue().joinToString(",","array(",")") { processValue(it) }
 
         else -> throw InvalidCode("invoke",fdArgValueContext)
     }

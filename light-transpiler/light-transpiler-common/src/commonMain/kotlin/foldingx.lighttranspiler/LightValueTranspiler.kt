@@ -6,6 +6,7 @@ interface LightValueTranspiler {
     fun processValue(fdValueContext: FoldingParser.ValueContext): String
 
     fun processJustDefaultValue(fdJustDefaultValueContext: FoldingParser.JustDefaultValueContext): String
+    fun processNull(fdNullContext: FoldingParser.NullContext): String
     fun processReflected(fdReflectedContext: FoldingParser.ReflectedContext): String
     fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String
     fun processUseForeignClass(fdUseForeignClassContext: FoldingParser.UseForeignClassContext): String
