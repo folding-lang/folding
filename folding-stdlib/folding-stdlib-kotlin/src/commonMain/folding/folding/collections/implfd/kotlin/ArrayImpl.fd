@@ -8,7 +8,9 @@ import folding.collections.kotlin
 typealias Array(T) = kotlin.'Array'(T)
 
 
-ArrayOfNulls T (size~Int) foreign Array(T?) `kotlin.arrayOfNulls<TClass>(size)`
+ArrayOfNulls T (size~Int) Array(T?) =
+    if (#size == 0) array@T?()
+    else ArrayOfNulls@T(#size - 1):plus(null)
 
 
 
