@@ -44,7 +44,22 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processReflected(fdReflectedContext: FoldingParser.ReflectedContext): String =
         "::" + processReference(fdReflectedContext.findReference()!!)
     override fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String =
-        "${processReference(fdCallFunctionContext.findReference()!!)}(" +
+        "${processReference(fdCallFunctionContext.findReference()!!)}"+
+                fdCallFunctionContext.findArgValue().let { when (it) {
+                    is FoldingParser.PrimaryArgValueContext ->
+                        if (it.findTypeEx().isNotEmpty())
+                            it.findTypeEx().joinToString(",","<",">") {
+                                processTypeEx(it)
+                            }
+                        else ""
+                    is FoldingParser.SingleListArgValueContext ->
+                        if (it.findTypeEx().isNotEmpty())
+                            it.findTypeEx().joinToString(",","<",">") {
+                                processTypeEx(it)
+                            }
+                        else ""
+                    else -> throw InvalidCode("type argument",it)
+                } } + "(" +
                 (fdCallFunctionContext.findArgValue()?.let { processArgValue(it) } ?: "") + ")"
     override fun processUseForeignClass(fdUseForeignClassContext: FoldingParser.UseForeignClassContext): String =
         "${processReference(fdUseForeignClassContext.findReference()!!)}(" +
@@ -156,13 +171,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
     override fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): String = when(fdArgValueContext) {
         is FoldingParser.PrimaryArgValueContext ->
-            if (fdArgValueContext.findTypeEx().isNotEmpty()) fdArgValueContext.findTypeEx().joinToString(",","<",">") {
-                processTypeEx(it)
-            } else "" + fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
+            fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
         is FoldingParser.SingleListArgValueContext ->
-            if (fdArgValueContext.findTypeEx().isNotEmpty()) fdArgValueContext.findTypeEx().joinToString(",","<",">") {
-                processTypeEx(it)
-            } else "" + fdArgValueContext.findValue().joinToString(",","array(",")") { processValue(it) }
+            fdArgValueContext.findValue().joinToString(",","array(",")") { processValue(it) }
 
         else -> throw InvalidCode("invoke",fdArgValueContext)
     }
