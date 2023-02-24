@@ -2,6 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightValueTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
+import foldingx.lighttranspiler.util.TranspiledArgValue
 import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.processAopId
 import foldingx.parser.identifier.processId
@@ -43,40 +44,37 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processNull(fdNullContext: FoldingParser.NullContext): String = "null"
     override fun processReflected(fdReflectedContext: FoldingParser.ReflectedContext): String =
         "::" + processReference(fdReflectedContext.findReference()!!)
-    override fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String =
-        "${processReference(fdCallFunctionContext.findReference()!!)}"+
-                (fdCallFunctionContext.findArgValue()?.let { when (it) {
-                    is FoldingParser.PrimaryArgValueContext ->
-                        if (it.findTypeEx().isNotEmpty())
-                            it.findTypeEx().joinToString(",","<",">") {
-                                processTypeEx(it)
-                            }
-                        else ""
-                    is FoldingParser.SingleListArgValueContext ->
-                        if (it.findTypeEx().isNotEmpty())
-                            it.findTypeEx().joinToString(",","<",">") {
-                                processTypeEx(it)
-                            }
-                        else ""
-                    else -> throw InvalidCode("type argument",it)
-                } } ?: "") + "(" +
-                (fdCallFunctionContext.findArgValue()?.let { processArgValue(it) } ?: "") + ")"
-    override fun processUseForeignClass(fdUseForeignClassContext: FoldingParser.UseForeignClassContext): String =
-        "${processReference(fdUseForeignClassContext.findReference()!!)}(" +
-                (fdUseForeignClassContext.findArgValue()?.let { processArgValue(it) } ?: "") + ")"
+    override fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String {
+        val (typeArguments,arguments) = fdCallFunctionContext.findArgValue()?.let { processArgValue(it) }
+            ?: TranspiledArgValue("","")
+        return processReference(fdCallFunctionContext.findReference()!!) + typeArguments + "(" +
+                arguments + ")"
+    }
+    override fun processUseForeignClass(fdUseForeignClassContext: FoldingParser.UseForeignClassContext): String {
+        val (typeArguments,arguments) = fdUseForeignClassContext.findArgValue()?.let { processArgValue(it) }
+            ?: TranspiledArgValue("","")
+        return "${processReference(fdUseForeignClassContext.findReference()!!)}$typeArguments(" +
+                arguments + ")"
+    }
     override fun processGetFieldGlobal(fdGetFieldGlobalContext: FoldingParser.GetFieldGlobalContext): String =
         processReference(fdGetFieldGlobalContext.findReference()!!)
     override fun processGetField(fdGetFieldContext: FoldingParser.GetFieldContext): String =
         "(${processValue(fdGetFieldContext.findValue()!!)}).${fdGetFieldContext.ID()!!.text}"
-    override fun processCallMethod(fdCallMethodContext: FoldingParser.CallMethodContext): String =
-        "(${processValue(fdCallMethodContext.findValue()!!)})." + "${fdCallMethodContext.ID()!!.text}(" +
-                (fdCallMethodContext.findArgValue()?.let { processArgValue(it) } ?: "") + ")"
+    override fun processCallMethod(fdCallMethodContext: FoldingParser.CallMethodContext): String {
+        val (typeArguments,arguments) = fdCallMethodContext.findArgValue()?.let { processArgValue(it) }
+            ?: TranspiledArgValue("","")
+        return "(${processValue(fdCallMethodContext.findValue()!!)})." + fdCallMethodContext.ID()!!.text +
+                typeArguments + "(" + arguments + ")"
+    }
     override fun processReflectedMethod(fdReflectedMethodContext: FoldingParser.ReflectedMethodContext): String =
         "(${processValue(fdReflectedMethodContext.findValue()!!)})::${fdReflectedMethodContext.ID()!!.text}"
-    override fun processCallFunctionLikeMethod(fdCallFunctionLikeMethodContext: FoldingParser.CallFunctionLikeMethodContext): String =
-        fdCallFunctionLikeMethodContext.ID()!!.text + "(" +
+    override fun processCallFunctionLikeMethod(fdCallFunctionLikeMethodContext: FoldingParser.CallFunctionLikeMethodContext): String {
+        val (typeArguments,arguments) = fdCallFunctionLikeMethodContext.findArgValue()?.let { processArgValue(it) }
+            ?: TranspiledArgValue("","")
+        return fdCallFunctionLikeMethodContext.ID()!!.text + typeArguments + "(" +
                 processValue(fdCallFunctionLikeMethodContext.findValue()!!) +
-                (fdCallFunctionLikeMethodContext.findArgValue()?.let { ", " + processArgValue(it) } ?: "") + ")"
+                (if (arguments == "") "" else ", $arguments") + ")"
+    }
     override fun processInvokeValue(fdInvokeValueContext: FoldingParser.InvokeValueContext): String =
         "(${processValue(fdInvokeValueContext.findValue()!!)}).invoke(" +
                 (fdInvokeValueContext.findInvoking()?.let { processInvoking(it) } ?: "") + ")"
@@ -169,13 +167,33 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
     fun getClassTranspilerKt(): LightClassTranspilerKt
 
-    override fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): String = when(fdArgValueContext) {
-        is FoldingParser.PrimaryArgValueContext ->
-            fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
-        is FoldingParser.SingleListArgValueContext ->
-            fdArgValueContext.findValue().joinToString(",","array(",")") { processValue(it) }
+    override fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): TranspiledArgValue {
+        val typeArguments = when (val it = fdArgValueContext) {
+            is FoldingParser.PrimaryArgValueContext ->
+                if (it.findTypeEx().isNotEmpty())
+                    it.findTypeEx().joinToString(",","<",">") {
+                        processTypeEx(it)
+                    }
+                else ""
+            is FoldingParser.SingleListArgValueContext ->
+                if (it.findTypeEx().isNotEmpty())
+                    it.findTypeEx().joinToString(",","<",">") {
+                        processTypeEx(it)
+                    }
+                else ""
+            else -> throw InvalidCode("type argument",it)
+        }
+        val arguments = when (fdArgValueContext) {
+            is FoldingParser.PrimaryArgValueContext ->
+                fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
 
-        else -> throw InvalidCode("invoke",fdArgValueContext)
+            is FoldingParser.SingleListArgValueContext ->
+                fdArgValueContext.findValue().joinToString(",", "array(", ")") { processValue(it) }
+
+            else -> throw InvalidCode("invoke", fdArgValueContext)
+        }
+
+        return TranspiledArgValue(typeArguments, arguments)
     }
     override fun processArgEx(fdArgExContext: FoldingParser.ArgExContext): String = when(fdArgExContext) {
         is FoldingParser.SingleArgContext ->
@@ -220,7 +238,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     ): Pair<String,String> {
         val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!) }
         val inherits = inheritContext?.findImpl()?.findTypeEx()?.let { processTypeEx(it) }?.let {
-            listOf(it + (inheritContext.findArgValue()?.let { "(${processArgValue(it)})" } ?: "()")) + interfaceList
+            listOf(it + (inheritContext.findArgValue()?.let { "(${processArgValue(it).arguments})" } ?: "()")) + interfaceList
         } ?: interfaceList
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
 
