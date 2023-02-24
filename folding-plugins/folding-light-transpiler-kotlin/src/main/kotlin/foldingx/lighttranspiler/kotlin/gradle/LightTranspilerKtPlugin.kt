@@ -51,12 +51,8 @@ open class LightTranspilerKtPlugin : Plugin<Project> {
             val task = target.tasks
                 .filterIsInstance<LightTranspileFoldingToKotlinTask>()
                 .find { it.name == name }
-            if (task != null)
-                target.tasks.create(name,LightTranspileFoldingToKotlinTask::class.java,it.outputPath,it.sourceSets)
-            else {
-                target.tasks.removeIf { it.name == name }
-                target.tasks.create(name,LightTranspileFoldingToKotlinTask::class.java,it.outputPath,it.sourceSets)
-            }
+            if (task != null) target.tasks.remove(task) // FIXME: tasks container does not support removing
+            target.tasks.create(name,LightTranspileFoldingToKotlinTask::class.java,it.outputPath,it.sourceSets)
         }
     }
 }
