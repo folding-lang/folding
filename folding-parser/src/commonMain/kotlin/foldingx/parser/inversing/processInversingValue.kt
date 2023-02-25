@@ -21,6 +21,7 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
             is FoldingParser.CallFunctionContext -> processId(value.findReference()!!.findCommonIdentifier()!!)
             is FoldingParser.CallAopFuncContext -> processAopId(value.findCallingAopId()!!.text)
             is FoldingParser.CallOpFuncContext -> processOpId(value.findCallingOpId()!!.text)
+            is FoldingParser.CallFunctionLikeMethodContext -> value.ID()!!.text
             else -> throw RuntimeException()
         }
 
@@ -31,6 +32,11 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
                 }
             is FoldingParser.CallAopFuncContext -> listOf(value.findValue()!!)
             is FoldingParser.CallOpFuncContext -> value.findValue()
+            is FoldingParser.CallFunctionLikeMethodContext ->
+                listOf(value.findValue()!!) +
+                        (value.findArgValue()!! as FoldingParser.PrimaryArgValueContext).findArgEx().map {
+                    (it as FoldingParser.SingleArgContext).findValue()!!
+                }
             else -> throw RuntimeException()
         }
 
@@ -42,9 +48,11 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
         val invValues = values.filter { isInverseValue(it) }
         val justValues = values - invValues.toSet()
 
-        val typeArgs = (value as? FoldingParser.CallFunctionContext)?.let {
-            (it.findArgValue()!! as FoldingParser.PrimaryArgValueContext).findTypeEx()
-        } ?: listOf()
+        val typeArgs = when(value) {
+            is FoldingParser.CallFunctionContext -> (value.findArgValue()!! as FoldingParser.PrimaryArgValueContext).findTypeEx()
+            is FoldingParser.CallFunctionLikeMethodContext -> (value.findArgValue()!! as FoldingParser.PrimaryArgValueContext).findTypeEx()
+            else -> listOf()
+        }
 
 
         invValues.flatMapIndexed { i, it ->
@@ -58,29 +66,31 @@ fun isInverseValue(value: FoldingParser.ValueContext): Boolean {
         return isInverseValue(value.findValue()!!)
     if (value is FoldingParser.OutputOfInversingContext)
         return true
-    if (!(         value is FoldingParser.CallFunctionContext
-                || value is FoldingParser.CallAopFuncContext
-                || value is FoldingParser.CallOpFuncContext)
-        ) return false
 
-    when(value){
-        is FoldingParser.CallFunctionContext -> {
-            if (value.findArgValue() == null) return false
-            if ((value.findArgValue() as? FoldingParser.PrimaryArgValueContext)?.let {
-                    it.findArgEx().all {
-                        (it as? FoldingParser.SingleArgContext)?.let {
-                            !isInverseValue(it.findValue()!!) } != false
-                    }
-            } == true)
-                return false
-        }
+    return when(value){
+        is FoldingParser.CallFunctionContext ->
+            if (value.findArgValue() == null) false
+            else (value.findArgValue() as? FoldingParser.PrimaryArgValueContext)?.let {
+                it.findArgEx().any { when(it){
+                    is FoldingParser.SingleArgContext -> isInverseValue(it.findValue()!!)
+                    else -> false
+                } }
+            } ?: false
         is FoldingParser.CallAopFuncContext ->
             return isInverseValue(value.findValue()!!)
         is FoldingParser.CallOpFuncContext ->
             return value.findValue().any { isInverseValue(it) }
+        is FoldingParser.CallFunctionLikeMethodContext ->
+            return if (isInverseValue(value.findValue()!!)) true
+            else if (value.findArgValue() == null) false
+            else (value.findArgValue() as? FoldingParser.PrimaryArgValueContext)?.let {
+                it.findArgEx().any { when(it){
+                    is FoldingParser.SingleArgContext -> isInverseValue(it.findValue()!!)
+                    else -> false
+                } }
+            } ?: false
+
+        else -> false
     }
-
-    return true
-
 
 }
