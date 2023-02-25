@@ -1,0 +1,5 @@
+package folding
+
+
+[++] (x~String y~String) foreign String
+

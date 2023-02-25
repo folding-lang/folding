@@ -1,0 +1,6 @@
+package folding.implfd.kotlin
+
+import folding
+
+
+[++] (x~String y~String) foreign String `x + y`
