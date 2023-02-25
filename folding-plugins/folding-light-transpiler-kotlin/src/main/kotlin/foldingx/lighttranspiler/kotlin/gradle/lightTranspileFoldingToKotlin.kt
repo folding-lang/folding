@@ -8,6 +8,7 @@ import foldingx.parser.util.SimpleErrorListener
 import org.antlr.v4.kotlinruntime.ANTLRErrorListener
 import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.TaskContainerScope
@@ -40,8 +41,8 @@ open class LightTranspileFoldingToKotlinToAllTask : LightTranspilerKtPluginTask(
     }
 }
 
-open class LightTranspileFoldingToKotlinTask @Inject constructor (private val outputPath: String, private val sourcesSets: List<FoldingSourceSet>) : LightTranspilerKtPluginTask() {
-
+open class LightTranspileFoldingToKotlinTask @Inject constructor (private val outputPath: String, private val sourcesSets: MutableList<FoldingSourceSet>) : LightTranspilerKtPluginTask() {
+    internal fun sourcesSets() = sourcesSets
     @TaskAction
     fun task() {
         val transpiler = DefaultLightTranspilerKt
