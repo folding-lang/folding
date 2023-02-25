@@ -16,7 +16,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
         val namespace = fdFileContextList.first().findNamespace()?.let { it.findPackage_()!!.text }
         currentPackage = namespace
         val packagePath = namespace?.replace(".","/") ?: ""
-        val top = namespace?.let { "package $namespace\n\n" }
+        val top = namespace?.let { "package $namespace\n\n" } ?: ""
 
         val importText = fdFileContextList.flatMap {
             it.findImportEx().flatMap { processImportEx(it).split("\n") }
