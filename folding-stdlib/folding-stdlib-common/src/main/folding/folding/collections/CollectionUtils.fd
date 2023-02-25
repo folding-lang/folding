@@ -42,6 +42,13 @@ makeMutableCollection T C~MutableCollection([T~]) (iterator~Iterator(T) dest~C) 
     }
     else #dest
 
+makeMutableCollectionTransform T R RC~MutableCollection([R~]) (iterator~Iterator(T) transform~(T)->R dest~RC) RC =
+    if (#iterator::hasNext) do {
+        #dest:add(#transform:(#iterator::next))
+        return #iterator::makeMutableCollectionTransform(#transform #dest)
+    }
+    else #dest
+
 
 
 toMutableList T (iterable~Iterable(T)) MutableList(T) =
@@ -89,9 +96,13 @@ inverse (#result::init #result::last)
 
 
 fold T R (iterable~Iterable([~T]) initial~R operation~(R T)->R) R =
+    if (#iterable::iterator::hasNext == false) #initial else
     let ->head +: ->tail = #iterable::toList
     let ->accumulator = #operation:(#initial #head)
     #tail::fold(#accumulator #operation)
+
+map T R (iterable~Iterable(T) transform~(T)->R) List(R) =
+    #iterable::iterator::makeMutableCollectionTransform(#transform MutableList)
 
 
 
