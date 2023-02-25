@@ -93,13 +93,13 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         "(${processValue(fdValueTypeCastingContext.findValue()!!)} " +
                 "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!)})"
     override fun processCallAopFuncBack(fdCallAopFuncBackContext: FoldingParser.CallAopFuncBackContext): String =
-        processAopId(fdCallAopFuncBackContext.findCallingAopId()!!.text) +
+        processAopId(fdCallAopFuncBackContext.OPID()!!.text) +
                 "(${processValue(fdCallAopFuncBackContext.findValue()!!)})"
     override fun processCallAopFunc(fdCallAopFuncContext: FoldingParser.CallAopFuncContext): String =
-        processAopId(fdCallAopFuncContext.findCallingAopId()!!.text) +
+        processAopId(fdCallAopFuncContext.OPID()!!.text) +
                 "(${processValue(fdCallAopFuncContext.findValue()!!)})"
     override fun processCallOpFunc(fdCallOpFuncContext: FoldingParser.CallOpFuncContext): String =
-        processOpId(fdCallOpFuncContext.findCallingOpId()!!.text) +
+        processOpId(fdCallOpFuncContext.OPID()!!.text) +
                 "(${processValue(fdCallOpFuncContext.findValue(0)!!)}," +
                 "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
     override fun processTypeCheck(fdTypeCheckContext: FoldingParser.TypeCheckContext): String =

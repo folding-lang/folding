@@ -19,8 +19,8 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
 
         val idPre = when (value) {
             is FoldingParser.CallFunctionContext -> processId(value.findReference()!!.findCommonIdentifier()!!)
-            is FoldingParser.CallAopFuncContext -> processAopId(value.findCallingAopId()!!.text)
-            is FoldingParser.CallOpFuncContext -> processOpId(value.findCallingOpId()!!.text)
+            is FoldingParser.CallAopFuncContext -> processAopId(value.OPID()!!.text)
+            is FoldingParser.CallOpFuncContext -> processOpId(value.OPID()!!.text)
             is FoldingParser.CallFunctionLikeMethodContext -> value.ID()!!.text
             else -> throw RuntimeException()
         }
