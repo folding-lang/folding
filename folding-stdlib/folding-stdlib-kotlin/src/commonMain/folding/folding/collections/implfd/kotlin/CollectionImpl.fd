@@ -42,6 +42,8 @@ abstract class List(T) {
 
 
 abstract class MutableList(T) {
+    :insert (index~Int element~T) Unit = #this:add(#index #element)
+
     impl List(T)
     impl MutableCollection(T)
     impl kotlin.collections.'MutableList'(T)

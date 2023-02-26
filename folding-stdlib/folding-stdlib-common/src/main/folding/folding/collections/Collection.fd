@@ -48,7 +48,7 @@ expect {
 
 typealias MutableList(T) foreign
 expect {
-    :add (index~Int element~T) Unit
+    :insert (index~Int element~T) Unit
     :set (index~Int element~T) T
 
     impl MutableCollection(T)

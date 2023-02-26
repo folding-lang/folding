@@ -4,6 +4,6 @@ package folding
 
 typealias Any foreign
 
-toString (obj~Any) foreign String
+toString (obj~Any?) foreign String
 
 unit foreign Unit

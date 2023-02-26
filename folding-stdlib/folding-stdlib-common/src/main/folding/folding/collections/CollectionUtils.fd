@@ -39,7 +39,7 @@ toArray T (collection~Collection(T)) Array(T) =
 replaceMutableListFromArray T (to~MutableList(T) from~Array(T) startIndex~Int) MutableList(T) =
     if (#from::length == #startIndex) #to else
     do {
-        #to:add(#from::get(#startIndex))
+        #to:set(#startIndex #from::get(#startIndex))
         return replaceMutableListFromArray(#to #from #startIndex + 1)
     }
 
@@ -95,7 +95,7 @@ init T (iterable~Iterable(T)) List(T) =
 
 [+:] T (element~T list~List(T)) List(T) =
     let ->result = #list::toMutableList
-    do { #result:add(0 #element) return #result }
+    do { #result:insert(0 #element) return #result }
 inverse (#result::head #result::tail)
 
 [:+] T (list~List(T) element~T) List(T) =

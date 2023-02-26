@@ -22,7 +22,7 @@ class DelegateKotlinCollection(T) {
     (kotlinCollection~kotlin.collections.'Collection'(T))
     inherit (#kotlinCollection) impl DelegateKotlinIterable(T)
     impl Collection(T) {
-        :#size Int = #kotlinCollection:#size
+        :#(foreign)size Int get! = #kotlinCollection:#size
         :isEmpty Boolean = #kotlinCollection:isEmpty
         :contains (element~T) Boolean = #kotlinCollection:contains(#element)
         :containsAll (elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinCollection:containsAll(#elements)
@@ -33,7 +33,7 @@ class DelegateKotlinMutableCollection(T) {
     (kotlinMutableCollection~kotlin.collections.'MutableCollection'(T))
     inherit (#kotlinMutableCollection) impl DelegateKotlinMutableIterable(T)
     impl MutableCollection(T) {
-        :#size Int = #kotlinMutableCollection:#size
+        :#(foreign)size Int get! = #kotlinMutableCollection:#size
         :isEmpty Boolean = #kotlinMutableCollection:isEmpty
         :contains (element~T) Boolean = #kotlinMutableCollection:contains(#element)
         :containsAll (elements~kotlin.collections.'Collection'(T)) Boolean = #kotlinMutableCollection:containsAll(#elements)
@@ -95,7 +95,7 @@ class DelegateKotlinMutableSet(T) {
 class DelegateKotlinMap(K V) {
     (kotlinMap~kotlin.collections.'Map'(K V))
     impl Map(K V) {
-        :#size Int = #kotlinMap:#size
+        :#(foreign)size Int get! = #kotlinMap:#size
         :#keys kotlin.collections.'Set'(K) = #kotlinMap:#keys
         :#values kotlin.collections.'Collection'(V) = #kotlinMap:#values
         :#entries kotlin.collections.'Set'(kotlin.collections.Map.'Entry'(K V)) = #kotlinMap:#entries
