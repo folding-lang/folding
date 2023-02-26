@@ -255,11 +255,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { "open override " + classTranspilerKt.transpileDef(it) }
         val implFieldListText = (listOf(inheritContext?.findImpl()) + implList)
             .mapNotNull { it?.findImplBody()?.findField() }.flatten().map {
-                val parts = classTranspilerKt.processField(it).split("\n", limit = 2)
-                val mainPart = "open override " + parts.last()
-                val privatePart = parts.takeIf { it.count() == 2 }?.first()
-
-                (privatePart?.let { it + "\n" } ?: "") + mainPart
+                val parts = classTranspilerKt.processField(it).split("\n").toMutableList()
+                val keywordEditIndex = if (parts[0] == "/** not initiated variance */") 2 else 0
+                parts[keywordEditIndex] = "open override " + parts[keywordEditIndex]
+                parts.joinToString("\n")
             }
         val vanillaDefList = defList.map { "open " + classTranspilerKt.transpileDef(it) }
         val defInInterfaceListText = defInInterfaceList.map { classTranspilerKt.processDefInInterface(it) }
