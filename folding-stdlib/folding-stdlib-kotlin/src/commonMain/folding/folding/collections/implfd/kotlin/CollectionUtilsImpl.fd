@@ -5,9 +5,9 @@ import folding.collections
 import folding.collections.kotlin
 
 
-List T (elements... ~T) List([~T]) = kotlin.collections.listOf(...#elements)::asFolding
+List T (elements... ~T) List(T) = kotlin.collections.listOf(...#elements)::asFolding
 MutableList T (elements... ~T) MutableList(T) = kotlin.collections.mutableListOf(...#elements)::asFolding
-Set T (elements... ~T) Set([~T]) = kotlin.collections.setOf(...#elements)::asFolding
+Set T (elements... ~T) Set(T) = kotlin.collections.setOf(...#elements)::asFolding
 MutableSet T (elements... ~T) MutableSet(T) = kotlin.collections.mutableSetOf(...#elements)::asFolding
 
 

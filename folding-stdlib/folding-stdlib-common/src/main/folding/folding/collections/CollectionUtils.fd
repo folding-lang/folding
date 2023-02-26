@@ -4,7 +4,7 @@ import folding
 
 
 
-List T (elements... ~T) foreign List([~T])
+List T (elements... ~T) foreign List(T)
 inverse (#result:get(0))
 inverse (#result:get(0) #result:get(1))
 inverse (#result:get(0) #result:get(1) #result:get(2))
@@ -19,7 +19,7 @@ inverse (#result:get(0) #result:get(1) #result:get(2) #result:get(3))
 inverse (#result:get(0) #result:get(1) #result:get(2) #result:get(3) #result:get(4))
 
 
-Set T (elements... ~T) foreign Set([~T])
+Set T (elements... ~T) foreign Set(T)
 MutableSet T (elements... ~T) foreign MutableSet(T)
 
 MutableListOfNulls T (size~Int) MutableList(T?) =
