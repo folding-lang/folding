@@ -5,7 +5,7 @@ import folding
 
 typealias Array(T) foreign
 
-ArrayOfNulls T (size~Int) foreign Array(T?)
+ArrayOfNulls T (length~Int) foreign Array(T?)
 
 array T (elements... ~T) Array(T) = #elements(~Array(T))
 inverse (#result::get(0))
@@ -16,4 +16,4 @@ inverse (#result::get(0) #result::get(1) #result::get(2) #result::get(3) #result
 
 get T (array~Array(T) index~Int) foreign T
 set T (array~Array(T) index~Int element~T) foreign T
-size T (array~Array(T)) foreign Int
+length T (array~Array(T)) foreign Int

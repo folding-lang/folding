@@ -22,6 +22,10 @@ inverse (#result:get(0) #result:get(1) #result:get(2) #result:get(3) #result:get
 Set T (elements... ~T) foreign Set([~T])
 MutableSet T (elements... ~T) foreign MutableSet(T)
 
+MutableListOfNulls T (size~Int) MutableList(T?) =
+    if (#size == 0) MutableList@T?() else
+    (MutableListOfNulls@T?(#size - 1) :+ null)(~MutableList(T?))
+
 
 makeArray T (iterator~Iterator(T) dest~Array(T?) index~Int) Array(T) =
     if (#iterator::hasNext) do {
@@ -32,6 +36,19 @@ makeArray T (iterator~Iterator(T) dest~Array(T?) index~Int) Array(T) =
 toArray T (collection~Collection(T)) Array(T) =
     #collection::iterator::makeArray(ArrayOfNulls@T(#collection:length) 0)
 
+replaceMutableListFromArray T (to~MutableList(T) from~Array(T) startIndex~Int) MutableList(T) =
+    if (#from::length == #startIndex) #to else
+    do {
+        #to:add(#from::get(#startIndex))
+        return replaceMutableListFromArray(#to #from #startIndex + 1)
+    }
+
+toMutableList T (targetArray~Array(T)) MutableList(T) =
+    replaceMutableListFromArray(
+        MutableListOfNulls(#targetArray::length)
+        #targetArray(~Array(T?))
+        0
+    )(~MutableList(T))
 
 
 

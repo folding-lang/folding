@@ -112,7 +112,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         return fdDoBlockContext.findCompo().joinToString("\n", "{\n") {
             when {
                 isReturned -> ""
-                it.findValue() != null -> processValue(it.findValue()!!) + ";folding.unit()"
+                it.findValue() != null -> processValue(it.findValue()!!) + ";folding.unit();"
                 it.findFieldAssign() != null -> it.findFieldAssign()!!.let { that ->
                     when (that) {
                         is FoldingParser.GlobalFieldAssignContext ->
@@ -122,10 +122,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
                         else -> throw InvalidCode("field assigning", that)
                     }
-                }
+                }+";"
                 it.findReturning() != null -> {
                     isReturned = true
-                    processValue(it.findReturning()!!.findValue()!!)
+                    processValue(it.findReturning()!!.findValue()!!)+";"
                 }
 
                 else -> throw InvalidCode("do expression", fdDoBlockContext)
