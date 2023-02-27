@@ -7,6 +7,8 @@ plugins {
     `maven-publish`
 }
 
+version = "0.1-SNAPSHOT"
+
 dependencies {
     commonMainImplementation(kotlin("stdlib-common"))
 }
@@ -41,7 +43,7 @@ kotlin {
 }
 
 publishing {
-    /*repositories {
+    repositories {
         mavenLocal()
     }
     publications {
@@ -80,5 +82,5 @@ publishing {
                 }
             }
         }
-    }*/
+    }
 }

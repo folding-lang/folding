@@ -1,0 +1,5 @@
+package folding.io.implfd.kotlin
+
+import folding
+
+print (message~Any?) Unit = kotlin.io.print(#message)
