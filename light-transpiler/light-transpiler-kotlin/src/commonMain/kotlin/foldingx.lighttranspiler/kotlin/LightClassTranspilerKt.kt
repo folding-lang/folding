@@ -191,7 +191,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         fdFieldContext.findFieldNotInit() != null -> if (fdFieldContext.findFieldNotInit()!!.findTypeEx()!!.QM() == null)
             fdFieldContext.findFieldNotInit()!!.let {
                 if (it.MUTABLE() != null) """
-                   |/** not initiated variance */
+                   |/** not initiated variable */
                    |private var ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!)}? = null
                    |var ${it.ID()!!.text}: ${processTypeEx(it.findTypeEx()!!)}
                    |    get() = ${it.ID()!!.text}_field ?: throw RuntimeException("The field '${it.ID()!!.text}' has not been initialized")

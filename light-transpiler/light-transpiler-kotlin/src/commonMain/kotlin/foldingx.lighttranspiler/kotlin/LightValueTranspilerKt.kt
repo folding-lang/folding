@@ -256,7 +256,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         val implFieldListText = (listOf(inheritContext?.findImpl()) + implList)
             .mapNotNull { it?.findImplBody()?.findField() }.flatten().map {
                 val parts = classTranspilerKt.processField(it).split("\n").toMutableList()
-                val keywordEditIndex = if (parts[0] == "/** not initiated variance */") 2 else 0
+                val keywordEditIndex = if (parts[0] == "/** not initiated variable */") 2 else 0
                 parts[keywordEditIndex] = "open override " + parts[keywordEditIndex]
                 parts.joinToString("\n")
             }
