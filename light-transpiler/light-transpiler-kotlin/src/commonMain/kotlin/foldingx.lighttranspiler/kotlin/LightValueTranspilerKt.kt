@@ -123,6 +123,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                         else -> throw InvalidCode("field assigning", that)
                     }
                 }+";"
+                it.findRemainLet_binding() != null ->
+                    processLet_binding(it.findRemainLet_binding()!!.findLet_binding()!!)
+                        .replace("\n    ","\n").removeSuffix("}()").removePrefix("{") + ";"
                 it.findReturning() != null -> {
                     isReturned = true
                     processValue(it.findReturning()!!.findValue()!!)+";"
@@ -147,12 +150,13 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         return "{ ${primaryHead + primaryBody}}"
     }
 
-    override fun processLetExpression(fdLetExpressionContext: FoldingParser.LetExpressionContext): String {
-        val (boundPre,bindTarget,value) = fdLetExpressionContext.findLet_binding()!!.findValue()
+    override fun processLetExpression(fdLetExpressionContext: FoldingParser.LetExpressionContext): String = processLet_binding(fdLetExpressionContext.findLet_binding()!!)
+    fun processLet_binding(fdLet_bindingContext: FoldingParser.Let_bindingContext): String {
+        val (boundPre,bindTarget,value) = fdLet_bindingContext.findValue()
         val bindTargetReferId = "r" + (bindTarget.position?.let { "${it.start.line},${it.start.column}" } ?: "null")
             .map { it.code.toString(32) }.joinToString("")
         val bounds = processInverse(boundPre, bindTargetReferId).joinToString("\n") { (id, inv) -> "val $id = ($inv)" }
-        return "{\nval $bindTargetReferId = ${processValue(bindTarget)}\n$bounds\n${processValue(value)}".insertMargin(4)+"\n}()"
+        return "{\nval $bindTargetReferId = ${processValue(bindTarget)}\n$bounds;\n${processValue(value)}".insertMargin(4)+"\n}()"
     }
 
     override fun processParenedValue(fdParenedValueContext: FoldingParser.ParenedValueContext): String =
