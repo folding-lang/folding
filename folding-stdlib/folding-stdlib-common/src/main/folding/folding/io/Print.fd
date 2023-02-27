@@ -5,4 +5,4 @@ import folding
 
 print (message~Any?) foreign Unit
 
-println (message~Any?) Unit = print(#message ++ "\n")
+println (message~Any?) Unit = print(#message::toString ++ "\n")
