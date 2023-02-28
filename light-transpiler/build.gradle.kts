@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    id("org.jetbrains.dokka")
     `maven-publish`
 }
 val prefix = "light-transpiler"
@@ -9,6 +10,7 @@ version = "0.1-SNAPSHOT"
 subprojects {
     apply(plugin="org.jetbrains.kotlin.multiplatform")
     apply(plugin="org.gradle.maven-publish")
+    apply(plugin="org.jetbrains.dokka")
 
     version = parent!!.version
 
@@ -38,48 +40,8 @@ subprojects {
         // endregion
     }
 
-    publishing {
-        repositories {
-            mavenLocal()
-        }
-        publications {
-            create<MavenPublication>(project.name) {
-
-                groupId = group as String
-                artifactId = project.name
-
-                pom {
-                    name.set(project.name)
-                    description.set("the folding-lang transpiler")
-                    url.set("https://github.com/folding-lang/${rootProject.name}")
-
-                    licenses {
-                        license {
-                            name.set("MIT")
-                            url.set("https://opensource.org/licenses/mit-license.php")
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id.set("muqhc")
-                            name.set("Muqhc")
-                            email.set("muqhc07@gmail.com")
-                            url.set("https://github.com/muqhc")
-                            roles.addAll("developer")
-                            timezone.set("Asia/Seoul")
-                        }
-                    }
-
-                    scm {
-                        connection.set("scm:git:git://github.com/folding-lang/${rootProject.name}.git")
-                        developerConnection.set("scm:git:ssh://github.com:folding-lang/${rootProject.name}.git")
-                        url.set("https://github.com/folding-lang/${rootProject.name}")
-                    }
-                }
-            }
-        }
-    }
+    val prepareMavenDeployment: Project.(description: String) -> Unit by rootProject.ext
+    prepareMavenDeployment("the folding-lang $name")
 }
 
 kotlin {
