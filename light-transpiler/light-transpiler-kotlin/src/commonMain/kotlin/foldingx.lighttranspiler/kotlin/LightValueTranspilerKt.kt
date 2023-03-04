@@ -22,6 +22,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.ReflectedMethodContext -> processReflectedMethod(fdValueContext)
         is FoldingParser.CallFunctionLikeMethodContext -> processCallFunctionLikeMethod(fdValueContext)
         is FoldingParser.InvokeValueContext -> processInvokeValue(fdValueContext)
+        is FoldingParser.InvokeValueLikeMethodContext -> processInvokeValueLikeMethod(fdValueContext)
         is FoldingParser.SimpleIfContext -> processSimpleIf(fdValueContext)
         is FoldingParser.TakeNullContext -> processTakeNull(fdValueContext)
         is FoldingParser.ValueTypeCastingContext -> processValueTypeCasting(fdValueContext)
@@ -30,6 +31,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.CallOpFuncContext -> processCallOpFunc(fdValueContext)
         is FoldingParser.TypeCheckContext -> processTypeCheck(fdValueContext)
         is FoldingParser.IfExpressionContext -> processIfExpression(fdValueContext)
+        is FoldingParser.PatternMatchExpressionContext -> TODO("processPatternMatchExpression(fdValueContext)")
         is FoldingParser.LetExpressionContext -> processLetExpression(fdValueContext)
         is FoldingParser.DoExpressionContext -> processDoExpression(fdValueContext)
         is FoldingParser.JustLambdaContext -> processJustLambda(fdValueContext)
@@ -78,6 +80,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processInvokeValue(fdInvokeValueContext: FoldingParser.InvokeValueContext): String =
         "(${processValue(fdInvokeValueContext.findValue()!!)}).invoke(" +
                 (fdInvokeValueContext.findInvoking()?.let { processInvoking(it) } ?: "") + ")"
+    override fun processInvokeValueLikeMethod(fdInvokeValueLikeMethodContext: FoldingParser.InvokeValueLikeMethodContext): String =
+        "(${processValue(fdInvokeValueLikeMethodContext.findValue(1)!!)}).invoke(" +
+                processValue(fdInvokeValueLikeMethodContext.findValue(0)!!) +
+                (fdInvokeValueLikeMethodContext.findInvoking()?.let { ","+ processInvoking(it) } ?: "") + ")"
     override fun processSimpleIf(fdSimpleIfContext: FoldingParser.SimpleIfContext): String =
         "(if (${processValue(fdSimpleIfContext.findValue(1)!!)}) (${processValue(fdSimpleIfContext.findValue(0)!!)})" +
                 " else null)"
