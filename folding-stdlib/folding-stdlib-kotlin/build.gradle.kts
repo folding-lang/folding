@@ -18,6 +18,9 @@ folding {
         val commonMain by creating {
             target = "kotlin"
         }
+        val jvmTest by creating {
+            target = "kotlin"
+        }
     }
 }
 

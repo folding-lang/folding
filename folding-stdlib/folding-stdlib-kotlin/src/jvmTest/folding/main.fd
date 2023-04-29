@@ -1,0 +1,34 @@
+//package <root>
+
+import folding
+import folding.collections
+import folding.io
+
+class MyStringBuilder {
+    (separator~String)
+
+    :#stack MutableList(String) = MutableList
+
+    inherit() impl Any {
+        :toString String =
+            if (#stack:length == 0) "" else
+            let ->head +: ->tail = #stack
+            #tail::fold(#head [acc~String e~String] #acc++#separator++#e)
+    }
+
+    impl (String) -> MyStringBuilder {
+        :invoke (str~String) MyStringBuilder = do {
+            #stack:add(#str)
+            return #this
+        }
+    }
+}
+
+MyStringBuilder MyStringBuilder = MyStringBuilder(" ")
+
+main Unit = do {
+    remain! let ->a = MyStringBuilder unit
+    println(
+        #a:("Hello"):("World!")
+    )
+}
