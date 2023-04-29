@@ -18,6 +18,32 @@ subprojects {
     publishing {
         repositories {
             mavenLocal()
+            maven {
+                name = "OSSRH"
+
+                credentials {
+                    username = rootProject.properties["ossrhUsername"]!! as String
+                    password = rootProject.properties["ossrhPassword"]!! as String
+                }
+
+                url = uri(
+                        if ("SNAPSHOT" in version as String) {
+                            "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                        } else {
+                            "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                        }
+                )
+            }
+            maven {
+                name = "Github"
+
+                credentials {
+                    username = rootProject.properties["githubUser"] as String
+                    password = rootProject.properties["githubToken"] as String
+                }
+
+                url = uri("https://maven.pkg.github.com/folding-lang/folding")
+            }
         }
     }
 }
