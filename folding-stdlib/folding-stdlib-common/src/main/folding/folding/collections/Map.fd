@@ -18,7 +18,7 @@ expect {
 class MapEntry(K V) { (key~K value~V) }
 
 
-[=>] K V (key~K value~V) MapEntry(K V) = MapEntry(#key #value)
+[to!] K V (key~K value~V) MapEntry(K V) = MapEntry(#key #value)
 
 mapOf K V (mapEntries~Array(MapEntry(K V))) foreign Map(K V)
 mutableMapOf K V (mapEntries~Array(MapEntry(K V))) foreign MutableMap(K V)
