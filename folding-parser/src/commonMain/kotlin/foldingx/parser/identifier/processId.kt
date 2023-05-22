@@ -2,6 +2,15 @@ package foldingx.parser.identifier
 
 import foldingx.parser.FoldingParser
 
+enum class OpIdUsage { OP, AOP }
+
+fun processCommonOpId(idSource: FoldingParser.CommonOpIdentifierContext, usage: OpIdUsage) =
+    if (idSource.OPID() != null) when (usage) {
+        OpIdUsage.OP -> processOpId(idSource.OPID()!!.text)
+        OpIdUsage.AOP -> processAopId(idSource.OPID()!!.text)
+    }
+    else processId(idSource.findCommonIdentifier()!!)
+
 fun processId(idSource: FoldingParser.CommonIdentifierContext) = when {
     idSource.ID() != null -> idSource.text
     idSource.findOpIdWrap() != null ->

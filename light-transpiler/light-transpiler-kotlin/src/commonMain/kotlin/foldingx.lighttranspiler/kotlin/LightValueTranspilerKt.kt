@@ -4,9 +4,7 @@ import foldingx.lighttranspiler.LightValueTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.util.TranspiledArgValue
 import foldingx.parser.FoldingParser
-import foldingx.parser.identifier.processAopId
-import foldingx.parser.identifier.processId
-import foldingx.parser.identifier.processOpId
+import foldingx.parser.identifier.*
 import foldingx.parser.inversing.processInverseValue
 
 interface LightValueTranspilerKt : LightValueTranspiler {
@@ -99,13 +97,13 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         "(${processValue(fdValueTypeCastingContext.findValue()!!)} " +
                 "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!)})"
     override fun processCallAopFuncBack(fdCallAopFuncBackContext: FoldingParser.CallAopFuncBackContext): String =
-        processAopId(fdCallAopFuncBackContext.OPID()!!.text) +
+        processCommonOpId(fdCallAopFuncBackContext.findCommonOpIdentifier()!!, OpIdUsage.AOP) +
                 "(${processValue(fdCallAopFuncBackContext.findValue()!!)})"
     override fun processCallAopFunc(fdCallAopFuncContext: FoldingParser.CallAopFuncContext): String =
-        processAopId(fdCallAopFuncContext.OPID()!!.text) +
+        processCommonOpId(fdCallAopFuncContext.findCommonOpIdentifier()!!, OpIdUsage.AOP) +
                 "(${processValue(fdCallAopFuncContext.findValue()!!)})"
     override fun processCallOpFunc(fdCallOpFuncContext: FoldingParser.CallOpFuncContext): String =
-        processOpId(fdCallOpFuncContext.OPID()!!.text) +
+        processCommonOpId(fdCallOpFuncContext.findCommonOpIdentifier()!!, OpIdUsage.OP) +
                 "(${processValue(fdCallOpFuncContext.findValue(0)!!)}," +
                 "${processValue(fdCallOpFuncContext.findValue(1)!!)})"
     override fun processTypeCheck(fdTypeCheckContext: FoldingParser.TypeCheckContext): String =
