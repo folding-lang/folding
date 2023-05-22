@@ -13,12 +13,12 @@ abstract class MutableMap(K V) {
 }
 
 
-mapOf K V (mapEntries~Array(MapEntry(K V))) Map(K V) =
+Map K V (mapEntries~Array(MapEntry(K V))) Map(K V) =
     kotlin.collections.mapOf(...#mapEntries:map(
         [key~K value~V from! MapEntry(->key ->value)~MapEntry(K V)]
         kotlin.Pair(#key #value)
     ):toTypedArray)::asFolding
-mutableMapOf K V (mapEntries~Array(MapEntry(K V))) MutableMap(K V) =
+MutableMap K V (mapEntries~Array(MapEntry(K V))) MutableMap(K V) =
     kotlin.collections.mutableMapOf(...#mapEntries:map(
         [key~K value~V from! MapEntry(->key ->value)~MapEntry(K V)]
         kotlin.Pair(#key #value)
