@@ -284,9 +284,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                         (callWrapper.typeArgs.takeIf { it.isNotEmpty() }?.joinToString(",","<",">") {
                             processTypeEx(it)
                         } ?: "") +
-                        (callWrapper.args.map {
+                        (listOf(acc) + callWrapper.args.map {
                             processValue(it)
-                        } + acc).joinToString(", ","(",")") + "._${callWrapper.inverseIndex}"
+                        }).joinToString(", ","(",")") + "._${callWrapper.inverseIndex}"
             }
         }
 
