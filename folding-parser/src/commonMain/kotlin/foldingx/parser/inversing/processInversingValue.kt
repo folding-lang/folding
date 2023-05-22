@@ -1,9 +1,7 @@
 package foldingx.parser.inversing
 
 import foldingx.parser.FoldingParser
-import foldingx.parser.identifier.processAopId
-import foldingx.parser.identifier.processId
-import foldingx.parser.identifier.processOpId
+import foldingx.parser.identifier.*
 
 fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List<CallWrapper>> = listOf(listOf())): List<List<CallWrapper>> {
     if (value is FoldingParser.ParenedValueContext)
@@ -19,8 +17,9 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
 
         val idPre = when (value) {
             is FoldingParser.CallFunctionContext -> processId(value.findReference()!!.findCommonIdentifier()!!)
-            is FoldingParser.CallAopFuncContext -> processAopId(value.OPID()!!.text)
-            is FoldingParser.CallOpFuncContext -> processOpId(value.OPID()!!.text)
+            is FoldingParser.CallAopFuncContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.AOP)
+            is FoldingParser.CallAopFuncBackContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.AOP)
+            is FoldingParser.CallOpFuncContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.OP)
             is FoldingParser.CallFunctionLikeMethodContext -> value.ID()!!.text
             else -> throw RuntimeException()
         }
@@ -31,6 +30,7 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
                     (it as FoldingParser.SingleArgContext).findValue()!!
                 }
             is FoldingParser.CallAopFuncContext -> listOf(value.findValue()!!)
+            is FoldingParser.CallAopFuncBackContext -> listOf(value.findValue()!!)
             is FoldingParser.CallOpFuncContext -> value.findValue()
             is FoldingParser.CallFunctionLikeMethodContext ->
                 listOf(value.findValue()!!) +
@@ -77,6 +77,8 @@ fun isInverseValue(value: FoldingParser.ValueContext): Boolean {
                 } }
             } ?: false
         is FoldingParser.CallAopFuncContext ->
+            return isInverseValue(value.findValue()!!)
+        is FoldingParser.CallAopFuncBackContext ->
             return isInverseValue(value.findValue()!!)
         is FoldingParser.CallOpFuncContext ->
             return value.findValue().any { isInverseValue(it) }
