@@ -3,8 +3,8 @@ package folding.implfd.kotlin
 import folding
 
 
-[==] (x~Any y~Any) Boolean = #x:equals(#y)
-[===] (x~Any y~Any) foreign Boolean `x === y`
+[==] (x~Any? y~Any?) foreign Boolean `x == y`
+[===] (x~Any? y~Any?) foreign Boolean `x === y`
 
 
 

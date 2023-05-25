@@ -1,0 +1,16 @@
+package folding
+
+isNull (value~Any?) Boolean = #value == null
+
+onIsNull T (value~T? f~()->T) T =
+    if (#value == null) #f:() else #value(~T)
+
+onIsNotNull T R (value~T? f~(T)->R) R? =
+    if (#value == null) null else #f:(#value(~T))
+
+[??] T (value~T? f~()->T) T = #value::onIsNull(#f)
+[?!] T R (value~T? f~(T)->R) R? = #value::onIsNotNull(#f)
+
+
+
+

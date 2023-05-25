@@ -38,4 +38,5 @@ main Unit = do {
             map! [num~Int from! (3 - ->num) ~ Int] #num)
             :joinToString(", " "[" "]")
     )
+    null ?? [] println("ahhhh")
 }
