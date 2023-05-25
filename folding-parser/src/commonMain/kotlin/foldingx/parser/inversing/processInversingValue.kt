@@ -20,7 +20,7 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
             is FoldingParser.CallAopFuncContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.AOP)
             is FoldingParser.CallAopFuncBackContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.AOP)
             is FoldingParser.CallOpFuncContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.OP)
-            is FoldingParser.CallFunctionLikeMethodContext -> value.ID()!!.text
+            is FoldingParser.CallFunctionLikeMethodContext -> processId(value.findCommonIdentifier()!!)
             else -> throw RuntimeException()
         }
 
