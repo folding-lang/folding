@@ -11,6 +11,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processValue(fdValueContext: FoldingParser.ValueContext): String = when(fdValueContext) {
         is FoldingParser.JustDefaultValueContext -> processJustDefaultValue(fdValueContext)
         is FoldingParser.NullContext -> processNull(fdValueContext)
+        is FoldingParser.ThisContext -> processThis(fdValueContext)
         is FoldingParser.ReflectedContext -> processReflected(fdValueContext)
         is FoldingParser.CallFunctionContext -> processCallFunction(fdValueContext)
         is FoldingParser.UseForeignClassContext -> processUseForeignClass(fdValueContext)
@@ -40,7 +41,9 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 
     override fun processJustDefaultValue(fdJustDefaultValueContext: FoldingParser.JustDefaultValueContext): String =
         fdJustDefaultValueContext.text
+
     override fun processNull(fdNullContext: FoldingParser.NullContext): String = "null"
+    override fun processThis(fdNullContext: FoldingParser.ThisContext): String = "this"
     override fun processReflected(fdReflectedContext: FoldingParser.ReflectedContext): String =
         "::" + processReference(fdReflectedContext.findReference()!!)
     override fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext): String {
