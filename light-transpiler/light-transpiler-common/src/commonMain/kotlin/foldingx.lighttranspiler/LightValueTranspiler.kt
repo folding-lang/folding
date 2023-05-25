@@ -19,7 +19,6 @@ interface LightValueTranspiler {
     fun processInvokeValue(fdInvokeValueContext: FoldingParser.InvokeValueContext): String
     fun processInvokeValueLikeMethod(fdInvokeValueLikeMethodContext: FoldingParser.InvokeValueLikeMethodContext): String
     fun processSimpleIf(fdSimpleIfContext: FoldingParser.SimpleIfContext): String
-    fun processTakeNull(fdTakeNullContext: FoldingParser.TakeNullContext): String
     fun processIfExpression(fdIfExpressionContext: FoldingParser.IfExpressionContext): String
     fun processValueTypeCasting(fdValueTypeCastingContext: FoldingParser.ValueTypeCastingContext): String
     fun processCallAopFuncBack(fdCallAopFuncBackContext: FoldingParser.CallAopFuncBackContext): String

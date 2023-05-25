@@ -22,7 +22,6 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.InvokeValueContext -> processInvokeValue(fdValueContext)
         is FoldingParser.InvokeValueLikeMethodContext -> processInvokeValueLikeMethod(fdValueContext)
         is FoldingParser.SimpleIfContext -> processSimpleIf(fdValueContext)
-        is FoldingParser.TakeNullContext -> processTakeNull(fdValueContext)
         is FoldingParser.ValueTypeCastingContext -> processValueTypeCasting(fdValueContext)
         is FoldingParser.CallAopFuncBackContext -> processCallAopFuncBack(fdValueContext)
         is FoldingParser.CallAopFuncContext -> processCallAopFunc(fdValueContext)
@@ -59,19 +58,19 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processGetFieldGlobal(fdGetFieldGlobalContext: FoldingParser.GetFieldGlobalContext): String =
         processReference(fdGetFieldGlobalContext.findReference()!!)
     override fun processGetField(fdGetFieldContext: FoldingParser.GetFieldContext): String =
-        "(${processValue(fdGetFieldContext.findValue()!!)}).${fdGetFieldContext.ID()!!.text}"
+        "(${processValue(fdGetFieldContext.findValue()!!)}).${processId(fdGetFieldContext.findCommonIdentifier()!!)}"
     override fun processCallMethod(fdCallMethodContext: FoldingParser.CallMethodContext): String {
         val (typeArguments,arguments) = fdCallMethodContext.findArgValue()?.let { processArgValue(it) }
             ?: TranspiledArgValue("","")
-        return "(${processValue(fdCallMethodContext.findValue()!!)})." + fdCallMethodContext.ID()!!.text +
+        return "(${processValue(fdCallMethodContext.findValue()!!)})." + processId(fdCallMethodContext.findCommonIdentifier()!!) +
                 typeArguments + "(" + arguments + ")"
     }
     override fun processReflectedMethod(fdReflectedMethodContext: FoldingParser.ReflectedMethodContext): String =
-        "(${processValue(fdReflectedMethodContext.findValue()!!)})::${fdReflectedMethodContext.ID()!!.text}"
+        "(${processValue(fdReflectedMethodContext.findValue()!!)})::${processId(fdReflectedMethodContext.findCommonIdentifier()!!)}"
     override fun processCallFunctionLikeMethod(fdCallFunctionLikeMethodContext: FoldingParser.CallFunctionLikeMethodContext): String {
         val (typeArguments,arguments) = fdCallFunctionLikeMethodContext.findArgValue()?.let { processArgValue(it) }
             ?: TranspiledArgValue("","")
-        return fdCallFunctionLikeMethodContext.ID()!!.text + typeArguments + "(" +
+        return processId(fdCallFunctionLikeMethodContext.findCommonIdentifier()!!) + typeArguments + "(" +
                 processValue(fdCallFunctionLikeMethodContext.findValue()!!) +
                 (if (arguments == "") "" else ", $arguments") + ")"
     }
@@ -85,8 +84,6 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processSimpleIf(fdSimpleIfContext: FoldingParser.SimpleIfContext): String =
         "(if (${processValue(fdSimpleIfContext.findValue(1)!!)}) (${processValue(fdSimpleIfContext.findValue(0)!!)})" +
                 " else null)"
-    override fun processTakeNull(fdTakeNullContext: FoldingParser.TakeNullContext): String =
-        "((${processValue(fdTakeNullContext.findValue(0)!!)}) ?: (${processValue(fdTakeNullContext.findValue(1)!!)}))"
     override fun processIfExpression(fdIfExpressionContext: FoldingParser.IfExpressionContext): String =
         fdIfExpressionContext.findIf_else()!!.let { ifElse ->
                 "(if (" + processValue(ifElse.findValue(0)!!) + ") (" +
