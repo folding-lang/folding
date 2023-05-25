@@ -6,14 +6,14 @@ import folding.collections.kotlin
 
 
 abstract class Iterable(T) {
-    :getIterator Iterator(T) = #this:iterator::asFolding
+    :getIterator Iterator(T) = this:iterator::asFolding
 
     impl kotlin.collections.'Iterable'(T)
 }
 
 
 abstract class MutableIterable(T) {
-    :mutableIterator MutableIterator(T) = #this:iterator::asFolding
+    :mutableIterator MutableIterator(T) = this:iterator::asFolding
 
     impl Iterable(T)
     impl kotlin.collections.'MutableIterable'(T)
@@ -21,7 +21,7 @@ abstract class MutableIterable(T) {
 
 
 abstract class Collection(T) {
-    :length Int = #this:#size
+    :length Int = this:#size
 
     impl Iterable(T)
     impl kotlin.collections.'Collection'(T)
@@ -42,7 +42,7 @@ abstract class List(T) {
 
 
 abstract class MutableList(T) {
-    :insert (index~Int element~T) Unit = #this:add(#index #element)
+    :insert (index~Int element~T) Unit = this:add(#index #element)
 
     impl List(T)
     impl MutableCollection(T)

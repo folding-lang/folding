@@ -19,7 +19,7 @@ class MyStringBuilder {
     impl (String) -> MyStringBuilder {
         :invoke (str~String) MyStringBuilder = do {
             #stack:add(#str)
-            return #this
+            return this
         }
     }
 }

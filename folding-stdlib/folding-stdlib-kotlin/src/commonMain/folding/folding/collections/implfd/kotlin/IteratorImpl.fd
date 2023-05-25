@@ -6,7 +6,7 @@ import folding.collections.kotlin
 
 
 abstract class Iterator(T) {
-    :getNext T = #this:next
+    :getNext T = this:next
     impl kotlin.collections.'Iterator'(T)
 }
 
