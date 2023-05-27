@@ -36,7 +36,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                 is FoldingParser.JustClassContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
                 is FoldingParser.JustAbstractClassContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
                 else -> throw InvalidCode("class",it)
-            } + "Class"
+            }
             val transpiled = transpileClass(it)
             val classText = transpiled.substringBeforeLast("/** folding class constructor function */\n")
             val constructText =
@@ -63,7 +63,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
         val typeAliasFile = typeAliasList.map {
             FileWrapper(
                 "$sourcesRoot/$packagePath",
-                it.ID()!!.text + "Class" + ".kt",
+                processCommonClassId(it.findCommonClassIdentifier()!!) + ".kt",
                 top + importText + "\n\n\n" + processTypeAlias(it)
             )
         }
@@ -122,7 +122,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
         "annotation class ${fdAnnotationDefContext.ID()!!.text} ${processParameter(fdAnnotationDefContext.findParameter()!!)}"
 
     override fun processTypeAlias(fdTypeAliasContext: FoldingParser.TypeAliasContext): String =
-        "typealias " + fdTypeAliasContext.ID()!!.text + "Class" +
+        "typealias " + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
                 (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "") +
                 " = " + when {
             fdTypeAliasContext.findTypeEx() != null ->
@@ -135,14 +135,14 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                     ?.RawString()?.text?.removeSurrounding("`")
                     ?: (
                             (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
-                                    "implfd.kotlin." + fdTypeAliasContext.ID()!!.text + "Class" +
+                                    "implfd.kotlin." + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
                                     (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "")
                             )
 
             }
 
             else -> (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
-                    "implfd.kotlin." + fdTypeAliasContext.ID()!!.text + "Class" +
+                    "implfd.kotlin." + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
                     (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "")
         }
 }
