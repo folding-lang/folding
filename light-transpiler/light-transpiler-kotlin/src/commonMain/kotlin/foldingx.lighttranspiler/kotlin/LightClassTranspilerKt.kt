@@ -32,9 +32,15 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         val primaryHead = "open class ${processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!)}$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
 
-        val inverseFunctionText = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
-            makeClassInverse(processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!), it, fdJustClassContext.findTypeParam())
-        }
+        val inverseFunctionText = if (fdJustClassContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()) {
+            fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
+                makeClassInverse(
+                    fdJustClassContext.findCommonClassIdentifier()!!.ID()!!.text,
+                    it,
+                    fdJustClassContext.findTypeParam()
+                )
+            }
+        } else null
 
         val constructFunctionText = if (fdJustClassContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()) {
             makeConstructFunction(
@@ -120,7 +126,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
                 "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +
                 (tTail ?: "")
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
-                "return ${classId}${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
+                "return ${classId}Class${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
 
         return primaryHead + primaryBody
     }
@@ -158,7 +164,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
                 outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
         val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
-        val primaryInput = "instance: ${classId}${tHead ?: ""}"
+        val primaryInput = "instance: ${classId}Class${tHead ?: ""}"
 
         val primaryHead = "fun${tHead?.let { " $it " } ?: " "}$id($primaryInput): $outputHead " +
                 (tTail ?: "")
