@@ -1,6 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.parser.FoldingParser
+import foldingx.parser.identifier.processCommonClassId
 
 fun processTypeParam(fdTypeParamContext: FoldingParser.TypeParamContext): Pair<String,String?> {
     val tMap = fdTypeParamContext.findTypeParamCompo().associate { processTypeParamCompo(it) }
@@ -9,7 +10,7 @@ fun processTypeParam(fdTypeParamContext: FoldingParser.TypeParamContext): Pair<S
     return head to tail
 }
 fun processTypeParamCompo(fdTypeParamCompoContext: FoldingParser.TypeParamCompoContext) =
-    fdTypeParamCompoContext.ID()!!.text.let {
-        val t = it + "Class"
+    fdTypeParamCompoContext.findCommonClassIdentifier().let {
+        val t = processCommonClassId(it!!)
         t to fdTypeParamCompoContext.findTypeEx().map { "$t : ${processTypeEx(it)}" }
     }

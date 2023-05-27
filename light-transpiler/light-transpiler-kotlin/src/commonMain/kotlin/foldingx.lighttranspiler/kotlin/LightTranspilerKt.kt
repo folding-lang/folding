@@ -4,6 +4,8 @@ import foldingx.lighttranspiler.FileWrapper
 import foldingx.lighttranspiler.LightTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
+import foldingx.parser.identifier.processCommonClassId
+import foldingx.parser.identifier.processId
 
 interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     var currentPackage: String?
@@ -30,9 +32,9 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
 
         val (classFiles,constructFuncTexts) = classList.map {
             val classId = when(it) {
-                is FoldingParser.JustInterfaceContext -> it.ID()!!.text
-                is FoldingParser.JustClassContext -> it.ID()!!.text
-                is FoldingParser.JustAbstractClassContext -> it.ID()!!.text
+                is FoldingParser.JustInterfaceContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
+                is FoldingParser.JustClassContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
+                is FoldingParser.JustAbstractClassContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
                 else -> throw InvalidCode("class",it)
             } + "Class"
             val transpiled = transpileClass(it)
@@ -95,15 +97,11 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
         return fdImportExContext.findImportBody()?.findImportCompo()?.joinToString("\n") { compo ->
             when {
                 compo.CLASS() == null ->
-                    "import $pkg${importNestId ?: ""}.${compo.ID()!!.text}" +
-                            (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
-                compo.QUOTE().isEmpty() ->
-                    "import $pkg${importNestId ?: ""}.${compo.ID()!!.text}" +
-                            (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "") +
-                            "\nimport $pkg.${compo.ID()!!.text}Class"
-                compo.QUOTE().isNotEmpty() ->
-                    "import $pkg.${compo.ID()!!.text}" +
-                            (compo.findImportAlias()?.let { " as ${it.ID()!!.text}" } ?: "")
+                    "import $pkg${importNestId ?: ""}.${processId(compo.findCommonIdentifier()!!)}" +
+                            (compo.findImportDefAlias()?.let { " as ${processId(it.findCommonIdentifier()!!)}" } ?: "")
+                compo.CLASS() != null ->
+                    "import $pkg${importNestId ?: ""}.${processCommonClassId(compo.findCommonClassIdentifier()!!)}" +
+                            (compo.findImportClassAlias()?.let { " as ${processCommonClassId(it.findCommonClassIdentifier()!!)}" } ?: "")
                 else -> throw InvalidCode("import",compo)
             }
         } ?: ((importNestId?.let { "import $pkg$it.*\n" } ?: "") + "import $pkg.*")

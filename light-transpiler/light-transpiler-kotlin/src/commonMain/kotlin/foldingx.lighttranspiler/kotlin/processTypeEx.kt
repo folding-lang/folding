@@ -2,6 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
+import foldingx.parser.identifier.processCommonClassId
 
 fun processTypeEx(fdTypeExContext: FoldingParser.TypeExContext): String = when {
     fdTypeExContext.findTypeExSingle() != null -> processTypeExSingle(fdTypeExContext.findTypeExSingle()!!)
@@ -11,11 +12,7 @@ fun processTypeEx(fdTypeExContext: FoldingParser.TypeExContext): String = when {
 fun processTypeExSingle(fdTypeExSingleContext: FoldingParser.TypeExSingleContext): String =
     if (fdTypeExSingleContext.findPrimitiveType() == null)
         (fdTypeExSingleContext.findPackage_()?.text?.let { "$it." } ?: "") +
-                (when {
-                    fdTypeExSingleContext.QUOTE().isNotEmpty() -> fdTypeExSingleContext.ID()!!.text
-                    fdTypeExSingleContext.QUOTE().isEmpty() -> fdTypeExSingleContext.ID()!!.text + "Class"
-                    else -> throw InvalidCode("type",fdTypeExSingleContext)
-                }) +
+                (processCommonClassId(fdTypeExSingleContext.findCommonClassIdentifier()!!)) +
                 (fdTypeExSingleContext.LPAREN()?.let { _ ->
                     fdTypeExSingleContext.findTypeArgEx().joinToString(",","<",">") {
                         when {

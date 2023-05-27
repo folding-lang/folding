@@ -4,6 +4,7 @@ import foldingx.lighttranspiler.LightClassTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
 import foldingx.parser.func.CommonJustDef
+import foldingx.parser.identifier.processCommonClassId
 import foldingx.parser.identifier.processId
 
 interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
@@ -28,15 +29,15 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),listOf())
         }
 
-        val primaryHead = "open class ${fdJustClassContext.ID()!!.text}Class$tHead$constructor$inheritsText $tTail"
+        val primaryHead = "open class ${processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!)}Class$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
-            makeClassInverse(fdJustClassContext.ID()!!.text, it, fdJustClassContext.findTypeParam())
+            makeClassInverse(processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!), it, fdJustClassContext.findTypeParam())
         }
 
         val constructFunctionText = makeConstructFunction(
-            fdJustClassContext.ID()!!.text, fdJustClassContext.findConstructorSelf()!!.findParameter(),
+            processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!), fdJustClassContext.findConstructorSelf()!!.findParameter(),
             fdJustClassContext.findTypeParam()
         )
 
@@ -61,11 +62,11 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),findDefInInterface())
         }
 
-        val primaryHead = "abstract class ${fdJustAbstractClassContext.ID()!!.text}Class$tHead$constructor$inheritsText $tTail"
+        val primaryHead = "abstract class ${processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!)}Class$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = fdJustAbstractClassContext.findConstructorSelf()?.findParameter()?.let {
-            makeClassInverse(fdJustAbstractClassContext.ID()!!.text, it, fdJustAbstractClassContext.findTypeParam())
+            makeClassInverse(processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!), it, fdJustAbstractClassContext.findTypeParam())
         }
 
         val annotation = fdJustAbstractClassContext.findAnnotationBlock()
@@ -82,7 +83,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassPrimaryBody(getClassTranspilerKt(),listOf(),findDef(),null,findImpl(),findDefInInterface(),findFieldInInterface())
         }
 
-        val primaryHead = "interface ${fdJustInterfaceContext.ID()!!.text}Class$tHead$inheritsText $tTail"
+        val primaryHead = "interface ${processCommonClassId(fdJustInterfaceContext.findCommonClassIdentifier()!!)}Class$tHead$inheritsText $tTail"
         val primaryBody = "{$compoListText".insertMargin(4)+"\n}"
 
         val factoryFunction = if (
@@ -90,7 +91,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             && fdJustInterfaceContext.ABSTRACT() == null
             )
             makeFactoryFunction(
-                fdJustInterfaceContext.ID()!!.text,
+                processCommonClassId(fdJustInterfaceContext.findCommonClassIdentifier()!!),
                 fdJustInterfaceContext.findTypeParam()
             )
         else null
