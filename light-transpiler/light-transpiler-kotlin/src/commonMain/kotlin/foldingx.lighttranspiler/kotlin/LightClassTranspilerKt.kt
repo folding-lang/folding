@@ -117,7 +117,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
         } ?: ("()" to null)
         val primaryHead = "/** folding class constructor function */\n" +
-                "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}${tHead ?: ""} " +
+                "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +
                 (tTail ?: "")
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
                 "return ${classId}${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
@@ -133,7 +133,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             h to t?.let { "$t " }
         } } ?: (null to "")
         val primaryHead = "/** folding class constructor function */\n" +
-                "fun${tHead?.let { " $it " } ?: " "}${classId}(): ${classId}${tHead ?: ""} " +
+                "fun${tHead?.let { " $it " } ?: " "}${classId}(): ${classId}Class${tHead ?: ""} " +
                 (tTail ?: "")
         val primaryBody = ("{\n"+
                 "return (object : ${classId}${tHead ?: ""} {})").insertMargin(4) + "\n}"
