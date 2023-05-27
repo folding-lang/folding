@@ -12,8 +12,7 @@ class MyStringBuilder {
     inherit() impl Any {
         :toString String =
             if (#stack:length == 0) "" else
-            let ->head +: ->tail = #stack
-            #tail::fold(#head [acc~String e~String] #acc++#separator++#e)
+            #stack reduce! [acc~String e~String] #acc++#separator++#e
     }
 
     impl (String) -> MyStringBuilder {

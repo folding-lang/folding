@@ -118,8 +118,14 @@ fold T R (iterable~Iterable([~T]) initial~R operation~(R T)->R) R =
     let ->accumulator = #operation:(#initial #head)
     #tail::fold(#accumulator #operation)
 
+reduce T (iterable~Iterable([~T]) operation~(T T)->T) T =
+    let ->head +: ->tail = #iterable::toList
+    #tail::fold@T T(#head #operation)
+
 map T R (iterable~Iterable(T) transform~(T)->R) List(R) =
     #iterable::iterator::makeMutableCollectionTransform(#transform MutableList)
+
+
 
 
 
