@@ -150,7 +150,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } } ?: (null to "")
 
         val outputList = parameter.findParamEx().map { "instance.${it.ID()!!.text}" to it.findTypeEx() }
-        val outputHead = "folding.FdTuple${outputList.count()}<"+
+        val outputHead = "folding.FdTuple${outputList.count()}Class<"+
                 outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
         val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
