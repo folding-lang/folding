@@ -27,3 +27,11 @@ fun processOpId(text: String) = "OP_" + text.toCharArray().joinToString("_") {
 fun processAopId(text: String) = "AOP_" + text.toCharArray().joinToString("_") {
     it.code.toString(16)
 }
+
+
+fun processCommonClassId(commonClassIdentifierContext: FoldingParser.CommonClassIdentifierContext) =
+    if (commonClassIdentifierContext.QUOTE().isEmpty())
+        commonClassIdentifierContext.ID()!!.text + "Class"
+    else commonClassIdentifierContext.ID()!!.text
+
+
