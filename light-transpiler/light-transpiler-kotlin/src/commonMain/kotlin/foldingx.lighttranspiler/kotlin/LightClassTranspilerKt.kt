@@ -29,7 +29,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),listOf())
         }
 
-        val primaryHead = "open class ${processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!)}Class$tHead$constructor$inheritsText $tTail"
+        val primaryHead = "open class ${processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!)}$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
@@ -62,7 +62,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),findDefInInterface())
         }
 
-        val primaryHead = "abstract class ${processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!)}Class$tHead$constructor$inheritsText $tTail"
+        val primaryHead = "abstract class ${processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!)}$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = fdJustAbstractClassContext.findConstructorSelf()?.findParameter()?.let {
@@ -83,7 +83,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassPrimaryBody(getClassTranspilerKt(),listOf(),findDef(),null,findImpl(),findDefInInterface(),findFieldInInterface())
         }
 
-        val primaryHead = "interface ${processCommonClassId(fdJustInterfaceContext.findCommonClassIdentifier()!!)}Class$tHead$inheritsText $tTail"
+        val primaryHead = "interface ${processCommonClassId(fdJustInterfaceContext.findCommonClassIdentifier()!!)}$tHead$inheritsText $tTail"
         val primaryBody = "{$compoListText".insertMargin(4)+"\n}"
 
         val factoryFunction = if (
@@ -113,10 +113,10 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
         } ?: ("()" to null)
         val primaryHead = "/** folding class constructor function */\n" +
-                "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +
+                "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}${tHead ?: ""} " +
                 (tTail ?: "")
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
-                "return ${classId}Class${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
+                "return ${classId}${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
 
         return primaryHead + primaryBody
     }
@@ -129,10 +129,10 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             h to t?.let { "$t " }
         } } ?: (null to "")
         val primaryHead = "/** folding class constructor function */\n" +
-                "fun${tHead?.let { " $it " } ?: " "}${classId}(): ${classId}Class${tHead ?: ""} " +
+                "fun${tHead?.let { " $it " } ?: " "}${classId}(): ${classId}${tHead ?: ""} " +
                 (tTail ?: "")
         val primaryBody = ("{\n"+
-                "return (object : ${classId}Class${tHead ?: ""} {})").insertMargin(4) + "\n}"
+                "return (object : ${classId}${tHead ?: ""} {})").insertMargin(4) + "\n}"
 
         return primaryHead + primaryBody
     }
@@ -150,11 +150,11 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         } } ?: (null to "")
 
         val outputList = parameter.findParamEx().map { "instance.${it.ID()!!.text}" to it.findTypeEx() }
-        val outputHead = "folding.FdTuple${outputList.count()}Class<"+
+        val outputHead = "folding.FdTuple${outputList.count()}<"+
                 outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
         val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
-        val primaryInput = "instance: ${classId}Class${tHead ?: ""}"
+        val primaryInput = "instance: ${classId}${tHead ?: ""}"
 
         val primaryHead = "fun${tHead?.let { " $it " } ?: " "}$id($primaryInput): $outputHead " +
                 (tTail ?: "")
