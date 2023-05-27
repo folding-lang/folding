@@ -6,7 +6,7 @@ package folding
 [/] (x~Int y~Int) foreign Int inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Int y~Int) foreign Int
 [~ +] (x~Int) foreign Int inverse r (#r)
-[~ -] (x~Int) foreign Int inverse r (-#r)
+[~ -] (x~Int) foreign Int inverse r (~-#r)
 
 [+] (x~Long y~Long) foreign Long inverse r (~>x  #r - #x) inverse r (#r - #y  ~>y)
 [-] (x~Long y~Long) foreign Long inverse r (~>x  #x - #r) inverse r (#r + #y  ~>y)
@@ -14,7 +14,7 @@ package folding
 [/] (x~Long y~Long) foreign Long inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Long y~Long) foreign Long
 [~ +] (x~Long) foreign Long inverse r (#r)
-[~ -] (x~Long) foreign Long inverse r (-#r)
+[~ -] (x~Long) foreign Long inverse r (~-#r)
 
 [+] (x~Byte y~Byte) foreign Int inverse r (~>x  (#r - #x::toInt)::toByte) inverse r ((#r - #y::toInt)::toByte  ~>y)
 [-] (x~Byte y~Byte) foreign Int inverse r (~>x  (#x::toInt - #r)::toByte) inverse r ((#r + #y::toInt)::toByte  ~>y)
@@ -30,7 +30,7 @@ package folding
 [/] (x~Double y~Double) foreign Double inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Double y~Double) foreign Double
 [~ +] (x~Double) foreign Double inverse r (#r)
-[~ -] (x~Double) foreign Double inverse r (-#r)
+[~ -] (x~Double) foreign Double inverse r (~-#r)
 
 [+] (x~Float y~Float) foreign Float inverse r (~>x  #r - #x) inverse r (#r - #y  ~>y)
 [-] (x~Float y~Float) foreign Float inverse r (~>x  #x - #r) inverse r (#r + #y  ~>y)
@@ -38,4 +38,4 @@ package folding
 [/] (x~Float y~Float) foreign Float inverse r (~>x  #x / #r) inverse r (#r * #y  ~>y)
 [%] (x~Float y~Float) foreign Float
 [~ +] (x~Float) foreign Float inverse r (#r)
-[~ -] (x~Float) foreign Float inverse r (-#r)
+[~ -] (x~Float) foreign Float inverse r (~-#r)
