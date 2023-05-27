@@ -36,15 +36,18 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeClassInverse(processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!), it, fdJustClassContext.findTypeParam())
         }
 
-        val constructFunctionText = makeConstructFunction(
-            processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!), fdJustClassContext.findConstructorSelf()!!.findParameter(),
-            fdJustClassContext.findTypeParam()
-        )
+        val constructFunctionText = if (fdJustClassContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()) {
+            makeConstructFunction(
+                fdJustClassContext.findCommonClassIdentifier()!!.ID()!!.text,
+                fdJustClassContext.findConstructorSelf()!!.findParameter(),
+                fdJustClassContext.findTypeParam()
+            ) + "\n"
+        } else ""
 
         val annotation = fdJustClassContext.findAnnotationBlock()
             ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
 
-        return annotation + primaryHead + primaryBody + "\n" + constructFunctionText + "\n" + (inverseFunctionText ?: "")
+        return annotation + primaryHead + primaryBody + "\n" + constructFunctionText + (inverseFunctionText ?: "")
     }
     override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String {
         val (tHead,tTail) = fdJustAbstractClassContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
@@ -89,9 +92,10 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         val factoryFunction = if (
             fdJustInterfaceContext.findDefInInterface().isEmpty()
             && fdJustInterfaceContext.ABSTRACT() == null
+            && fdJustInterfaceContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()
             )
             makeFactoryFunction(
-                processCommonClassId(fdJustInterfaceContext.findCommonClassIdentifier()!!),
+                fdJustInterfaceContext.findCommonClassIdentifier()!!.ID()!!.text,
                 fdJustInterfaceContext.findTypeParam()
             )
         else null
