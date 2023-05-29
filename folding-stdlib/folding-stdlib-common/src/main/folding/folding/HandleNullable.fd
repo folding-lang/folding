@@ -10,7 +10,7 @@ onIsNotNull T R (value~T? f~(T)->R) R? =
 
 [??] T (value~T? f~()->T) T = #value::onIsNull(#f)
 [?!] T R (value~T? f~(T)->R) R? = #value::onIsNotNull(#f)
-
+[!!] T (value~T?) T = #value (~T)
 
 
 

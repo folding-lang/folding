@@ -122,11 +122,23 @@ reduce T (iterable~Iterable([~T]) operation~(T T)->T) T =
     let ->head +: ->tail = #iterable::toList
     #tail::fold@T T(#head #operation)
 
-map T R (iterable~Iterable(T) transform~(T)->R) List(R) =
+
+map T R (iterable~Iterable([~T]) transform~(T)->R) List(R) =
     #iterable::iterator::makeMutableCollectionTransform(#transform MutableList)
 
+forEach T (iterable~Iterable([~T]) action~(T)->Unit) Unit =
+    #iterable::iterator::forEachIterator(#action)
+
+forEachIterator T (iterator~Iterator([~T]) action~(T)->Unit) Unit =
+    if (#iterator::hasNext) #iterator::forEachIterator(#action) else unit
 
 
+joinToString T (iterable~Iterable([~T]) separator~String) String =
+    #iterable
+        (map! [it~T] #it::toString)
+        (reduce! [acc~String it~String] #acc ++ #separator ++ #it)
+
+joinToString T (iterable~Iterable([~T])) String = #iterable::joinToString(", ")
 
 
 

@@ -1,0 +1,18 @@
+package folding
+
+
+not (x~Boolean) Boolean = if (#x) false else true
+
+[&&] (x~Boolean y~Boolean) Boolean =
+    if (#x) #y else false
+
+[^^] (x~Boolean y~Boolean) Boolean =
+    #x (== #y) ::not
+
+[||] (x~Boolean y~Boolean) Boolean =
+    if (#x && #y) true else (#x ^^ #y)
+
+
+
+
+

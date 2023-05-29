@@ -15,3 +15,11 @@ class Equatable {
 
 [===] (x~Any? y~Any?) foreign Boolean
 
+
+
+
+
+[!=] (x~Equatable y~Any?) Boolean = #x (== #y) ::not
+[!=] (x~Any? y~Any?) Boolean = #x (== #y) ::not
+[!==] (x~Any? y~Any?) Boolean = #x (=== #y) ::not
+
