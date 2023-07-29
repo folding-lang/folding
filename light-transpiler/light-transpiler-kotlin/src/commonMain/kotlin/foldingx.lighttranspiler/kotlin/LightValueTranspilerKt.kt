@@ -3,6 +3,7 @@ package foldingx.lighttranspiler.kotlin
 import foldingx.lighttranspiler.LightValueTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.util.TranspiledArgValue
+import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.*
 import foldingx.parser.inversing.processInverseValue
@@ -142,10 +143,10 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     }
     override fun processJustLambda(fdJustLambdaContext: FoldingParser.JustLambdaContext): String {
         val lambdaContext = fdJustLambdaContext.findLambda()!!
-        val (param,paramC) = lambdaContext.findParameterForLambda()?.let { p ->
-            processParameterForLambda(p) to
-                    p.findParameterFromValueForLambda()?.let {
-                        mateParamAndParamCExes(p.findParamEx(), processParameterFromValueForLambda(it))
+        val (param,paramC) = lambdaContext.findParameter()?.let { p ->
+            processParameter(p).removeSurrounding("(",")") to
+                    extractParamDestruction(p.findParamEx()).let {
+                        mateParamAndParamCExes(p.findParamEx(), processParamDestruction(it))
                     }
         } ?: ("" to null)
         val primaryHead = "$param ->"
@@ -215,20 +216,33 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processInvoking(fdInvokingContext: FoldingParser.InvokingContext): String =
         fdInvokingContext.findValue().joinToString(",") { processValue(it) }
 
-    override fun processParameterForLambda(fdParameterForLambdaContext: FoldingParser.ParameterForLambdaContext): String =
-        when {
-            fdParameterForLambdaContext.findParameterFromValueForLambda() == null ->
-                fdParameterForLambdaContext.findParamEx().joinToString(", ","","") {
-                    (if (it.ELLIPSIS() == null) "" else "vararg ") + it.ID()!!.text + ": " + processTypeEx(it.findTypeEx()!!)
-                }
-            else -> fdParameterForLambdaContext.findParameterFromValueForLambda()!!.findParamCEx().mapIndexed { index, paramCExContext ->
-                "r$index" + ": " + processTypeEx(paramCExContext.findTypeEx()!!)
-            }.joinToString(", ","","")
-        }
-    override fun processParameterFromValueForLambda(fdParameterFromValueForLambdaContext: FoldingParser.ParameterFromValueForLambdaContext): String =
-        fdParameterFromValueForLambdaContext.findParamCEx().flatMapIndexed { i, it ->
-            val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
-            processInverse(it.findValue()!!,id).map { (invId,invValue) -> invValue }
+//    override fun processParameterForLambda(fdParameterForLambdaContext: FoldingParser.ParameterForLambdaContext): String =
+//        when {
+//            fdParameterForLambdaContext.findParameterFromValueForLambda() == null ->
+//                fdParameterForLambdaContext.findParamEx().joinToString(", ","","") {
+//                    (if (it.ELLIPSIS() == null) "" else "vararg ") + it.ID()!!.text + ": " + processTypeEx(it.findTypeEx()!!)
+//                }
+//            else -> fdParameterForLambdaContext.findParameterFromValueForLambda()!!.findParamCEx().mapIndexed { index, paramCExContext ->
+//                "r$index" + ": " + processTypeEx(paramCExContext.findTypeEx()!!)
+//            }.joinToString(", ","","")
+//        }
+//    override fun processParameterFromValueForLambda(fdParameterFromValueForLambdaContext: FoldingParser.ParameterFromValueForLambdaContext): String =
+//        fdParameterFromValueForLambdaContext.findParamCEx().flatMapIndexed { i, it ->
+//            val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
+//            processInverse(it.findValue()!!,id).map { (invId,invValue) -> invValue }
+//        }.joinToString("\n")
+
+    override fun processParameter(fdParameterContext: FoldingParser.ParameterContext): String =
+        fdParameterContext.findParamEx().mapIndexed { i, it ->
+            val id = it.ID()?.text ?: "r$i"
+            (if (it.ELLIPSIS() == null) "" else "vararg ") + id + ": " + processTypeEx(it.findTypeEx()!!)
+        }.joinToString(", ","(",")")
+
+
+    override fun processParamDestruction(fdParamDestruction: List<Pair<String?,FoldingParser.ValueContext>>): String =
+        fdParamDestruction.flatMapIndexed { i, (idNullable,valueCtx) ->
+            val id = idNullable ?: "r$i"
+            processInverse(valueCtx,id).map { (invId,invValue) -> invValue }
         }.joinToString("\n")
 
 

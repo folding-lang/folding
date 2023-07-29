@@ -2,6 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightClassTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
+import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
 import foldingx.parser.func.CommonJustDef
 import foldingx.parser.identifier.processCommonClassId
@@ -120,7 +121,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             h to t?.let { "$t " }
         } } ?: (null to "")
         val (param,paramC) = parameter?.let { p ->
-            processParameter(p) to p.findParameterFromValue()?.let { processParameterFromValue(it) }
+            processParameter(p) to extractParamDestruction(p.findParamEx()).let { processParamDestruction(it) }
         } ?: ("()" to null)
         val primaryHead = "/** folding class constructor function */\n" +
                 "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +

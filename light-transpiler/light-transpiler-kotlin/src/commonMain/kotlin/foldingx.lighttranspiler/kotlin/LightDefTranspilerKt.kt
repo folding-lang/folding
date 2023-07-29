@@ -2,6 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightDefTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
+import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
 import foldingx.parser.func.CommonForeignDef
 import foldingx.parser.func.CommonInverseDef
@@ -34,8 +35,8 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
-            processParameter(p) to p.findParameterFromValue()?.let {
-                mateParamAndParamCExes(p.findParamEx(), processParameterFromValue(it))
+            processParameter(p) to extractParamDestruction(p.findParamEx()).let {
+                mateParamAndParamCExes(p.findParamEx(), processParamDestruction(it))
             }
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
@@ -94,8 +95,8 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonForeignDef.parameterContext?.let { p ->
-            processParameter(p) to p.findParameterFromValue()?.let {
-                mateParamAndParamCExes(p.findParamEx(), processParameterFromValue(it))
+            processParameter(p) to extractParamDestruction(p.findParamEx()).let {
+                mateParamAndParamCExes(p.findParamEx(), processParamDestruction(it))
             }
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
@@ -114,10 +115,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                         "implfd.kotlin." + fdCommonForeignDef.id +
                         tHead.removePrefix(" ").removeSuffix(" ") +
                         (fdCommonForeignDef.parameterContext?.let { context ->
-                            if (context.findParameterFromValue() != null) param.replace(":"," as").replace("vararg","*")
-                            else context.findParamEx().joinToString(", ","(",")") {
-                                (if (it.ELLIPSIS() != null) "*" else "") + it.ID()!!.text
-                            }
+                            param.replace(":"," as").replace("vararg","*")
                         } ?: "()")
                 )
 
@@ -126,19 +124,4 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         return annotation + primaryHead + primaryBody
     }
 
-    override fun processParameter(fdParameterContext: FoldingParser.ParameterContext): String = when {
-        fdParameterContext.findParameterFromValue() == null ->
-            fdParameterContext.findParamEx().joinToString(", ","(",")") {
-                (if (it.ELLIPSIS() == null) "" else "vararg ") + it.ID()!!.text + ": " + processTypeEx(it.findTypeEx()!!)
-            }
-        else -> fdParameterContext.findParameterFromValue()!!.findParamCEx().mapIndexed { index, paramCExContext ->
-            "r$index" + ": " + processTypeEx(paramCExContext.findTypeEx()!!)
-        }.joinToString(", ","(",")")
-    }
-
-    override fun processParameterFromValue(fdParameterFromValueContext: FoldingParser.ParameterFromValueContext): String =
-        fdParameterFromValueContext.findParamCEx().flatMapIndexed { i, it ->
-            val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
-            processInverse(it.findValue()!!,id).map { (invId,invValue) -> invValue }
-        }.joinToString("\n")
 }
