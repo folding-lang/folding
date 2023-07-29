@@ -33,6 +33,8 @@ interface LightValueTranspiler {
 
     fun processAnonymousClassObject(fdAnonymousClassObjectContext: FoldingParser.AnonymousClassObjectContext): String
 
+    fun processTuple(fdTupleContext: FoldingParser.TupleContext): String
+
     fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): TranspiledArgValue
     fun processArgEx(fdArgExContext: FoldingParser.ArgExContext): String
     fun processInvoking(fdInvokingContext: FoldingParser.InvokingContext): String

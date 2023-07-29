@@ -21,6 +21,7 @@ fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List
             is FoldingParser.CallAopFuncBackContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.AOP)
             is FoldingParser.CallOpFuncContext -> processCommonOpId(value.findCommonOpIdentifier()!!, OpIdUsage.OP)
             is FoldingParser.CallFunctionLikeMethodContext -> processId(value.findCommonIdentifier()!!)
+            is FoldingParser.TupleContext -> value.findTupleEx()!!.findValue().let { "FdTuple${it.count()}" }
             else -> throw RuntimeException()
         }
 

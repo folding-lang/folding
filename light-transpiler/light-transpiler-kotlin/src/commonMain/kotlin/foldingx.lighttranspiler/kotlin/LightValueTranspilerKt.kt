@@ -35,6 +35,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         is FoldingParser.JustLambdaContext -> processJustLambda(fdValueContext)
         is FoldingParser.ParenedValueContext -> processParenedValue(fdValueContext)
         is FoldingParser.AnonymousClassObjectContext -> processAnonymousClassObject(fdValueContext)
+        is FoldingParser.TupleContext -> processTuple(fdValueContext)
 
         else -> throw InvalidCode("value",fdValueContext)
     }
@@ -173,6 +174,13 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         return "object$i {$c".insertMargin(4)+"}"
     }
 
+    override fun processTuple(fdTupleContext: FoldingParser.TupleContext): String {
+        val values = fdTupleContext.findTupleEx()!!.findValue()
+        return values.joinToString(", ","FdTuple${values.count()}(",")") {
+            processValue(it)
+        }
+    }
+
     fun getClassTranspilerKt(): LightClassTranspilerKt
 
     override fun processArgValue(fdArgValueContext: FoldingParser.ArgValueContext): TranspiledArgValue {
@@ -183,20 +191,12 @@ interface LightValueTranspilerKt : LightValueTranspiler {
                         processTypeEx(it)
                     }
                 else ""
-            is FoldingParser.SingleListArgValueContext ->
-                if (it.findTypeEx().isNotEmpty())
-                    it.findTypeEx().joinToString(",","<",">") {
-                        processTypeEx(it)
-                    }
-                else ""
+
             else -> throw InvalidCode("type argument",it)
         }
         val arguments = when (fdArgValueContext) {
             is FoldingParser.PrimaryArgValueContext ->
                 fdArgValueContext.findArgEx().joinToString(",") { processArgEx(it) }
-
-            is FoldingParser.SingleListArgValueContext ->
-                fdArgValueContext.findValue().joinToString(",", "array(", ")") { processValue(it) }
 
             else -> throw InvalidCode("invoke", fdArgValueContext)
         }

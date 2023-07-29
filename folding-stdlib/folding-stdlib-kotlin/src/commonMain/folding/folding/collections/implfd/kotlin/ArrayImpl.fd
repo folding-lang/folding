@@ -9,8 +9,8 @@ typealias Array(T) = kotlin.'Array'(T)
 
 
 ArrayOfNulls T (length~Int) Array(T?) =
-    if (#length == 0) array@T?()
-    else ArrayOfNulls@T(#length - 1):plus(null)
+    if (#length == 0) array(T?|)
+    else ArrayOfNulls(T|#length - 1):plus(null)
 
 
 
