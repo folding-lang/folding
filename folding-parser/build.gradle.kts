@@ -44,7 +44,7 @@ kotlin {
         val commonAntlr by creating {
 
             dependencies {
-                api(kotlin("stdlib-common"))
+                implementation(kotlin("stdlib-common"))
                 api("$antlrGroup:antlr-kotlin-runtime:$antlrVersion")
             }
         }

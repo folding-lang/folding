@@ -3,7 +3,7 @@ import foldingx.generate.gradle.generateFdTuples
 folding {
     sourcesSets {
         val main by creating {
-            outputDirs += "../folding-stdlib-kotlin/src/commonMain"
+            outputDirs += "../folding-stdlib-kotlin/src/commonMain_transpiled_fd"
         }
     }
 }

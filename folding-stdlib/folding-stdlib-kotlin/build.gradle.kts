@@ -20,6 +20,7 @@ folding {
         }
         val jvmTest by creating {
             target = "kotlin"
+            outputDirs +="src/jvmTest"
         }
     }
 }
@@ -43,6 +44,18 @@ kotlin {
         }
     }
     // endregion\
+
+    sourceSets {
+        val commonMain_transpiled_fd by creating {
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+            }
+        }
+
+        val commonMain by getting {
+            dependsOn(commonMain_transpiled_fd)
+        }
+    }
 }
 
 val prepareMavenDeployment: Project.(description: String) -> Unit by rootProject.ext
