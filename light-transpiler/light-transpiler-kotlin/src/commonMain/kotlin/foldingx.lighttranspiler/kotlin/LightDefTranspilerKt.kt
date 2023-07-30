@@ -35,9 +35,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
-            processParameter(p) to extractParamDestruction(p.findParamEx()).let {
-                mateParamAndParamCExes(p.findParamEx(), processParamDestruction(it))
-            }
+            processParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
                 (tTail ?: "")
@@ -95,9 +93,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonForeignDef.parameterContext?.let { p ->
-            processParameter(p) to extractParamDestruction(p.findParamEx()).let {
-                mateParamAndParamCExes(p.findParamEx(), processParamDestruction(it))
-            }
+            processParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
                 (tTail ?: "")

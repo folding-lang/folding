@@ -21,6 +21,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             h to (t ?: "")
         } } ?: ("" to "")
 
+        // TODO: make constructor's paramC that bind to instance (in class body)
         val constructor = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let { processConstructorParameter(it) } ?: "()"
         val initialize = fdJustClassContext.findConstructorSelf()!!.findDoBlock()?.let {
             "\ninit " + processDoBlock(it).removeSuffix("()")
@@ -61,6 +62,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             h to (t ?: "")
         } } ?: ("" to "")
 
+        // TODO: make constructor's paramC that bind to instance (in class body)
         val constructor = fdJustAbstractClassContext.findConstructorSelf()?.let { c ->
             c.findParameter()?.let { processConstructorParameter(it) } ?: "()"
         } ?: ""
@@ -120,13 +122,13 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
             h to t?.let { "$t " }
         } } ?: (null to "")
-        val (param,paramC) = parameter?.let { p ->
-            processParameter(p) to extractParamDestruction(p.findParamEx()).let { processParamDestruction(it) }
-        } ?: ("()" to null)
+        val param = parameter?.let { p ->
+            processParameter(p)
+        } ?: "()"
         val primaryHead = "/** folding class constructor function */\n" +
                 "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +
                 (tTail ?: "")
-        val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
+        val primaryBody = ("{\n"+
                 "return ${classId}Class${tHead ?: ""}("+(parameter?.findParamEx()?.joinToString { it.ID()!!.text } ?: "")+")").insertMargin(4) + "\n}"
 
         return primaryHead + primaryBody
@@ -175,9 +177,9 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
     }
 
     fun processConstructorParameter(fdParameterContext: FoldingParser.ParameterContext) =
-        fdParameterContext.findParamEx().joinToString(", ","(",")") {
-            (if (it.ELLIPSIS() == null) "val " else "vararg val ") + it.ID()!!.text + ": " + processTypeEx(it.findTypeEx()!!)
-        }
+        fdParameterContext.findParamEx().mapIndexed { i, it ->
+            (if (it.ELLIPSIS() == null) "val " else "vararg val ") + makeIndexedParamId(i,it.ID()?.text) + ": " + processTypeEx(it.findTypeEx()!!)
+        }.joinToString(", ","(",")")
 
     override fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext): String {
         val fdCommonJustDef = CommonJustDef(

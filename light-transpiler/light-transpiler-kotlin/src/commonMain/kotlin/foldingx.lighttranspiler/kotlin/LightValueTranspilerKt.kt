@@ -145,9 +145,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         val lambdaContext = fdJustLambdaContext.findLambda()!!
         val (param,paramC) = lambdaContext.findParameter()?.let { p ->
             processParameter(p).removeSurrounding("(",")") to
-                    extractParamDestruction(p.findParamEx()).let {
-                        mateParamAndParamCExes(p.findParamEx(), processParamDestruction(it))
-                    }
+                processParamDestruction(extractParamDestruction(p.findParamEx()))
         } ?: ("" to null)
         val primaryHead = "$param ->"
         val primaryBody = ("\n"+(paramC?.let { "$it\n" } ?: "")+
@@ -233,17 +231,18 @@ interface LightValueTranspilerKt : LightValueTranspiler {
 //        }.joinToString("\n")
 
     override fun processParameter(fdParameterContext: FoldingParser.ParameterContext): String =
-        fdParameterContext.findParamEx().mapIndexed { i, it ->
-            val id = it.ID()?.text ?: "r$i"
+        makeParamIdBag(fdParameterContext.findParamEx()).joinToString(", ", "(", ")") { (id, it) ->
             (if (it.ELLIPSIS() == null) "" else "vararg ") + id + ": " + processTypeEx(it.findTypeEx()!!)
-        }.joinToString(", ","(",")")
+        }
 
 
     override fun processParamDestruction(fdParamDestruction: List<Pair<String?,FoldingParser.ValueContext>>): String =
         fdParamDestruction.flatMapIndexed { i, (idNullable,valueCtx) ->
-            val id = idNullable ?: "r$i"
-            processInverse(valueCtx,id).map { (invId,invValue) -> invValue }
-        }.joinToString("\n")
+            val id = makeIndexedParamId(i,idNullable)
+            processInverse(valueCtx,id).map { (invId,invValue) -> invId to invValue }
+        }.joinToString("\n") { (invId,invValue) ->
+            "val $invId = $invValue"
+        }
 
 
     fun processReference(fdReferenceContext: FoldingParser.ReferenceContext) =
