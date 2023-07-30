@@ -21,8 +21,9 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             h to (t ?: "")
         } } ?: ("" to "")
 
-        // TODO: make constructor's paramC that bind to instance (in class body)
-        val constructor = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let { processConstructorParameter(it) } ?: "()"
+        val (constructor,constructorC) = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let { p ->
+            processConstructorParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
+        } ?: ("()" to null)
         val initialize = fdJustClassContext.findConstructorSelf()!!.findDoBlock()?.let {
             "\ninit " + processDoBlock(it).removeSuffix("()")
         } ?: ""
@@ -32,7 +33,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         }
 
         val primaryHead = "open class ${processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!)}$tHead$constructor$inheritsText $tTail"
-        val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
+        val primaryBody = "{${(constructorC?.let { "\n$it\n" } ?: "")}$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = if (fdJustClassContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()) {
             fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
@@ -62,10 +63,11 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             h to (t ?: "")
         } } ?: ("" to "")
 
-        // TODO: make constructor's paramC that bind to instance (in class body)
-        val constructor = fdJustAbstractClassContext.findConstructorSelf()?.let { c ->
-            c.findParameter()?.let { processConstructorParameter(it) } ?: "()"
-        } ?: ""
+        val (constructor,constructorC) = fdJustAbstractClassContext.findConstructorSelf()?.let { c ->
+            c.findParameter()?.let { p ->
+                processConstructorParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
+            } ?: ("()" to null)
+        } ?: ("" to null)
         val initialize = fdJustAbstractClassContext.findConstructorSelf()?.findDoBlock()?.let {
             "\ninit " + processDoBlock(it).removeSuffix("()")
         } ?: ""
@@ -75,7 +77,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         }
 
         val primaryHead = "abstract class ${processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!)}$tHead$constructor$inheritsText $tTail"
-        val primaryBody = "{$compoListText\n$initialize".insertMargin(4)+"\n}"
+        val primaryBody = "{${(constructorC?.let { "\n$it\n" } ?: "")}$compoListText\n$initialize".insertMargin(4)+"\n}"
 
         val inverseFunctionText = fdJustAbstractClassContext.findConstructorSelf()?.findParameter()?.let {
             makeClassInverse(processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!), it, fdJustAbstractClassContext.findTypeParam())

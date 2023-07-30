@@ -214,21 +214,6 @@ interface LightValueTranspilerKt : LightValueTranspiler {
     override fun processInvoking(fdInvokingContext: FoldingParser.InvokingContext): String =
         fdInvokingContext.findValue().joinToString(",") { processValue(it) }
 
-//    override fun processParameterForLambda(fdParameterForLambdaContext: FoldingParser.ParameterForLambdaContext): String =
-//        when {
-//            fdParameterForLambdaContext.findParameterFromValueForLambda() == null ->
-//                fdParameterForLambdaContext.findParamEx().joinToString(", ","","") {
-//                    (if (it.ELLIPSIS() == null) "" else "vararg ") + it.ID()!!.text + ": " + processTypeEx(it.findTypeEx()!!)
-//                }
-//            else -> fdParameterForLambdaContext.findParameterFromValueForLambda()!!.findParamCEx().mapIndexed { index, paramCExContext ->
-//                "r$index" + ": " + processTypeEx(paramCExContext.findTypeEx()!!)
-//            }.joinToString(", ","","")
-//        }
-//    override fun processParameterFromValueForLambda(fdParameterFromValueForLambdaContext: FoldingParser.ParameterFromValueForLambdaContext): String =
-//        fdParameterFromValueForLambdaContext.findParamCEx().flatMapIndexed { i, it ->
-//            val id = it.findSpecificAlias()?.ID()?.text ?: "r$i"
-//            processInverse(it.findValue()!!,id).map { (invId,invValue) -> invValue }
-//        }.joinToString("\n")
 
     override fun processParameter(fdParameterContext: FoldingParser.ParameterContext): String =
         makeParamIdBag(fdParameterContext.findParamEx()).joinToString(", ", "(", ")") { (id, it) ->
