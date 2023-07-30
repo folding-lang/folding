@@ -92,14 +92,16 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
         val (tHead,tTail) = fdCommonForeignDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
-        val (param,paramC) = fdCommonForeignDef.parameterContext?.let { p ->
-            processParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
+        val (param,paramCLazy) = fdCommonForeignDef.parameterContext?.let { p ->
+            processParameter(p) to lazy { processParamDestruction(extractParamDestruction(p.findParamEx())) }
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
                 (tTail ?: "")
 
         val annotation = fdCommonForeignDef.annotationBlockContext
             ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        var isParamCNeeded = true
 
         val foreignBody = fdCommonForeignDef.foreignBodyContext?.let { when {
             it.RawString() != null -> it.RawString()!!.text.removeSurrounding("`")
@@ -111,11 +113,15 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                         "implfd.kotlin." + fdCommonForeignDef.id +
                         tHead.removePrefix(" ").removeSuffix(" ") +
                         (fdCommonForeignDef.parameterContext?.let { context ->
-                            param.replace(":"," as").replace("vararg","*")
+                            isParamCNeeded = false
+                            makeParamIdBag(context.findParamEx()).joinToString(", ", "(", ")") { (id, it) ->
+                                if (it.ELLIPSIS() != null) "*($id as Array<out ${processTypeEx(it.findTypeEx()!!)}>)"
+                                else "($id as ${processTypeEx(it.findTypeEx()!!)})"
+                            }
                         } ?: "()")
                 )
 
-        val primaryBody = "{\n${paramC?.let { "$it\n" } ?: ""}return ($foreignBody)".insertMargin(4) + "\n}"
+        val primaryBody = "{\n${paramCLazy.takeIf { isParamCNeeded }?.let { "${it.value}\n" } ?: ""}return ($foreignBody)".insertMargin(4) + "\n}"
 
         return annotation + primaryHead + primaryBody
     }
