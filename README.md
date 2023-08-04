@@ -7,7 +7,7 @@ just a programming language
 
 ### Light transpiling
 
-[supporting language that transpile to](https://github.com/folding-lang/folding/issues/3)
+[supporting language that transpile to ...](https://github.com/folding-lang/folding/issues/3)
 
 
 ## Reference
