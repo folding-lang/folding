@@ -93,7 +93,10 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     }
     override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext): String {
         val pkg = fdImportExContext.findPackage_()!!.text
-        val importNestId = fdImportExContext.findImportNest()?.let { "." + it.ID()!!.text }
+        val importNestId = fdImportExContext.findImportNest()?.let {
+            if (it.EM() != null) ""
+            else "." + it.ID()!!.text
+        }
         return fdImportExContext.findImportBody()?.findImportCompo()?.joinToString("\n") { compo ->
             when {
                 compo.CLASS() == null ->
