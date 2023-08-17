@@ -4,27 +4,25 @@ import foldingx.lighttranspiler.LightDefTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
-import foldingx.parser.func.CommonForeignDef
-import foldingx.parser.func.CommonInverseDef
-import foldingx.parser.func.CommonJustDef
-import foldingx.parser.func.processJustDef as processJustDefRaw
-import foldingx.parser.func.processInverseDef as processInverseDefRaw
-import foldingx.parser.func.processForeignDef as processForeignDefRaw
+import foldingx.parser.func.*
+import foldingx.parser.func.processJustDef as processJustDefPre
+import foldingx.parser.func.processInverseDef as processInverseDefPre
+import foldingx.parser.func.processForeignDef as processForeignDefPre
 
 interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     fun getCurrentTranspilingPackage(): String?
 
     override fun transpileDef(fdDefContext: FoldingParser.DefContext): String = when {
-        fdDefContext.findJustDef() != null -> processJustDefRaw(fdDefContext.findJustDef()!!).let { p ->
+        fdDefContext.findJustDef() != null -> processJustDefPre(fdDefContext.findJustDef()!!).let { p ->
             processJustDef(p) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
                 ?.joinToString("\n", "\n") {
-                    processInverseDefining(processInverseDefRaw(p, it))
+                    processInverseDefining(processInverseDefPre(p, it))
                 } ?: "")
         }
-        fdDefContext.findForeignDef() != null -> processForeignDefRaw(fdDefContext.findForeignDef()!!).let { p ->
+        fdDefContext.findForeignDef() != null -> processForeignDefPre(fdDefContext.findForeignDef()!!).let { p ->
             processForeignDef(p) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
                 ?.joinToString("\n", "\n") {
-                    processInverseDefining(processInverseDefRaw(p, it))
+                    processInverseDefining(processInverseDefPre(p, it))
                 } ?: "")
         }
         else -> throw InvalidCode("def",fdDefContext)
@@ -50,35 +48,74 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
     }
     override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef): String {
         val idHead = "${fdCommonInverseDef.parent.id}_inverse"
-        val idTail = fdCommonInverseDef.inverseDefCompoList.mapIndexed { i,it -> when(it) {
-            is FoldingParser.OutputParamContext -> "_$i"
-            else -> "__"
-        } }.joinToString("")
+        val idTail = when (fdCommonInverseDef) {
+            is CommonInverseDefSimple ->
+                fdCommonInverseDef.inverseDefCompoList.mapIndexed { i, it ->
+                    when (it) {
+                        is FoldingParser.OutputParamContext -> "_$i"
+                        else -> "__"
+                    }
+                }.joinToString("")
+            is CommonInverseDefRaw ->
+                fdCommonInverseDef.inverseDefGateCompoList.mapIndexed { i, it ->
+                    when {
+                        it.As() != null -> "__"
+                        else -> "_$i"
+                    }
+                }.joinToString("")
+        }
         val id = idHead + idTail
 
         val (tHead,tTail) = fdCommonInverseDef.parent.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
 
-        val outputList = fdCommonInverseDef.inverseDefCompoList
-            .mapIndexed { i, it ->
-                if (it is FoldingParser.OutputParamContext)
-                    processValue(it.findValue()!!) to (it.findTypeEx()
-                        ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)?.findTypeEx()
-                        ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx().last().findTypeEx()!!)
-                else null
-            }.filterNotNull()
-        val outputHead = "folding.FdTuple${outputList.count()}Class<"+
-                outputList.joinToString(",") { (_,t) -> processTypeEx(t) } +">"
-        val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
-        val param = fdCommonInverseDef.inverseDefCompoList
-            .mapIndexed { i, it ->
-                if (it is FoldingParser.NecessaryParamContext)
-                    it.ID()!!.text to
-                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
-                else null
+        val (outputHead,output) = when (fdCommonInverseDef) {
+            is CommonInverseDefSimple -> {
+                val outputList = fdCommonInverseDef.inverseDefCompoList
+                    .mapIndexed { i, it ->
+                        if (it is FoldingParser.OutputParamContext)
+                            processValue(it.findValue()!!) to (it.findTypeEx()
+                                ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)?.findTypeEx()
+                                ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx().last().findTypeEx()!!)
+                        else null
+                    }.filterNotNull()
+                val outputHead = "folding.FdTuple${outputList.count()}Class<"+
+                    outputList.joinToString(",") { (_,t) -> processTypeEx(t) } +">"
+                outputHead to outputList.joinToString(",", "$outputHead(", ")") { it.first }
             }
+            is CommonInverseDefRaw -> {
+                val outputTypeList = fdCommonInverseDef.inverseDefGateCompoList
+                    .mapIndexed { i, it ->
+                        if (it.As() == null)
+                             (
+                                fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)?.findTypeEx()
+                                ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx().last().findTypeEx()!!)
+                        else null
+                    }.filterNotNull()
+                val outputHead = "folding.FdTuple${outputTypeList.count()}Class<"+
+                    outputTypeList.joinToString(",") { t -> processTypeEx(t) } +">"
+                outputHead to processValue(fdCommonInverseDef.value)
+            }
+        }
+
+        val param = when(fdCommonInverseDef) {
+            is CommonInverseDefSimple -> fdCommonInverseDef.inverseDefCompoList
+                .mapIndexed { i, it ->
+                    if (it is FoldingParser.NecessaryParamContext)
+                        it.ID()!!.text to
+                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
+                    else null
+                }
+            is CommonInverseDefRaw -> fdCommonInverseDef.inverseDefGateCompoList
+                .mapIndexed { i, it ->
+                    if (it.As() != null)
+                        it.ID()!!.text to
+                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
+                    else null
+                }
+        }
             .filterNotNull().map { (pid,type) -> "$pid: $type" }
         val primaryInput = fdCommonInverseDef.resultId + ": " + processTypeEx(fdCommonInverseDef.parent.typeExContext!!)
 

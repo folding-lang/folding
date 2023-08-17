@@ -2,8 +2,20 @@ package foldingx.parser.func
 
 import foldingx.parser.FoldingParser
 
-class CommonInverseDef(
-    val parent: ICommonDef,
-    val resultId: String,
+sealed interface CommonInverseDef : CommonDefiningGroup {
+    val parent: ICommonDef
+    val resultId: String
+}
+
+class CommonInverseDefSimple(
+    override val parent: ICommonDef,
+    override val resultId: String,
     val inverseDefCompoList: List<FoldingParser.InverseDefCompoContext>
-) : CommonDefiningGroup
+) : CommonInverseDef
+
+class CommonInverseDefRaw(
+    override val parent: ICommonDef,
+    override val resultId: String,
+    val inverseDefGateCompoList: List<FoldingParser.InverseDefGateCompoContext>,
+    val value: FoldingParser.ValueContext
+) : CommonInverseDef

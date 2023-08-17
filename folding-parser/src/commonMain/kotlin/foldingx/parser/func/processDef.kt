@@ -13,11 +13,26 @@ fun processJustDef(justDefContext: FoldingParser.JustDefContext): CommonJustDef 
         valueContext = justDefContext.findValue()
     )
 
-fun processInverseDef(parent: ICommonDef, inverseDefiningContext: FoldingParser.InverseDefiningContext): CommonInverseDef =
-    CommonInverseDef(
+fun processInverseDef(parent: ICommonDef, inverseDefiningContext: FoldingParser.InverseDefiningContext) =
+    when (inverseDefiningContext) {
+        is FoldingParser.SimpleInverseDefContext -> processInverseDefSimple(parent,inverseDefiningContext)
+        is FoldingParser.RawInverseDefContext -> processInverseDefRaw(parent,inverseDefiningContext)
+        else -> throw IllegalArgumentException("unexpected inverseDefiningContext type")
+    }
+
+fun processInverseDefSimple(parent: ICommonDef, inverseDefSimpleContext: FoldingParser.SimpleInverseDefContext): CommonInverseDefSimple =
+    CommonInverseDefSimple(
         parent = parent,
-        resultId = inverseDefiningContext.ID()?.text ?: "result",
-        inverseDefCompoList = inverseDefiningContext.findInverseDefCompo()
+        resultId = inverseDefSimpleContext.ID()?.text ?: "result",
+        inverseDefCompoList = inverseDefSimpleContext.findInverseDefCompo()
+    )
+
+fun processInverseDefRaw(parent: ICommonDef, inverseDefRawContext: FoldingParser.RawInverseDefContext): CommonInverseDefRaw =
+    CommonInverseDefRaw(
+        parent = parent,
+        resultId = inverseDefRawContext.ID()?.text ?: "result",
+        inverseDefGateCompoList = inverseDefRawContext.findInverseDefGateCompo(),
+        value = inverseDefRawContext.findValue()!!
     )
 
 fun processForeignDef(foreignDefContext: FoldingParser.ForeignDefContext): CommonForeignDef =
