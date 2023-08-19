@@ -5,10 +5,13 @@ import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.util.TranspiledArgValue
 import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
+import foldingx.parser.classes.CommonClass
 import foldingx.parser.identifier.*
 import foldingx.parser.inversing.processInverseValue
 
 interface LightValueTranspilerKt : LightValueTranspiler {
+    fun registerGeneratedClass(commonClass: CommonClass): Boolean
+
     override fun processValue(fdValueContext: FoldingParser.ValueContext): String = when(fdValueContext) {
         is FoldingParser.JustDefaultValueContext -> processJustDefaultValue(fdValueContext)
         is FoldingParser.NullContext -> processNull(fdValueContext)

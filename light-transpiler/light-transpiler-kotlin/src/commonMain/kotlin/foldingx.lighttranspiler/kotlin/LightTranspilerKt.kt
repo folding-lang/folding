@@ -4,12 +4,16 @@ import foldingx.lighttranspiler.FileWrapper
 import foldingx.lighttranspiler.LightTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.parser.FoldingParser
+import foldingx.parser.classes.CommonClass
 import foldingx.parser.identifier.processCommonClassId
 import foldingx.parser.identifier.processId
 
 interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     var currentPackage: String?
+    var generatedClassRegistry: MutableList<CommonClass>?
     override fun getCurrentTranspilingPackage(): String? = currentPackage
+    override fun registerGeneratedClass(commonClass: CommonClass): Boolean =
+        generatedClassRegistry?.add(commonClass) ?: false
 
     override fun transpilePackage(
         sourcesRoot: String,
@@ -17,6 +21,8 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
     ): List<FileWrapper> {
         val namespace = fdFileContextList.first().findNamespace()?.let { it.findPackage_()!!.text }
         currentPackage = namespace
+        val generatedClassBasket: MutableList<CommonClass> = mutableListOf()
+        generatedClassRegistry = generatedClassBasket
         val packagePath = namespace?.replace(".","/") ?: ""
         val top = namespace?.let { "package $namespace\n\n" } ?: ""
 
@@ -30,7 +36,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
         val globalFieldList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findField() } }
         val classList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findClass_() } }
 
-        val (classFiles,constructFuncTexts) = classList.map {
+        val (classFilesOrigin,constructFuncTextsOrigin) = classList.map {
             val classId = when(it) {
                 is FoldingParser.JustInterfaceContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
                 is FoldingParser.JustClassContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
@@ -51,6 +57,26 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                 top + importText + "\n\n\n" + classText
             ) to constructText
         }.unzip()
+
+        val (classFilesAdditional,constructFuncTextsAdditional) = generatedClassBasket.map {
+            val classId = processCommonClassId(it.identifier)
+            val transpiled = processCommonClass(it)
+            val classText = transpiled.substringBeforeLast("/** folding class constructor function */\n")
+            val constructText =
+                if (transpiled.contains("/** folding class constructor function */\n"))
+                    "/** folding class constructor function */\n" +
+                        transpiled.substringAfterLast("/** folding class constructor function */\n")
+                else ""
+
+            FileWrapper(
+                "$sourcesRoot/$packagePath",
+                "$classId.kt",
+                top + importText + "\n\n\n" + classText
+            ) to constructText
+        }.unzip()
+
+        val classFiles = classFilesOrigin + classFilesAdditional
+        val constructFuncTexts = constructFuncTextsOrigin + constructFuncTextsAdditional
 
         val annotationDefFile = annotationDefList.map {
             FileWrapper(
