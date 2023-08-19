@@ -4,6 +4,9 @@ import foldingx.lighttranspiler.LightClassTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
+import foldingx.parser.classes.ClassCategory
+import foldingx.parser.classes.CommonClass
+import foldingx.parser.classes.processClassContext
 import foldingx.parser.func.CommonJustDef
 import foldingx.parser.identifier.processCommonClassId
 import foldingx.parser.identifier.processId
@@ -16,105 +19,72 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         else -> throw InvalidCode("class",fdClass_Context)
     }
 
-    override fun processJustClass(fdJustClassContext: FoldingParser.JustClassContext): String {
-        val (tHead,tTail) = fdJustClassContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
+    override fun processCommonClass(fdCommonClass: CommonClass): String {
+        val (tHead,tTail) = fdCommonClass.typeParam?.let { processTypeParam(it).let { (h,t) ->
             h to (t ?: "")
         } } ?: ("" to "")
 
-        val (constructor,constructorC) = fdJustClassContext.findConstructorSelf()!!.findParameter()?.let { p ->
+        val (constructor,constructorC) = fdCommonClass.constructorSelf?.findParameter()?.let { p ->
             processConstructorParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
-        } ?: ("()" to null)
-        val initialize = fdJustClassContext.findConstructorSelf()!!.findDoBlock()?.let {
+        } ?: ((if (fdCommonClass.category.canHasConstructorSelf) "()" else "") to null)
+        val initialize = fdCommonClass.constructorSelf?.findDoBlock()?.let {
             "\ninit " + processDoBlock(it).removeSuffix("()")
         } ?: ""
 
-        val (inheritsText,compoListText) = fdJustClassContext.run {
-            makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),listOf())
+        val (inheritsText,compoListText) = fdCommonClass.run {
+            makeClassPrimaryBody(
+                getClassTranspilerKt(),
+                fieldList, defList, inheritContext, implList, defInInterfaceList, fieldInInterfaceList
+            )
         }
 
-        val primaryHead = "open class ${processCommonClassId(fdJustClassContext.findCommonClassIdentifier()!!)}$tHead$constructor$inheritsText $tTail"
+        val headKeyword = when(fdCommonClass.category) {
+            ClassCategory.DATA_CLASS -> "class"
+            ClassCategory.ABSTRACT_CLASS -> "interface"
+            ClassCategory.ABSTRACT_DATA_CLASS -> "abstract class"
+        }
+
+        val annotation = fdCommonClass.annotationBlockContext
+            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+
+        val primaryHead = "open $headKeyword ${processCommonClassId(fdCommonClass.identifier)}$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{${(constructorC?.let { "\n$it\n" } ?: "")}$compoListText\n$initialize".insertMargin(4)+"\n}"
 
-        val inverseFunctionText = if (fdJustClassContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()) {
-            fdJustClassContext.findConstructorSelf()!!.findParameter()?.let {
+        val inverseFunctionText = if (
+            fdCommonClass.category == ClassCategory.DATA_CLASS &&
+            fdCommonClass.identifier.QUOTE().isEmpty()
+            ) {
+            fdCommonClass.constructorSelf!!.findParameter()?.let {
                 makeClassInverse(
-                    fdJustClassContext.findCommonClassIdentifier()!!.ID()!!.text,
+                    fdCommonClass.identifier.ID()!!.text,
                     it,
-                    fdJustClassContext.findTypeParam()
+                    fdCommonClass.typeParam
                 )
             }
         } else null
 
-        val constructFunctionText = if (fdJustClassContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()) {
+        val constructFunctionText = if (
+            fdCommonClass.category == ClassCategory.DATA_CLASS &&
+            fdCommonClass.identifier.QUOTE().isEmpty()
+            ) {
             makeConstructFunction(
-                fdJustClassContext.findCommonClassIdentifier()!!.ID()!!.text,
-                fdJustClassContext.findConstructorSelf()!!.findParameter(),
-                fdJustClassContext.findTypeParam()
+                fdCommonClass.identifier.ID()!!.text,
+                fdCommonClass.constructorSelf!!.findParameter(),
+                fdCommonClass.typeParam
             ) + "\n"
         } else ""
 
-        val annotation = fdJustClassContext.findAnnotationBlock()
-            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
-
         return annotation + primaryHead + primaryBody + "\n" + constructFunctionText + (inverseFunctionText ?: "")
     }
+
+    override fun processJustClass(fdJustClassContext: FoldingParser.JustClassContext): String {
+        return processCommonClass(processClassContext(fdJustClassContext))
+    }
     override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String {
-        val (tHead,tTail) = fdJustAbstractClassContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
-            h to (t ?: "")
-        } } ?: ("" to "")
-
-        val (constructor,constructorC) = fdJustAbstractClassContext.findConstructorSelf()?.let { c ->
-            c.findParameter()?.let { p ->
-                processConstructorParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
-            } ?: ("()" to null)
-        } ?: ("" to null)
-        val initialize = fdJustAbstractClassContext.findConstructorSelf()?.findDoBlock()?.let {
-            "\ninit " + processDoBlock(it).removeSuffix("()")
-        } ?: ""
-
-        val (inheritsText,compoListText) = fdJustAbstractClassContext.run {
-            makeClassPrimaryBody(getClassTranspilerKt(),findField(),findDef(),findInherit(),findImpl(),findDefInInterface())
-        }
-
-        val primaryHead = "abstract class ${processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!)}$tHead$constructor$inheritsText $tTail"
-        val primaryBody = "{${(constructorC?.let { "\n$it\n" } ?: "")}$compoListText\n$initialize".insertMargin(4)+"\n}"
-
-        val inverseFunctionText = fdJustAbstractClassContext.findConstructorSelf()?.findParameter()?.let {
-            makeClassInverse(processCommonClassId(fdJustAbstractClassContext.findCommonClassIdentifier()!!), it, fdJustAbstractClassContext.findTypeParam())
-        }
-
-        val annotation = fdJustAbstractClassContext.findAnnotationBlock()
-            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
-
-        return annotation + primaryHead + primaryBody + (inverseFunctionText?.let { "\n" + it } ?: "")
+        return processCommonClass(processClassContext(fdJustAbstractClassContext))
     }
     override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String {
-        val (tHead,tTail) = fdJustInterfaceContext.findTypeParam()?.let { processTypeParam(it).let { (h,t) ->
-            " $h " to (t ?: "")
-        } } ?: ("" to "")
-
-        val (inheritsText,compoListText) = fdJustInterfaceContext.run {
-            makeClassPrimaryBody(getClassTranspilerKt(),listOf(),findDef(),null,findImpl(),findDefInInterface(),findFieldInInterface())
-        }
-
-        val primaryHead = "interface ${processCommonClassId(fdJustInterfaceContext.findCommonClassIdentifier()!!)}$tHead$inheritsText $tTail"
-        val primaryBody = "{$compoListText".insertMargin(4)+"\n}"
-
-        val factoryFunction = if (
-            fdJustInterfaceContext.findDefInInterface().isEmpty()
-            && fdJustInterfaceContext.ABSTRACT() == null
-            && fdJustInterfaceContext.findCommonClassIdentifier()!!.QUOTE().isEmpty()
-            )
-            makeFactoryFunction(
-                fdJustInterfaceContext.findCommonClassIdentifier()!!.ID()!!.text,
-                fdJustInterfaceContext.findTypeParam()
-            )
-        else null
-
-        val annotation = fdJustInterfaceContext.findAnnotationBlock()
-            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
-
-        return annotation + primaryHead + primaryBody + (factoryFunction?.let { "\n"+it } ?: "")
+        return processCommonClass(processClassContext(fdJustInterfaceContext))
     }
 
     fun makeConstructFunction(
@@ -136,6 +106,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
         return primaryHead + primaryBody
     }
 
+    @Deprecated("legacy")
     fun makeFactoryFunction(
         classId: String,
         typeParamContext: FoldingParser.TypeParamContext?
