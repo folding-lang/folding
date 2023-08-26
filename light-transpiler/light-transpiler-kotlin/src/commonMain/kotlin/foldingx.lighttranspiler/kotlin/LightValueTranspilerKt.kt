@@ -246,7 +246,7 @@ interface LightValueTranspilerKt : LightValueTranspiler {
         fieldInInterfaceList: List<FoldingParser.FieldInInterfaceContext> = listOf()
     ): Pair<String,String> {
         val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!) }
-        val inherits = inheritContext?.findImpl()?.findTypeEx()?.let { processTypeEx(it) }?.let {
+        val inherits = inheritContext?.findTypeEx()?.let { processTypeEx(it) }?.let {
             listOf(it + (inheritContext.findArgValue()?.let { "(${processArgValue(it).arguments})" } ?: "()")) + interfaceList
         } ?: interfaceList
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
@@ -260,10 +260,12 @@ interface LightValueTranspilerKt : LightValueTranspiler {
             "abstract $keyword $id: $typeEx"
         }
 
-        val implDefListText = (listOf(inheritContext?.findImpl()) + implList)
-            .mapNotNull { it?.findImplBody()?.findDef() }.flatten().map { "open override " + classTranspilerKt.transpileDef(it) }
-        val implFieldListText = (listOf(inheritContext?.findImpl()) + implList)
-            .mapNotNull { it?.findImplBody()?.findField() }.flatten().map {
+        val implBodyList = implList.mapNotNull { it.findImplBody() }
+
+        val implDefListText = (listOf(inheritContext?.findImplBody()) + implBodyList)
+            .mapNotNull { it?.findDef() }.flatten().map { "open override " + classTranspilerKt.transpileDef(it) }
+        val implFieldListText = (listOf(inheritContext?.findImplBody()) + implBodyList)
+            .mapNotNull { it?.findField() }.flatten().map {
                 val parts = classTranspilerKt.processField(it).split("\n").toMutableList()
                 val keywordEditIndex = if (parts[0] == "/** not initiated variable */") 2 else 0
                 parts[keywordEditIndex] = "open override " + parts[keywordEditIndex]
