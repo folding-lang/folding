@@ -20,7 +20,7 @@ class DelegateKotlinMutableIterable(T) {
 
 class DelegateKotlinCollection(T) {
     (kotlinCollection~kotlin.collections.'Collection'(T))
-    inherit (#kotlinCollection) impl DelegateKotlinIterable(T)
+    inherit DelegateKotlinIterable(T) { (#kotlinCollection) }
     impl Collection(T) {
         :#(foreign)size Int get! = #kotlinCollection:#size
         :isEmpty Boolean = #kotlinCollection:isEmpty
@@ -31,7 +31,7 @@ class DelegateKotlinCollection(T) {
 
 class DelegateKotlinMutableCollection(T) {
     (kotlinMutableCollection~kotlin.collections.'MutableCollection'(T))
-    inherit (#kotlinMutableCollection) impl DelegateKotlinMutableIterable(T)
+    inherit DelegateKotlinMutableIterable(T) { (#kotlinMutableCollection) }
     impl MutableCollection(T) {
         :#(foreign)size Int get! = #kotlinMutableCollection:#size
         :isEmpty Boolean = #kotlinMutableCollection:isEmpty
@@ -49,7 +49,7 @@ class DelegateKotlinMutableCollection(T) {
 
 class DelegateKotlinList(T) {
     (kotlinList~kotlin.collections.'List'(T))
-    inherit (#kotlinList) impl DelegateKotlinCollection(T)
+    inherit DelegateKotlinCollection(T) { (#kotlinList) }
     impl List(T) {
         :get (index~Int) T = #kotlinList:get(#index)
         :indexOf (element~T) Int = #kotlinList:indexOf(#element)
@@ -62,7 +62,7 @@ class DelegateKotlinList(T) {
 
 class DelegateKotlinMutableList(T) {
     (kotlinMutableList~kotlin.collections.'MutableList'(T))
-    inherit (#kotlinMutableList) impl DelegateKotlinMutableCollection(T)
+    inherit DelegateKotlinMutableCollection(T) { (#kotlinMutableList) }
     impl MutableList(T) {
         :get (index~Int) T = #kotlinMutableList:get(#index)
         :indexOf (element~T) Int = #kotlinMutableList:indexOf(#element)
@@ -81,13 +81,13 @@ class DelegateKotlinMutableList(T) {
 
 class DelegateKotlinSet(T) {
     (kotlinSet~kotlin.collections.'Set'(T))
-    inherit (#kotlinSet) impl DelegateKotlinCollection(T)
+    inherit DelegateKotlinCollection(T) { (#kotlinSet) }
     impl Set(T)
 }
 
 class DelegateKotlinMutableSet(T) {
     (kotlinMutableSet~kotlin.collections.'MutableSet'(T))
-    inherit (#kotlinMutableSet) impl DelegateKotlinMutableCollection(T)
+    inherit DelegateKotlinMutableCollection(T) { (#kotlinMutableSet) }
     impl MutableSet(T)
 }
 
@@ -109,7 +109,7 @@ class DelegateKotlinMap(K V) {
 
 class DelegateKotlinMutableMap(K V) {
     (kotlinMutableMap~kotlin.collections.'MutableMap'(K V))
-    inherit (#kotlinMutableMap) impl DelegateKotlinMap(K V)
+    inherit DelegateKotlinMap(K V) { (#kotlinMutableMap) }
     impl MutableMap(K V) {
         :#keys kotlin.collections.'MutableSet'(K) = #kotlinMutableMap:#keys
         :#values kotlin.collections.'MutableCollection'(V) = #kotlinMutableMap:#values
@@ -133,7 +133,7 @@ class DelegateKotlinIterator(T) {
 
 class DelegateKotlinMutableIterator(T) {
     (kotlinMutableIterator~kotlin.collections.'MutableIterator'(T))
-    inherit (#kotlinMutableIterator) impl DelegateKotlinIterator(T)
+    inherit DelegateKotlinIterator(T) { (#kotlinMutableIterator) }
     impl MutableIterator(T) {
         :remove Unit = #kotlinMutableIterator:remove
     }
