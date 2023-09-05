@@ -2,6 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightClassTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
+import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
 import foldingx.parser.classes.ClassCategory
@@ -11,30 +12,30 @@ import foldingx.parser.func.CommonJustDef
 import foldingx.parser.identifier.processCommonClassId
 import foldingx.parser.identifier.processId
 
-interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
-    override fun transpileClass(fdClass_Context: FoldingParser.Class_Context): String = when(fdClass_Context) {
-        is FoldingParser.JustClassContext -> processJustClass(fdClass_Context)
-        is FoldingParser.JustAbstractClassContext -> processJustAbstractClass(fdClass_Context)
-        is FoldingParser.JustInterfaceContext -> processJustInterface(fdClass_Context)
+interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTranspilerKt {
+    override fun transpileClass(fdClass_Context: FoldingParser.Class_Context, effect: EffectKt): String = when(fdClass_Context) {
+        is FoldingParser.JustClassContext -> processJustClass(fdClass_Context,effect)
+        is FoldingParser.JustAbstractClassContext -> processJustAbstractClass(fdClass_Context,effect)
+        is FoldingParser.JustInterfaceContext -> processJustInterface(fdClass_Context,effect)
         else -> throw InvalidCode("class",fdClass_Context)
     }
 
-    override fun processCommonClass(fdCommonClass: CommonClass): String {
+    override fun processCommonClass(fdCommonClass: CommonClass, effect: EffectKt): String {
         val (tHead,tTail) = fdCommonClass.typeParam?.let { processTypeParam(it).let { (h,t) ->
             h to (t ?: "")
         } } ?: ("" to "")
 
         val (constructor,constructorC) = fdCommonClass.constructorSelf?.findParameter()?.let { p ->
-            processConstructorParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
+            processConstructorParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()),effect)
         } ?: ((if (fdCommonClass.category.canHasConstructorSelf) "()" else "") to null)
         val initialize = fdCommonClass.constructorSelf?.findDoBlock()?.let {
-            "\ninit " + processDoBlock(it).removeSuffix("()")
+            "\ninit " + processDoBlock(it,effect).removeSuffix("()")
         } ?: ""
 
         val (inheritsText,compoListText) = fdCommonClass.run {
             makeClassPrimaryBody(
                 getClassTranspilerKt(),
-                fieldList, defList, inheritContext, implList, defInInterfaceList, fieldInInterfaceList
+                fieldList, defList, inheritContext, implList, defInInterfaceList, fieldInInterfaceList, effect=effect
             )
         }
 
@@ -70,32 +71,33 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             makeConstructFunction(
                 fdCommonClass.identifier.ID()!!.text,
                 fdCommonClass.constructorSelf!!.findParameter(),
-                fdCommonClass.typeParam
+                fdCommonClass.typeParam,
+                effect
             ) + "\n"
         } else ""
 
         return annotation + primaryHead + primaryBody + "\n" + constructFunctionText + (inverseFunctionText ?: "")
     }
 
-    override fun processJustClass(fdJustClassContext: FoldingParser.JustClassContext): String {
-        return processCommonClass(processClassContext(fdJustClassContext))
+    override fun processJustClass(fdJustClassContext: FoldingParser.JustClassContext, effect: EffectKt): String {
+        return processCommonClass(processClassContext(fdJustClassContext),effect)
     }
-    override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext): String {
-        return processCommonClass(processClassContext(fdJustAbstractClassContext))
+    override fun processJustAbstractClass(fdJustAbstractClassContext: FoldingParser.JustAbstractClassContext, effect: EffectKt): String {
+        return processCommonClass(processClassContext(fdJustAbstractClassContext),effect)
     }
-    override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext): String {
-        return processCommonClass(processClassContext(fdJustInterfaceContext))
+    override fun processJustInterface(fdJustInterfaceContext: FoldingParser.JustInterfaceContext, effect: EffectKt): String {
+        return processCommonClass(processClassContext(fdJustInterfaceContext),effect)
     }
 
     fun makeConstructFunction(
         classId: String, parameter: FoldingParser.ParameterContext?,
         typeParamContext: FoldingParser.TypeParamContext?
-    ): String {
+    , effect: EffectKt): String {
         val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
             h to t?.let { "$t " }
         } } ?: (null to "")
         val param = parameter?.let { p ->
-            processParameter(p)
+            processParameter(p,effect)
         } ?: "()"
         val primaryHead = "/** folding class constructor function */\n" +
                 "fun${tHead?.let { " $it " } ?: " "}${classId}$param: ${classId}Class${tHead ?: ""} " +
@@ -154,7 +156,7 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             (if (it.ELLIPSIS() == null) "val " else "vararg val ") + makeIndexedParamId(i,it.ID()?.text) + ": " + processTypeEx(it.findTypeEx()!!)
         }.joinToString(", ","(",")")
 
-    override fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext): String {
+    override fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext, effect: EffectKt): String {
         val fdCommonJustDef = CommonJustDef(
             fdDefInInterfaceContext.findAnnotationBlock(),
             processId(fdDefInInterfaceContext.findCommonIdentifier()!!),
@@ -168,13 +170,13 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
                 " $h " to t
             }
         } ?: (" " to "")
-        val param = fdCommonJustDef.parameterContext?.let { p -> processParameter(p) } ?: "()"
+        val param = fdCommonJustDef.parameterContext?.let { p -> processParameter(p,effect) } ?: "()"
 
         return "abstract fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
                 (tTail ?: "")
     }
 
-    override fun processField(fdFieldContext: FoldingParser.FieldContext): String = when {
+    override fun processField(fdFieldContext: FoldingParser.FieldContext, effect: EffectKt): String = when {
         fdFieldContext.findFieldNotInit() != null -> if (fdFieldContext.findFieldNotInit()!!.findTypeEx()!!.QM() == null)
             fdFieldContext.findFieldNotInit()!!.let {
                 if (it.MUTABLE() != null) """
@@ -197,15 +199,15 @@ interface LightClassTranspilerKt : LightClassTranspiler, LightDefTranspilerKt {
             )
         fdFieldContext.findFieldSetted() != null -> fdFieldContext.findFieldSetted()!!.let {
             val keyword = if (it.MUTABLE() != null) "var" else "val"
-            "$keyword ${it.ID()!!.text} ${it.findTypeEx()?.let { t -> ": " + processTypeEx(t) } ?: ""} = ${processValue(it.findValue()!!)}"
+            "$keyword ${it.ID()!!.text} ${it.findTypeEx()?.let { t -> ": " + processTypeEx(t) } ?: ""} = ${processValue(it.findValue()!!,effect)}"
         }
         fdFieldContext.findForeignField() != null -> fdFieldContext.findForeignField()!!.let {
             val keyword = it.settingValue?.let { "var" } ?: "val"
             val head = "$keyword ${it.ID(0).text}: ${processTypeEx(it.findTypeEx()!!)}"
             val getting =
-                if (it.gettingValue != null) "\nget() = (${processValue(it.gettingValue!!)})"
+                if (it.gettingValue != null) "\nget() = (${processValue(it.gettingValue!!,effect)})"
                 else "\nget() { throw RuntimeException(\"Getter of the field '${it.ID(0).text}' is not defined\") }"
-            val setting = if (it.settingValue != null) "\nset(${it.inputID!!.text}) {${processValue(it.settingValue!!)}}" else ""
+            val setting = if (it.settingValue != null) "\nset(${it.inputID!!.text}) {${processValue(it.settingValue!!,effect)}}" else ""
             (head + getting + setting).insertMargin(4)
         }
         else -> throw InvalidCode("field",fdFieldContext)

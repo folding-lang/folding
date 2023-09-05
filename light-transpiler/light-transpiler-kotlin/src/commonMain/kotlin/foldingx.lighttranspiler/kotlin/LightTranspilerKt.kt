@@ -3,31 +3,31 @@ package foldingx.lighttranspiler.kotlin
 import foldingx.lighttranspiler.FileWrapper
 import foldingx.lighttranspiler.LightTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
+import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.parser.FoldingParser
 import foldingx.parser.classes.CommonClass
 import foldingx.parser.identifier.processCommonClassId
 import foldingx.parser.identifier.processId
 
-interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
-    var currentPackage: String?
-    var generatedClassRegistry: MutableList<CommonClass>?
-    override fun getCurrentTranspilingPackage(): String? = currentPackage
-    override fun registerGeneratedClass(commonClass: CommonClass): Boolean =
+interface LightTranspilerKt : LightTranspiler<EffectKt>, LightClassTranspilerKt {
+    override fun EffectKt.getCurrentTranspilingPackage(): String? = currentPackage
+    override fun EffectKt.registerGeneratedClass(commonClass: CommonClass): Boolean =
         generatedClassRegistry?.add(commonClass) ?: false
 
     override fun transpilePackage(
         sourcesRoot: String,
-        fdFileContextList: List<FoldingParser.FileContext>
+        fdFileContextList: List<FoldingParser.FileContext>,
+        effect: EffectKt
     ): List<FileWrapper> {
         val namespace = fdFileContextList.first().findNamespace()?.let { it.findPackage_()!!.text }
-        currentPackage = namespace
+        effect.currentPackage = namespace
         val generatedClassBasket: MutableList<CommonClass> = mutableListOf()
-        generatedClassRegistry = generatedClassBasket
+        effect.generatedClassRegistry = generatedClassBasket
         val packagePath = namespace?.replace(".","/") ?: ""
         val top = namespace?.let { "package $namespace\n\n" } ?: ""
 
         val importText = fdFileContextList.flatMap {
-            it.findImportEx().flatMap { processImportEx(it).split("\n") }
+            it.findImportEx().flatMap { processImportEx(it,effect).split("\n") }
         }.distinct().joinToString("\n")
 
         val defList = fdFileContextList.flatMap { it.findFileCompo().mapNotNull { it.findDefinition()?.findDef() } }
@@ -43,7 +43,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                 is FoldingParser.JustAbstractClassContext -> processCommonClassId(it.findCommonClassIdentifier()!!)
                 else -> throw InvalidCode("class",it)
             }
-            val transpiled = transpileClass(it)
+            val transpiled = transpileClass(it,effect)
             val classText = transpiled.substringBeforeLast("/** folding class constructor function */\n")
             val constructText =
                 if (transpiled.contains("/** folding class constructor function */\n"))
@@ -60,7 +60,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
 
         val (classFilesAdditional,constructFuncTextsAdditional) = generatedClassBasket.map {
             val classId = processCommonClassId(it.identifier)
-            val transpiled = processCommonClass(it)
+            val transpiled = processCommonClass(it,effect)
             val classText = transpiled.substringBeforeLast("/** folding class constructor function */\n")
             val constructText =
                 if (transpiled.contains("/** folding class constructor function */\n"))
@@ -82,7 +82,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             FileWrapper(
                 "$sourcesRoot/$packagePath",
                 it.ID()!!.text + ".kt",
-                top + importText + "\n\n\n" + processAnnotationDef(it)
+                top + importText + "\n\n\n" + processAnnotationDef(it,effect)
             )
         }
 
@@ -90,7 +90,7 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             FileWrapper(
                 "$sourcesRoot/$packagePath",
                 processCommonClassId(it.findCommonClassIdentifier()!!) + ".kt",
-                top + importText + "\n\n\n" + processTypeAlias(it)
+                top + importText + "\n\n\n" + processTypeAlias(it,effect)
             )
         }
 
@@ -98,26 +98,26 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             "$sourcesRoot/$packagePath",
             "Default.kt",
             top + importText +
-                    globalFieldList.joinToString("\n\n","\n\n\n") { processField(it) } +
+                    globalFieldList.joinToString("\n\n","\n\n\n") { processField(it,effect) } +
                     constructFuncTexts.joinToString("\n\n","\n\n\n") +
-                    defList.joinToString("\n\n","\n\n\n") { processDef(it) }
+                    defList.joinToString("\n\n","\n\n\n") { processDef(it,effect) }
         )
 
         return listOf(defaultFile) + annotationDefFile + typeAliasFile + classFiles
     }
 
-    override fun transpileFile(fdFileContext: FoldingParser.FileContext): String {
+    override fun transpileFile(fdFileContext: FoldingParser.FileContext, effect: EffectKt): String {
         val namespace = fdFileContext.findNamespace()?.let { "package " + it.findPackage_()!!.text } ?: ""
-        currentPackage = fdFileContext.findNamespace()?.findPackage_()?.text
+        effect.currentPackage = fdFileContext.findNamespace()?.findPackage_()?.text
         val imports = fdFileContext.findImportEx()
-            .flatMap { processImportEx(it).split("\n") }
+            .flatMap { processImportEx(it,effect).split("\n") }
             .distinct().joinToString("\n")
-        val allAnnotationDef = fdFileContext.findAnnotationDef().joinToString("\n") { processAnnotationDef(it) }
-        val allTypeAlias = fdFileContext.findTypeAlias().joinToString("\n") { processTypeAlias(it) }
-        val fileBody = fdFileContext.findFileCompo().joinToString("\n\n") { processFileCompo(it) }
+        val allAnnotationDef = fdFileContext.findAnnotationDef().joinToString("\n") { processAnnotationDef(it,effect) }
+        val allTypeAlias = fdFileContext.findTypeAlias().joinToString("\n") { processTypeAlias(it,effect) }
+        val fileBody = fdFileContext.findFileCompo().joinToString("\n\n") { processFileCompo(it,effect) }
         return listOf(namespace,imports,allTypeAlias,allAnnotationDef,fileBody).filter { it != "" }.joinToString("\n\n\n")
     }
-    override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext): String {
+    override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext, effect: EffectKt): String {
         val pkg = fdImportExContext.findPackage_()!!.text
         val importNestId = fdImportExContext.findImportNest()?.let {
             if (it.EM() != null) ""
@@ -135,22 +135,22 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
             }
         } ?: ((importNestId?.let { "import $pkg$it.*\n" } ?: "") + "import $pkg.*")
     }
-    override fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext): String = when {
-        fdFileCompoContext.findDefinition() != null -> processDefinition(fdFileCompoContext.findDefinition()!!)
-        fdFileCompoContext.findField() != null -> processField(fdFileCompoContext.findField()!!)
+    override fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext, effect: EffectKt): String = when {
+        fdFileCompoContext.findDefinition() != null -> processDefinition(fdFileCompoContext.findDefinition()!!,effect)
+        fdFileCompoContext.findField() != null -> processField(fdFileCompoContext.findField()!!,effect)
         else -> throw InvalidCode("fileCompo",fdFileCompoContext)
     }
-    override fun processDefinition(fdDefinitionContext: FoldingParser.DefinitionContext): String = when {
-        fdDefinitionContext.findDef() != null -> processDef(fdDefinitionContext.findDef()!!)
-        fdDefinitionContext.findClass_() != null -> processClass(fdDefinitionContext.findClass_()!!)
+    override fun processDefinition(fdDefinitionContext: FoldingParser.DefinitionContext, effect: EffectKt): String = when {
+        fdDefinitionContext.findDef() != null -> processDef(fdDefinitionContext.findDef()!!,effect)
+        fdDefinitionContext.findClass_() != null -> processClass(fdDefinitionContext.findClass_()!!,effect)
         else -> throw InvalidCode("definition",fdDefinitionContext)
     }
-    override fun processDef(fdDefContext: FoldingParser.DefContext): String = transpileDef(fdDefContext)
-    override fun processClass(fdClass_Context: FoldingParser.Class_Context): String = transpileClass(fdClass_Context)
-    override fun processAnnotationDef(fdAnnotationDefContext: FoldingParser.AnnotationDefContext): String =
-        "annotation class ${fdAnnotationDefContext.ID()!!.text} ${processParameter(fdAnnotationDefContext.findParameter()!!)}"
+    override fun processDef(fdDefContext: FoldingParser.DefContext, effect: EffectKt): String = transpileDef(fdDefContext,effect)
+    override fun processClass(fdClass_Context: FoldingParser.Class_Context, effect: EffectKt): String = transpileClass(fdClass_Context,effect)
+    override fun processAnnotationDef(fdAnnotationDefContext: FoldingParser.AnnotationDefContext, effect: EffectKt): String =
+        "annotation class ${fdAnnotationDefContext.ID()!!.text} ${processParameter(fdAnnotationDefContext.findParameter()!!,effect)}"
 
-    override fun processTypeAlias(fdTypeAliasContext: FoldingParser.TypeAliasContext): String =
+    override fun processTypeAlias(fdTypeAliasContext: FoldingParser.TypeAliasContext, effect: EffectKt): String =
         "typealias " + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
                 (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "") +
                 " = " + when {
@@ -163,14 +163,14 @@ interface LightTranspilerKt : LightTranspiler, LightClassTranspilerKt {
                     .find { it.findForeignPlatform()!!.ID()!!.text == "kotlin" }
                     ?.RawString()?.text?.removeSurrounding("`")
                     ?: (
-                            (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
+                            (effect.getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
                                     "implfd.kotlin." + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
                                     (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "")
                             )
 
             }
 
-            else -> (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
+            else -> (effect.getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
                     "implfd.kotlin." + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
                     (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "")
         }

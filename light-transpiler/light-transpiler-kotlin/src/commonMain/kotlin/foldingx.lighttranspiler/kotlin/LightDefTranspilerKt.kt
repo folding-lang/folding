@@ -2,6 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.LightDefTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
+import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
 import foldingx.parser.func.*
@@ -9,31 +10,31 @@ import foldingx.parser.func.processJustDef as processJustDefPre
 import foldingx.parser.func.processInverseDef as processInverseDefPre
 import foldingx.parser.func.processForeignDef as processForeignDefPre
 
-interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
-    fun getCurrentTranspilingPackage(): String?
+interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspilerKt {
+    fun EffectKt.getCurrentTranspilingPackage(): String?
 
-    override fun transpileDef(fdDefContext: FoldingParser.DefContext): String = when {
+    override fun transpileDef(fdDefContext: FoldingParser.DefContext, effect: EffectKt): String = when {
         fdDefContext.findJustDef() != null -> processJustDefPre(fdDefContext.findJustDef()!!).let { p ->
-            processJustDef(p) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
+            processJustDef(p,effect) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
                 ?.joinToString("\n", "\n") {
-                    processInverseDefining(processInverseDefPre(p, it))
+                    processInverseDefining(processInverseDefPre(p, it),effect)
                 } ?: "")
         }
         fdDefContext.findForeignDef() != null -> processForeignDefPre(fdDefContext.findForeignDef()!!).let { p ->
-            processForeignDef(p) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
+            processForeignDef(p,effect) + (fdDefContext.findInverseDefining().takeIf { it.isNotEmpty() }
                 ?.joinToString("\n", "\n") {
-                    processInverseDefining(processInverseDefPre(p, it))
+                    processInverseDefining(processInverseDefPre(p, it),effect)
                 } ?: "")
         }
         else -> throw InvalidCode("def",fdDefContext)
     }
 
-    override fun processJustDef(fdCommonJustDef: CommonJustDef): String {
+    override fun processJustDef(fdCommonJustDef: CommonJustDef, effect: EffectKt): String {
         val (tHead,tTail) = fdCommonJustDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
-            processParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()))
+            processParameter(p,effect) to processParamDestruction(extractParamDestruction(p.findParamEx()),effect)
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
                 (tTail ?: "")
@@ -42,11 +43,11 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
             ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
 
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
-                "return ("+processValue(fdCommonJustDef.valueContext!!)+")").insertMargin(4) + "\n}"
+                "return ("+processValue(fdCommonJustDef.valueContext!!,effect)+")").insertMargin(4) + "\n}"
 
         return annotation + primaryHead + primaryBody
     }
-    override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef): String {
+    override fun processInverseDefining(fdCommonInverseDef: CommonInverseDef, effect: EffectKt): String {
         val idHead = "${fdCommonInverseDef.parent.id}_inverse"
         val idTail = when (fdCommonInverseDef) {
             is CommonInverseDefSimple ->
@@ -76,7 +77,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                 val outputList = fdCommonInverseDef.inverseDefCompoList
                     .mapIndexed { i, it ->
                         if (it is FoldingParser.OutputParamContext)
-                            processValue(it.findValue()!!) to (it.findTypeEx()
+                            processValue(it.findValue()!!,effect) to (it.findTypeEx()
                                 ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)?.findTypeEx()
                                 ?: fdCommonInverseDef.parent.parameterContext!!.findParamEx().last().findTypeEx()!!)
                         else null
@@ -96,7 +97,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                     }.filterNotNull()
                 val outputHead = "folding.FdTuple${outputTypeList.count()}Class<"+
                     outputTypeList.joinToString(",") { t -> processTypeEx(t) } +">"
-                outputHead to processValue(fdCommonInverseDef.value)
+                outputHead to processValue(fdCommonInverseDef.value,effect)
             }
         }
 
@@ -125,12 +126,12 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
 
         return primaryHead + primaryBody
     }
-    override fun processForeignDef(fdCommonForeignDef: CommonForeignDef): String {
+    override fun processForeignDef(fdCommonForeignDef: CommonForeignDef, effect: EffectKt): String {
         val (tHead,tTail) = fdCommonForeignDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramCLazy) = fdCommonForeignDef.parameterContext?.let { p ->
-            processParameter(p) to lazy { processParamDestruction(extractParamDestruction(p.findParamEx())) }
+            processParameter(p,effect) to lazy { processParamDestruction(extractParamDestruction(p.findParamEx()),effect) }
         } ?: ("()" to null)
         val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
                 (tTail ?: "")
@@ -146,7 +147,7 @@ interface LightDefTranspilerKt : LightDefTranspiler, LightValueTranspilerKt {
                 ?.RawString()?.text?.removeSurrounding("`")
             else -> throw InvalidCode("foreign def",null)
         } } ?: (
-                (getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
+                (effect.getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
                         "implfd.kotlin." + fdCommonForeignDef.id +
                         tHead.removePrefix(" ").removeSuffix(" ") +
                         (fdCommonForeignDef.parameterContext?.let { context ->
