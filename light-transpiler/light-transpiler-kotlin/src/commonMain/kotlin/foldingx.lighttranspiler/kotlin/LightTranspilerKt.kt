@@ -19,7 +19,7 @@ interface LightTranspilerKt : LightTranspiler<EffectKt>, LightClassTranspilerKt 
         fdFileContextList: List<FoldingParser.FileContext>,
         effect: EffectKt
     ): List<FileWrapper> {
-        val namespace = fdFileContextList.first().findNamespace()?.let { it.findPackage_()!!.text }
+        val namespace = fdFileContextList.first().findNamespace()?.let { processPackage(it.findPackage_()!!.text,effect) }
         effect.currentPackage = namespace
         val generatedClassBasket: MutableList<CommonClass> = mutableListOf()
         effect.generatedClassRegistry = generatedClassBasket
@@ -107,8 +107,8 @@ interface LightTranspilerKt : LightTranspiler<EffectKt>, LightClassTranspilerKt 
     }
 
     override fun transpileFile(fdFileContext: FoldingParser.FileContext, effect: EffectKt): String {
-        val namespace = fdFileContext.findNamespace()?.let { "package " + it.findPackage_()!!.text } ?: ""
-        effect.currentPackage = fdFileContext.findNamespace()?.findPackage_()?.text
+        val namespace = fdFileContext.findNamespace()?.let { "package " + processPackage(it.findPackage_()!!.text,effect) } ?: ""
+        effect.currentPackage = processPackage(fdFileContext.findNamespace()?.findPackage_()?.text!!,effect)
         val imports = fdFileContext.findImportEx()
             .flatMap { processImportEx(it,effect).split("\n") }
             .distinct().joinToString("\n")
@@ -118,7 +118,7 @@ interface LightTranspilerKt : LightTranspiler<EffectKt>, LightClassTranspilerKt 
         return listOf(namespace,imports,allTypeAlias,allAnnotationDef,fileBody).filter { it != "" }.joinToString("\n\n\n")
     }
     override fun processImportEx(fdImportExContext: FoldingParser.ImportExContext, effect: EffectKt): String {
-        val pkg = fdImportExContext.findPackage_()!!.text
+        val pkg = processPackage(fdImportExContext.findPackage_()!!.text,effect)
         val importNestId = fdImportExContext.findImportNest()?.let {
             if (it.EM() != null) ""
             else "." + it.ID()!!.text
@@ -155,7 +155,7 @@ interface LightTranspilerKt : LightTranspiler<EffectKt>, LightClassTranspilerKt 
                 (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "") +
                 " = " + when {
             fdTypeAliasContext.findTypeEx() != null ->
-                processTypeEx(fdTypeAliasContext.findTypeEx()!!)
+                processTypeEx(fdTypeAliasContext.findTypeEx()!!,effect)
             fdTypeAliasContext.findForeignBody() != null -> {
                 val foreignBody = fdTypeAliasContext.findForeignBody()!!
                 if (foreignBody.RawString() != null) foreignBody.RawString()!!.text.removeSurrounding("`")

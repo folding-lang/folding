@@ -1,4 +1,5 @@
 import foldingx.gradle.base.folding
+import foldingx.gradle.base.sourceSets
 import foldingx.lighttranspiler.kotlin.gradle.LightTranspileFoldingToKotlinTask
 import foldingx.lighttranspiler.kotlin.gradle.lightTranspileFoldingToKotlinToAll
 
@@ -14,7 +15,7 @@ dependencies {
 }
 
 folding {
-    sourcesSets {
+    sourceSets {
         val commonMain by creating {
             target = "kotlin"
         }

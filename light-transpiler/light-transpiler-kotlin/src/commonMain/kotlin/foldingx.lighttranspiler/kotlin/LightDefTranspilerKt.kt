@@ -36,11 +36,11 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
             processParameter(p,effect) to processParamDestruction(extractParamDestruction(p.findParamEx()),effect)
         } ?: ("()" to null)
-        val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
+        val primaryHead = "fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!,effect)} " +
                 (tTail ?: "")
 
         val annotation = fdCommonJustDef.annotationBlockContext
-            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+            ?.let { processAnnotationBlock(it,this,effect) + "\n" } ?: ""
 
         val primaryBody = ("{\n"+(paramC?.let { "$it\n" } ?: "")+
                 "return ("+processValue(fdCommonJustDef.valueContext!!,effect)+")").insertMargin(4) + "\n}"
@@ -83,7 +83,7 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
                         else null
                     }.filterNotNull()
                 val outputHead = "folding.FdTuple${outputList.count()}Class<"+
-                    outputList.joinToString(",") { (_,t) -> processTypeEx(t) } +">"
+                    outputList.joinToString(",") { (_,t) -> processTypeEx(t,effect) } +">"
                 outputHead to outputList.joinToString(",", "$outputHead(", ")") { it.first }
             }
             is CommonInverseDefRaw -> {
@@ -96,7 +96,7 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
                         else null
                     }.filterNotNull()
                 val outputHead = "folding.FdTuple${outputTypeList.count()}Class<"+
-                    outputTypeList.joinToString(",") { t -> processTypeEx(t) } +">"
+                    outputTypeList.joinToString(",") { t -> processTypeEx(t,effect) } +">"
                 outputHead to processValue(fdCommonInverseDef.value,effect)
             }
         }
@@ -106,19 +106,19 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
                 .mapIndexed { i, it ->
                     if (it is FoldingParser.NecessaryParamContext)
                         it.ID()!!.text to
-                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
+                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!,effect)
                     else null
                 }
             is CommonInverseDefRaw -> fdCommonInverseDef.inverseDefGateCompoList
                 .mapIndexed { i, it ->
                     if (it.As() != null)
                         it.ID()!!.text to
-                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!)
+                            processTypeEx(fdCommonInverseDef.parent.parameterContext!!.findParamEx(i)!!.findTypeEx()!!,effect)
                     else null
                 }
         }
             .filterNotNull().map { (pid,type) -> "$pid: $type" }
-        val primaryInput = fdCommonInverseDef.resultId + ": " + processTypeEx(fdCommonInverseDef.parent.typeExContext!!)
+        val primaryInput = fdCommonInverseDef.resultId + ": " + processTypeEx(fdCommonInverseDef.parent.typeExContext!!,effect)
 
         val primaryHead = "fun$tHead$id(${(listOf(primaryInput) + param).joinToString()}): $outputHead " +
                 (tTail ?: "")
@@ -133,11 +133,11 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
         val (param,paramCLazy) = fdCommonForeignDef.parameterContext?.let { p ->
             processParameter(p,effect) to lazy { processParamDestruction(extractParamDestruction(p.findParamEx()),effect) }
         } ?: ("()" to null)
-        val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!)} " +
+        val primaryHead = "fun$tHead${fdCommonForeignDef.id}$param: ${processTypeEx(fdCommonForeignDef.typeExContext!!,effect)} " +
                 (tTail ?: "")
 
         val annotation = fdCommonForeignDef.annotationBlockContext
-            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+            ?.let { processAnnotationBlock(it,this,effect) + "\n" } ?: ""
 
         var isParamCNeeded = true
 
@@ -153,8 +153,8 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
                         (fdCommonForeignDef.parameterContext?.let { context ->
                             isParamCNeeded = false
                             makeParamIdBag(context.findParamEx()).joinToString(", ", "(", ")") { (id, it) ->
-                                if (it.ELLIPSIS() != null) "*($id as Array<out ${processTypeEx(it.findTypeEx()!!)}>)"
-                                else "($id as ${processTypeEx(it.findTypeEx()!!)})"
+                                if (it.ELLIPSIS() != null) "*($id as Array<out ${processTypeEx(it.findTypeEx()!!,effect)}>)"
+                                else "($id as ${processTypeEx(it.findTypeEx()!!,effect)})"
                             }
                         } ?: "()")
                 )

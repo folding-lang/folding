@@ -51,21 +51,21 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
     override fun processNull(fdNullContext: FoldingParser.NullContext, effect: EffectKt): String = "null"
     override fun processThis(fdNullContext: FoldingParser.ThisContext, effect: EffectKt): String = "this"
     override fun processReflected(fdReflectedContext: FoldingParser.ReflectedContext, effect: EffectKt): String =
-        "::" + processReference(fdReflectedContext.findReference()!!)
+        "::" + processReference(fdReflectedContext.findReference()!!,effect)
     override fun processCallFunction(fdCallFunctionContext: FoldingParser.CallFunctionContext, effect: EffectKt): String {
         val (typeArguments,arguments) = fdCallFunctionContext.findArgValue()?.let { processArgValue(it,effect) }
             ?: TranspiledArgValue("","")
-        return processReference(fdCallFunctionContext.findReference()!!) + typeArguments + "(" +
+        return processReference(fdCallFunctionContext.findReference()!!,effect) + typeArguments + "(" +
                 arguments + ")"
     }
     override fun processUseForeignClass(fdUseForeignClassContext: FoldingParser.UseForeignClassContext, effect: EffectKt): String {
         val (typeArguments,arguments) = fdUseForeignClassContext.findArgValue()?.let { processArgValue(it,effect) }
             ?: TranspiledArgValue("","")
-        return "${processReference(fdUseForeignClassContext.findReference()!!)}$typeArguments(" +
+        return "${processReference(fdUseForeignClassContext.findReference()!!,effect)}$typeArguments(" +
                 arguments + ")"
     }
     override fun processGetFieldGlobal(fdGetFieldGlobalContext: FoldingParser.GetFieldGlobalContext, effect: EffectKt): String =
-        processReference(fdGetFieldGlobalContext.findReference()!!)
+        processReference(fdGetFieldGlobalContext.findReference()!!,effect)
     override fun processGetField(fdGetFieldContext: FoldingParser.GetFieldContext, effect: EffectKt): String =
         "(${processValue(fdGetFieldContext.findValue()!!,effect)}).${processId(fdGetFieldContext.findCommonIdentifier()!!)}"
     override fun processCallMethod(fdCallMethodContext: FoldingParser.CallMethodContext, effect: EffectKt): String {
@@ -101,7 +101,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
         }
     override fun processValueTypeCasting(fdValueTypeCastingContext: FoldingParser.ValueTypeCastingContext, effect: EffectKt): String =
         "(${processValue(fdValueTypeCastingContext.findValue()!!,effect)} " +
-                "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!)})"
+                "as ${processTypeEx(fdValueTypeCastingContext.findTypeCasting()!!.findTypeEx()!!,effect)})"
     override fun processCallAopFuncBack(fdCallAopFuncBackContext: FoldingParser.CallAopFuncBackContext, effect: EffectKt): String =
         processCommonOpId(fdCallAopFuncBackContext.findCommonOpIdentifier()!!, OpIdUsage.AOP) +
                 "(${processValue(fdCallAopFuncBackContext.findValue()!!,effect)})"
@@ -114,7 +114,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
                 "${processValue(fdCallOpFuncContext.findValue(1)!!,effect)})"
     override fun processTypeCheck(fdTypeCheckContext: FoldingParser.TypeCheckContext, effect: EffectKt): String =
         "(" + processValue(fdTypeCheckContext.findValue()!!,effect) +
-                " is " + processTypeEx(fdTypeCheckContext.findTypeEx()!!) + ")"
+                " is " + processTypeEx(fdTypeCheckContext.findTypeEx()!!,effect) + ")"
     override fun processDoExpression(fdDoExpressionContext: FoldingParser.DoExpressionContext, effect: EffectKt): String =
         processDoBlock(fdDoExpressionContext.findDoBlock()!!,effect)
     fun processDoBlock(fdDoBlockContext: FoldingParser.DoBlockContext, effect: EffectKt): String {
@@ -191,7 +191,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
             is FoldingParser.PrimaryArgValueContext ->
                 if (it.findTypeEx().isNotEmpty())
                     it.findTypeEx().joinToString(",","<",">") {
-                        processTypeEx(it)
+                        processTypeEx(it,effect)
                     }
                 else ""
 
@@ -221,7 +221,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
 
     override fun processParameter(fdParameterContext: FoldingParser.ParameterContext, effect: EffectKt): String =
         makeParamIdBag(fdParameterContext.findParamEx()).joinToString(", ", "(", ")") { (id, it) ->
-            (if (it.ELLIPSIS() == null) "" else "vararg ") + id + ": " + processTypeEx(it.findTypeEx()!!)
+            (if (it.ELLIPSIS() == null) "" else "vararg ") + id + ": " + processTypeEx(it.findTypeEx()!!,effect)
         }
 
 
@@ -234,8 +234,8 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
         }
 
 
-    fun processReference(fdReferenceContext: FoldingParser.ReferenceContext) =
-        (fdReferenceContext.findPackage_()?.text?.let { "$it." } ?: "") +
+    fun processReference(fdReferenceContext: FoldingParser.ReferenceContext, effect: EffectKt) =
+        (fdReferenceContext.findPackage_()?.text?.let { "${processPackage(it,effect)}." } ?: "") +
                 processId(fdReferenceContext.findCommonIdentifier()!!)
 
 
@@ -247,8 +247,8 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
         fieldInInterfaceList: List<FoldingParser.FieldInInterfaceContext> = listOf(),
         effect: EffectKt
     ): Pair<String,String> {
-        val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!) }
-        val inherits = inheritContext?.findTypeEx()?.let { processTypeEx(it) }?.let {
+        val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!,effect) }
+        val inherits = inheritContext?.findTypeEx()?.let { processTypeEx(it,effect) }?.let {
             listOf(it + (inheritContext.findArgValue()?.let { "(${processArgValue(it,effect).arguments})" } ?: "()")) + interfaceList
         } ?: interfaceList
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
@@ -256,7 +256,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
         val fieldListText = fieldList.map { classTranspilerKt.processField(it,effect) }
         val abstractFieldList = fieldInInterfaceList.map {
             val id = it.findFieldNotInit()!!.ID()!!.text
-            val typeEx = processTypeEx(it.findFieldNotInit()!!.findTypeEx()!!)
+            val typeEx = processTypeEx(it.findFieldNotInit()!!.findTypeEx()!!,effect)
             val keyword =
                 if (it.findFieldNotInit()!!.MUTABLE() == null) "val" else "var"
             "abstract $keyword $id: $typeEx"
@@ -287,7 +287,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
             it.last().id to it.dropLast(1).fold(inputValueId) { acc, callWrapper ->
                 callWrapper.id +
                         (callWrapper.typeArgs.takeIf { it.isNotEmpty() }?.joinToString(",","<",">") {
-                            processTypeEx(it)
+                            processTypeEx(it,effect)
                         } ?: "") +
                         (listOf(acc) + callWrapper.args.map {
                             processValue(it,effect)

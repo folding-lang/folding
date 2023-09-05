@@ -26,7 +26,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
         } } ?: ("" to "")
 
         val (constructor,constructorC) = fdCommonClass.constructorSelf?.findParameter()?.let { p ->
-            processConstructorParameter(p) to processParamDestruction(extractParamDestruction(p.findParamEx()),effect)
+            processConstructorParameter(p,effect) to processParamDestruction(extractParamDestruction(p.findParamEx()),effect)
         } ?: ((if (fdCommonClass.category.canHasConstructorSelf) "()" else "") to null)
         val initialize = fdCommonClass.constructorSelf?.findDoBlock()?.let {
             "\ninit " + processDoBlock(it,effect).removeSuffix("()")
@@ -46,7 +46,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
         }
 
         val annotation = fdCommonClass.annotationBlockContext
-            ?.let { processAnnotationBlock(it,this) + "\n" } ?: ""
+            ?.let { processAnnotationBlock(it,this,effect) + "\n" } ?: ""
 
         val primaryHead = "open $headKeyword ${processCommonClassId(fdCommonClass.identifier)}$tHead$constructor$inheritsText $tTail"
         val primaryBody = "{${(constructorC?.let { "\n$it\n" } ?: "")}$compoListText\n$initialize".insertMargin(4)+"\n}"
@@ -59,7 +59,8 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
                 makeClassInverse(
                     fdCommonClass.identifier.ID()!!.text,
                     it,
-                    fdCommonClass.typeParam
+                    fdCommonClass.typeParam,
+                    effect
                 )
             }
         } else null
@@ -127,7 +128,8 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
 
     fun makeClassInverse(
         classId: String, parameter: FoldingParser.ParameterContext,
-        typeParamContext: FoldingParser.TypeParamContext?
+        typeParamContext: FoldingParser.TypeParamContext?,
+        effect: EffectKt
     ): String {
         val idHead = "${classId}_inverse"
         val idTail =  (0 until parameter.findParamEx().count()).joinToString("_","_")
@@ -139,7 +141,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
 
         val outputList = parameter.findParamEx().map { "instance.${it.ID()!!.text}" to it.findTypeEx() }
         val outputHead = "folding.FdTuple${outputList.count()}Class<"+
-                outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it) } ?: "_" } +">"
+                outputList.joinToString(",") { (_,t) -> t?.let { processTypeEx(it,effect) } ?: "_" } +">"
         val output = outputList.joinToString(",","$outputHead(",")") { it.first }
 
         val primaryInput = "instance: ${classId}Class${tHead ?: ""}"
@@ -151,9 +153,9 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
         return primaryHead + primaryBody
     }
 
-    fun processConstructorParameter(fdParameterContext: FoldingParser.ParameterContext) =
+    fun processConstructorParameter(fdParameterContext: FoldingParser.ParameterContext, effect: EffectKt) =
         fdParameterContext.findParamEx().mapIndexed { i, it ->
-            (if (it.ELLIPSIS() == null) "val " else "vararg val ") + makeIndexedParamId(i,it.ID()?.text) + ": " + processTypeEx(it.findTypeEx()!!)
+            (if (it.ELLIPSIS() == null) "val " else "vararg val ") + makeIndexedParamId(i,it.ID()?.text) + ": " + processTypeEx(it.findTypeEx()!!, effect)
         }.joinToString(", ","(",")")
 
     override fun processDefInInterface(fdDefInInterfaceContext: FoldingParser.DefInInterfaceContext, effect: EffectKt): String {
@@ -172,7 +174,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
         } ?: (" " to "")
         val param = fdCommonJustDef.parameterContext?.let { p -> processParameter(p,effect) } ?: "()"
 
-        return "abstract fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!)} " +
+        return "abstract fun$tHead${fdCommonJustDef.id}$param: ${processTypeEx(fdCommonJustDef.typeExContext!!,effect)} " +
                 (tTail ?: "")
     }
 
@@ -181,14 +183,14 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
             fdFieldContext.findFieldNotInit()!!.let {
                 if (it.MUTABLE() != null) """
                    |/** not initiated variable */
-                   |private var ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!)}? = null
-                   |var ${it.ID()!!.text}: ${processTypeEx(it.findTypeEx()!!)}
+                   |private var ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!,effect)}? = null
+                   |var ${it.ID()!!.text}: ${processTypeEx(it.findTypeEx()!!,effect)}
                    |    get() = ${it.ID()!!.text}_field ?: throw RuntimeException("The field '${it.ID()!!.text}' has not been initialized")
                    |    set(value) { ${it.ID()!!.text}_field = value }""".trimMargin()
                 else """
                    |/** not initiated variance */
-                   |private var ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!)}? = null
-                   |var ${it.ID()!!.text}: ${processTypeEx(it.findTypeEx()!!)}
+                   |private var ${it.ID()!!.text}_field: ${processTypeEx(it.findTypeEx()!!,effect)}? = null
+                   |var ${it.ID()!!.text}: ${processTypeEx(it.findTypeEx()!!,effect)}
                    |    get() = ${it.ID()!!.text}_field ?: throw RuntimeException("The field '${it.ID()!!.text}' has not been initialized")
                    |    set(value) {
                    |        if (${it.ID()!!.text}_field != null) ${it.ID()!!.text}_field = value
@@ -199,11 +201,11 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
             )
         fdFieldContext.findFieldSetted() != null -> fdFieldContext.findFieldSetted()!!.let {
             val keyword = if (it.MUTABLE() != null) "var" else "val"
-            "$keyword ${it.ID()!!.text} ${it.findTypeEx()?.let { t -> ": " + processTypeEx(t) } ?: ""} = ${processValue(it.findValue()!!,effect)}"
+            "$keyword ${it.ID()!!.text} ${it.findTypeEx()?.let { t -> ": " + processTypeEx(t,effect) } ?: ""} = ${processValue(it.findValue()!!,effect)}"
         }
         fdFieldContext.findForeignField() != null -> fdFieldContext.findForeignField()!!.let {
             val keyword = it.settingValue?.let { "var" } ?: "val"
-            val head = "$keyword ${it.ID(0).text}: ${processTypeEx(it.findTypeEx()!!)}"
+            val head = "$keyword ${it.ID(0).text}: ${processTypeEx(it.findTypeEx()!!,effect)}"
             val getting =
                 if (it.gettingValue != null) "\nget() = (${processValue(it.gettingValue!!,effect)})"
                 else "\nget() { throw RuntimeException(\"Getter of the field '${it.ID(0).text}' is not defined\") }"
