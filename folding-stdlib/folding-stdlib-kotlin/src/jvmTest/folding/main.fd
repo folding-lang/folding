@@ -9,7 +9,7 @@ class MyStringBuilder {
 
     :#stack MutableList(String) = MutableList
 
-    inherit() impl Any {
+    inherit Any {
         :toString String =
             if (#stack:length == 0) "" else
             #stack reduce! [acc~String e~String] #acc++#separator++#e

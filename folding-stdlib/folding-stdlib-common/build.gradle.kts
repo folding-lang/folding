@@ -1,9 +1,11 @@
+import foldingx.gradle.base.folding
 import foldingx.generate.gradle.generateFdTuples
+import foldingx.lighttranspiler.kotlin.gradle.kotlin
 
 folding {
-    sourcesSets {
+    sourceSets {
         val main by creating {
-            outputDirs += "../folding-stdlib-kotlin/src/commonMain_transpiled_fd"
+            outputDirs[kotlin] = "../folding-stdlib-kotlin/src/commonMain/kotlin"
         }
     }
 }

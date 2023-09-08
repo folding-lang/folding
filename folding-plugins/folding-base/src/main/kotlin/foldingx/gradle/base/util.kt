@@ -11,4 +11,17 @@ fun Project.folding(action: FoldingExtension.() -> Unit) =
     configure(action)
 
 fun FoldingExtension.sourceSets(action: NamedDomainObjectContainer<FoldingSourceSet>.() -> Unit) =
-    sourcesSets.action()
+    sourceSets.action()
+
+fun FoldingExtension.platforms(action: NamedDomainObjectContainer<FoldingPlatform>.() -> Unit) =
+    platforms.action()
+
+fun FoldingSourceSet.target(vararg platforms: FoldingPlatform) =
+    Targets(platforms.toMutableSet()).also {
+        targetPlatforms = it
+    }
+
+fun FoldingSourceSet.targetAll() =
+    All.also {
+        targetPlatforms = it
+    }

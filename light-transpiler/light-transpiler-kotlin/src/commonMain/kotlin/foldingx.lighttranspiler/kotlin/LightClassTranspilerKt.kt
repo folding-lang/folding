@@ -21,7 +21,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
     }
 
     override fun processCommonClass(fdCommonClass: CommonClass, effect: EffectKt): String {
-        val (tHead,tTail) = fdCommonClass.typeParam?.let { processTypeParam(it).let { (h,t) ->
+        val (tHead,tTail) = fdCommonClass.typeParam?.let { processTypeParam(it,effect).let { (h,t) ->
             h to (t ?: "")
         } } ?: ("" to "")
 
@@ -94,7 +94,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
         classId: String, parameter: FoldingParser.ParameterContext?,
         typeParamContext: FoldingParser.TypeParamContext?
     , effect: EffectKt): String {
-        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it,effect).let { (h,t) ->
             h to t?.let { "$t " }
         } } ?: (null to "")
         val param = parameter?.let { p ->
@@ -112,9 +112,10 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
     @Deprecated("legacy")
     fun makeFactoryFunction(
         classId: String,
-        typeParamContext: FoldingParser.TypeParamContext?
+        typeParamContext: FoldingParser.TypeParamContext?,
+        effect: EffectKt
     ): String {
-        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it,effect).let { (h,t) ->
             h to t?.let { "$t " }
         } } ?: (null to "")
         val primaryHead = "/** folding class constructor function */\n" +
@@ -135,7 +136,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
         val idTail =  (0 until parameter.findParamEx().count()).joinToString("_","_")
         val id = idHead + idTail
 
-        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+        val (tHead,tTail) = typeParamContext?.let { processTypeParam(it,effect).let { (h,t) ->
             h to t
         } } ?: (null to "")
 
@@ -168,7 +169,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
             null
         )
         val (tHead, tTail) = fdCommonJustDef.typeParamContext?.let {
-            processTypeParam(it).let { (h, t) ->
+            processTypeParam(it,effect).let { (h, t) ->
                 " $h " to t
             }
         } ?: (" " to "")

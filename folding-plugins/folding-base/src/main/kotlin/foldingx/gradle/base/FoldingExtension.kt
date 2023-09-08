@@ -1,10 +1,10 @@
 package foldingx.gradle.base
 
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
 open class FoldingExtension(project: Project) {
-    lateinit var sourcesSets: FoldingSourceSetContainer
+    lateinit var sourceSets: FoldingSourceSetContainer
+    lateinit var platforms: FoldingPlatformContainer
 
     companion object {
         val name = "folding"

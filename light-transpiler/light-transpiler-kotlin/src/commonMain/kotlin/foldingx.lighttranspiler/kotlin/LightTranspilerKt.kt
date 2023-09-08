@@ -152,7 +152,7 @@ interface LightTranspilerKt : LightTranspiler<EffectKt>, LightClassTranspilerKt 
 
     override fun processTypeAlias(fdTypeAliasContext: FoldingParser.TypeAliasContext, effect: EffectKt): String =
         "typealias " + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
-                (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "") +
+                (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it,effect).first } ?: "") +
                 " = " + when {
             fdTypeAliasContext.findTypeEx() != null ->
                 processTypeEx(fdTypeAliasContext.findTypeEx()!!,effect)
@@ -165,13 +165,13 @@ interface LightTranspilerKt : LightTranspiler<EffectKt>, LightClassTranspilerKt 
                     ?: (
                             (effect.getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
                                     "implfd.kotlin." + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
-                                    (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "")
+                                    (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it,effect).first } ?: "")
                             )
 
             }
 
             else -> (effect.getCurrentTranspilingPackage()?.let { "$it." } ?: "") +
                     "implfd.kotlin." + processCommonClassId(fdTypeAliasContext.findCommonClassIdentifier()!!) +
-                    (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it).first } ?: "")
+                    (fdTypeAliasContext.findTypeParam()?.let { processTypeParam(it,effect).first } ?: "")
         }
 }

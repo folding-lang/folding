@@ -1,6 +1,6 @@
 plugins {
     id("io.github.folding-lang.foldingx.generate") version "1.0-SNAPSHOT"
-    id("io.github.folding-lang.folding.lighttranspiler.kotlin") version "0.1-SNAPSHOT"
+    id("io.github.folding-lang.folding.lighttranspiler.kotlin") version "0.1-SNAPSHOT" apply false
 }
 
 buildscript {

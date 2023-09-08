@@ -30,7 +30,7 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
     }
 
     override fun processJustDef(fdCommonJustDef: CommonJustDef, effect: EffectKt): String {
-        val (tHead,tTail) = fdCommonJustDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+        val (tHead,tTail) = fdCommonJustDef.typeParamContext?.let { processTypeParam(it,effect).let { (h,t) ->
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramC) = fdCommonJustDef.parameterContext?.let { p ->
@@ -67,7 +67,7 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
         }
         val id = idHead + idTail
 
-        val (tHead,tTail) = fdCommonInverseDef.parent.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+        val (tHead,tTail) = fdCommonInverseDef.parent.typeParamContext?.let { processTypeParam(it,effect).let { (h,t) ->
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
 
@@ -127,7 +127,7 @@ interface LightDefTranspilerKt : LightDefTranspiler<EffectKt>, LightValueTranspi
         return primaryHead + primaryBody
     }
     override fun processForeignDef(fdCommonForeignDef: CommonForeignDef, effect: EffectKt): String {
-        val (tHead,tTail) = fdCommonForeignDef.typeParamContext?.let { processTypeParam(it).let { (h,t) ->
+        val (tHead,tTail) = fdCommonForeignDef.typeParamContext?.let { processTypeParam(it,effect).let { (h,t) ->
             " $h " to t?.let { "$t " }
         } } ?: (" " to "")
         val (param,paramCLazy) = fdCommonForeignDef.parameterContext?.let { p ->

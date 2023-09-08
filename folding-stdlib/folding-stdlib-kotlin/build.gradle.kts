@@ -1,7 +1,6 @@
-import foldingx.gradle.base.folding
 import foldingx.gradle.base.sourceSets
-import foldingx.lighttranspiler.kotlin.gradle.LightTranspileFoldingToKotlinTask
-import foldingx.lighttranspiler.kotlin.gradle.lightTranspileFoldingToKotlinToAll
+import foldingx.gradle.base.target
+import foldingx.lighttranspiler.kotlin.gradle.kotlin
 
 plugins {
     kotlin("multiplatform")
@@ -17,18 +16,17 @@ dependencies {
 folding {
     sourceSets {
         val commonMain by creating {
-            target = "kotlin"
+            target(kotlin)
         }
         val jvmTest by creating {
-            target = "kotlin"
-            outputDirs +="src/jvmTest"
+            target(kotlin)
         }
     }
 }
 
 kotlin {
     jvm()
-    js(BOTH) {
+    js(IR) {
         browser {}
         nodejs {}
     }
@@ -45,18 +43,6 @@ kotlin {
         }
     }
     // endregion\
-
-    sourceSets {
-        val commonMain_transpiled_fd by creating {
-            dependencies {
-                implementation(kotlin("stdlib-common"))
-            }
-        }
-
-        val commonMain by getting {
-            dependsOn(commonMain_transpiled_fd)
-        }
-    }
 }
 
 val prepareMavenDeployment: Project.(description: String) -> Unit by rootProject.ext

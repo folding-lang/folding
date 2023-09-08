@@ -1,21 +1,34 @@
 package foldingx.lighttranspiler.kotlin.gradle
 
-import foldingx.gradle.base.FoldingBasePlugin
-import foldingx.gradle.base.folding
+import foldingx.gradle.base.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.accessors.primitiveKotlinTypeNames
+import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.provideDelegate
 
 open class LightTranspilerKtPlugin : Plugin<Project> {
     val mySimpleTasks: List<Class<out LightTranspilerKtPluginTask>> = listOf(
-        LightTranspileFoldingToKotlinToAllTask::class.java
     )
 
-    lateinit var generatedOutputSpecs: List<OutputSpec>
+    lateinit var foldingLightKotlinProcessor: FoldingProcessor
+
+    lateinit var defaultPlatform: FoldingPlatform
 
     override fun apply(target: Project) = target.run {
 
         apply { it.plugin(FoldingBasePlugin::class.java) }
+
+        foldingLightKotlinProcessor = FoldingToKotlinLightProcessor(this)
+
+        folding {
+            platforms {
+                defaultPlatform = create("kotlin") {
+                    it.processor = foldingLightKotlinProcessor
+                }
+            }
+        }
 
         registerTasks(this)
 
@@ -26,43 +39,26 @@ open class LightTranspilerKtPlugin : Plugin<Project> {
             val name = it.simpleName.removeSuffix("Task").replaceFirstChar { it.lowercase() }
             target.tasks.register(name,it)
         }
-        target.folding.sourcesSets.actions += {
-            generatedOutputSpecs = generateOutputSpecs(target.folding.sourcesSets.toList() + it)
-            registerGeneratedTranspilingTasks(target)
-        }
-        target.afterEvaluate {
-            target.tasks {
-                lightTranspileFoldingToKotlinToAll {
-                    project.tasks.filterIsInstance<LightTranspileFoldingToKotlinTask>().forEach {
-                        dependsOn(it.path)
-                    }
-                }
-            }
-        }
     }
 
-    private fun registerGeneratedTranspilingTasks(target: Project) {
-        generatedOutputSpecs.forEach {
-            val name =
-                "lightTranspileFoldingToKotlinToThe${it.outputPath
-                    .replace("/","_")
-                    .replace("\\","_")
-                    .replace(":","_")}"
-            val task = target.tasks
-                .filterIsInstance<LightTranspileFoldingToKotlinTask>()
-                .find { it.name == name }
-            if (task != null) {
-                task.sourcesSets().clear()
-                task.sourcesSets().addAll(it.sourceSets)
-            }
-            else {
-                target.tasks.create(
-                    name,
-                    LightTranspileFoldingToKotlinTask::class.java,
-                    it.outputPath,
-                    it.sourceSets.toMutableList()
-                )
-            }
+    private class FoldingToKotlinLightProcessor(val target: Project): FoldingProcessor {
+        override fun makeTasksWithPlatform(platform: FoldingPlatform) {
+            val name = "lightTranspileAllFoldingTo${platform.name}"
+            target.tasks.create(
+                name,
+                LightTranspileAllFoldingToKotlinByPlatformTask::class.java,
+                platform
+            )
+        }
+
+        override fun makeTasksWithSourceSet(platform: FoldingPlatform, sourceSet: FoldingSourceSet) {
+            val name = "lightTranspile${sourceSet.name}FoldingTo${platform.name}"
+            target.tasks.create(
+                name,
+                LightTranspileFoldingToKotlinTask::class.java,
+                platform,
+                sourceSet
+            )
         }
     }
 }
