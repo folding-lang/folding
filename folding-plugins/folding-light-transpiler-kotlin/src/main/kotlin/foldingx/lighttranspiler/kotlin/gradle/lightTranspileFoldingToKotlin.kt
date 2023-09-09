@@ -10,9 +10,6 @@ import foldingx.parser.util.SimpleErrorListener
 import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.TaskContainerScope
-import org.gradle.kotlin.dsl.named
 import java.io.File
 import javax.inject.Inject
 
@@ -63,6 +60,7 @@ fun lightTranspileFoldingToKotlin(platform: FoldingPlatform, sourceSet: FoldingS
 
     val effect = EffectKt()
     effect.packageFormatMap["platform"] = platform.name
+    effect.packageFormatMap += platform.formats
 
     val transpiledList = fileContextsByPackage.values.flatMap {
         transpiler.transpilePackage(outputPath,it,effect)
