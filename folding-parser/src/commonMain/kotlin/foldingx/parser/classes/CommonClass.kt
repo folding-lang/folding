@@ -1,6 +1,7 @@
 package foldingx.parser.classes
 
 import foldingx.parser.FoldingParser
+import foldingx.parser.fields.FieldSpec
 
 class CommonClass (
     val category: ClassCategory,
@@ -13,5 +14,6 @@ class CommonClass (
     val inheritContext: FoldingParser.InheritContext? = null,
     val implList: List<FoldingParser.ImplContext> = listOf(),
     val defInInterfaceList: List<FoldingParser.DefInInterfaceContext> = listOf(),
-    val fieldInInterfaceList: List<FoldingParser.FieldInInterfaceContext> = listOf()
+//    val fieldInInterfaceList: List<FoldingParser.FieldInInterfaceContext> = listOf(),
+    val fieldSpecList: List<FieldSpec> = listOf()
 )

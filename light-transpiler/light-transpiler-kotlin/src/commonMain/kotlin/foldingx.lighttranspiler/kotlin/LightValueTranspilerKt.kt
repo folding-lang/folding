@@ -7,6 +7,7 @@ import foldingx.lighttranspiler.util.TranspiledArgValue
 import foldingx.lighttranspiler.util.extractParamDestruction
 import foldingx.parser.FoldingParser
 import foldingx.parser.classes.CommonClass
+import foldingx.parser.fields.FieldSpec
 import foldingx.parser.identifier.*
 import foldingx.parser.inversing.processInverseValue
 
@@ -244,7 +245,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
         fieldList: List<FoldingParser.FieldContext> = listOf(), defList: List<FoldingParser.DefContext> = listOf(),
         inheritContext: FoldingParser.InheritContext? = null, implList: List<FoldingParser.ImplContext> = listOf(),
         defInInterfaceList: List<FoldingParser.DefInInterfaceContext> = listOf(),
-        fieldInInterfaceList: List<FoldingParser.FieldInInterfaceContext> = listOf(),
+        fieldSpecList: List<FieldSpec> = listOf(),
         effect: EffectKt
     ): Pair<String,String> {
         val interfaceList = implList.map { processTypeEx(it.findTypeEx()!!,effect) }
@@ -254,12 +255,9 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
         val inheritsText = inherits.takeIf { it.isNotEmpty() }?.joinToString(", "," : ") ?: ""
 
         val fieldListText = fieldList.map { classTranspilerKt.processField(it,effect) }
-        val abstractFieldList = fieldInInterfaceList.map {
-            val id = it.findFieldNotInit()!!.ID()!!.text
-            val typeEx = processTypeEx(it.findFieldNotInit()!!.findTypeEx()!!,effect)
-            val keyword =
-                if (it.findFieldNotInit()!!.MUTABLE() == null) "val" else "var"
-            "abstract $keyword $id: $typeEx"
+        val abstractFieldList = fieldSpecList.map {
+            val keyword = if (it.isMutable) "var" else "val"
+            "abstract $keyword ${it.id}: ${it.typeEx}"
         }
 
         val implBodyList = implList.mapNotNull { it.findImplBody() }

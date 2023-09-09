@@ -34,8 +34,8 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
 
         val (inheritsText,compoListText) = fdCommonClass.run {
             makeClassPrimaryBody(
-                getClassTranspilerKt(),
-                fieldList, defList, inheritContext, implList, defInInterfaceList, fieldInInterfaceList, effect=effect
+                this@LightClassTranspilerKt,
+                fieldList, defList, inheritContext, implList, defInInterfaceList, fieldSpecList, effect=effect
             )
         }
 

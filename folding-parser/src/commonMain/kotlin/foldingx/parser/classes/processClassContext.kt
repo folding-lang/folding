@@ -1,6 +1,7 @@
 package foldingx.parser.classes
 
 import foldingx.parser.FoldingParser
+import foldingx.parser.fields.FieldSpec
 
 fun processClassContext(fdClassContext: FoldingParser.Class_Context): CommonClass {
     return when (fdClassContext) {
@@ -12,7 +13,14 @@ fun processClassContext(fdClassContext: FoldingParser.Class_Context): CommonClas
             defList = fdClassContext.findDef(),
             implList = fdClassContext.findImpl(),
             defInInterfaceList = fdClassContext.findDefInInterface(),
-            fieldInInterfaceList = fdClassContext.findFieldInInterface()
+            fieldSpecList = fdClassContext.findFieldInInterface().map {
+                val notInitContext = it.findFieldNotInit()!!
+                FieldSpec(
+                    notInitContext.ID()!!.text,
+                    notInitContext.findTypeEx()!!,
+                    notInitContext.MUTABLE() != null
+                )
+            }
         )
         is FoldingParser.JustClassContext -> CommonClass(
             category = ClassCategory.DATA_CLASS,
@@ -36,7 +44,14 @@ fun processClassContext(fdClassContext: FoldingParser.Class_Context): CommonClas
             inheritContext = fdClassContext.findInherit(),
             implList = fdClassContext.findImpl(),
             defInInterfaceList = fdClassContext.findDefInInterface(),
-            fieldInInterfaceList = fdClassContext.findFieldInInterface()
+            fieldSpecList = fdClassContext.findFieldInInterface().map {
+                val notInitContext = it.findFieldNotInit()!!
+                FieldSpec(
+                    notInitContext.ID()!!.text,
+                    notInitContext.findTypeEx()!!,
+                    notInitContext.MUTABLE() != null
+                )
+            }
         )
 
         else -> throw IllegalArgumentException("unexpected kind of class")
