@@ -2,8 +2,11 @@ package foldingx.lighttranspiler.kotlin.gradle
 
 import foldingx.gradle.base.FoldingPlatform
 import foldingx.gradle.base.FoldingSourceSet
+import foldingx.lighttranspiler.FileWrapper
 import foldingx.lighttranspiler.kotlin.DefaultLightTranspilerKt
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
+import foldingx.lighttranspiler.kotlin.processPackage
+import foldingx.lighttranspiler.raw.processFoldingRawFile
 import foldingx.parser.FoldingLexer
 import foldingx.parser.FoldingParser
 import foldingx.parser.util.SimpleErrorListener
@@ -39,9 +42,13 @@ fun lightTranspileFoldingToKotlin(platform: FoldingPlatform, sourceSet: FoldingS
     val inputDir = File(inputPath)
     if (!inputDir.exists()) return
 
-    val files = inputDir.walk()
+    val effect = EffectKt()
+    effect.packageFormatMap["platform"] = platform.name
+    effect.packageFormatMap += platform.formats
+
+    val files = inputDir.walk().filterNot { it.isDirectory }
     val fileContextsByPackage = files
-        .filterNot { it.isDirectory }
+        .filter { it.extension == "fd" }
         .map {
             val parser = FoldingParser(CommonTokenStream(FoldingLexer(CharStreams.fromString(it.readText()))))
             val listener = SimpleErrorListener(it.name)
@@ -49,7 +56,7 @@ fun lightTranspileFoldingToKotlin(platform: FoldingPlatform, sourceSet: FoldingS
             parser.addErrorListener(listener)
             parser.file()
         }
-        .groupBy { it.findNamespace()?.findPackage_()?.text }
+        .groupBy { it.findNamespace()?.findPackage_()?.text?.let { processPackage(it,effect) } }
         .filter {
             val isImpl = it.key?.matches(".+\\.(implfd\\.(.+\\.?)+)".toRegex()) ?: false
             val isImplThisPlatform = it.key?.matches(".+\\.(implfd\\.${platform.name})".toRegex()) ?: false
@@ -58,14 +65,29 @@ fun lightTranspileFoldingToKotlin(platform: FoldingPlatform, sourceSet: FoldingS
 
     if (syntaxErrorListenerList.any { it.syntaxErrorCount > 0 }) handleSyntaxErrors(syntaxErrorListenerList)
 
-    val effect = EffectKt()
-    effect.packageFormatMap["platform"] = platform.name
-    effect.packageFormatMap += platform.formats
 
     val transpiledList = fileContextsByPackage.values.flatMap {
         transpiler.transpilePackage(outputPath,it,effect)
     }
-    val transpiledDirsToTranspiled = transpiledList.map {
+
+    val transpiledRawList = files
+        .filter { it.extension == "fdr" }
+        .mapNotNull {
+            val (rp,c) = processFoldingRawFile(it.readText(),effect)
+            val p = processPackage(rp,effect)
+            val dirText = "$outputPath/${p.replace(".","/")}"
+
+            val isImpl = p.matches(".+\\.(implfd\\.(.+\\.?)+)".toRegex())
+            val isImplThisPlatform = p.matches(".+\\.(implfd\\.${platform.name})".toRegex())
+
+            if (!isImpl || isImplThisPlatform)
+                FileWrapper(dirText,it.nameWithoutExtension + ".kt", c)
+            else null
+        }
+
+    val totalTranspiledList = transpiledList + transpiledRawList
+
+    val transpiledDirsToTranspiled = totalTranspiledList.map {
         File(it.dirText)
         File(it.dirText) to it
     }
@@ -78,6 +100,8 @@ fun lightTranspileFoldingToKotlin(platform: FoldingPlatform, sourceSet: FoldingS
         file.writeText(it.content)
         file
     }
+
+
 }
 
 fun handleSyntaxErrors(listeners: List<SimpleErrorListener>): Nothing {
