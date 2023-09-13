@@ -22,7 +22,7 @@ internal fun File.makeAllDirsForce(): Boolean {
 
     return if (mkdir()) true
     else {
-        File(path.split(File.separator).dropLast(1).joinToString(File.separator)).makeAllDirsForce()
+        parentFile.makeAllDirsForce()
         mkdir()
     }
 }
@@ -71,30 +71,29 @@ fun lightTranspileFoldingToKotlin(platform: FoldingPlatform, sourceSet: FoldingS
     }
 
     val transpiledRawList = files
-        .filter { it.extension == "fdr" }
+        .filter { it.extension == "fdr" }.toList()
         .mapNotNull {
             val (rp,c) = processFoldingRawFile(it.readText(),effect)
             val p = processPackage(rp,effect)
-            val dirText = "$outputPath/${p.replace(".","/")}"
+            val dirText = "$outputPath/${p.replace(".","/")}".replace("\r","")
 
             val isImpl = p.matches(".+\\.(implfd\\.(.+\\.?)+)".toRegex())
             val isImplThisPlatform = p.matches(".+\\.(implfd\\.${platform.name})".toRegex())
 
             if (!isImpl || isImplThisPlatform)
-                FileWrapper(dirText,it.nameWithoutExtension + ".kt", c)
+                FileWrapper(dirText, it.nameWithoutExtension + ".kt", c)
             else null
         }
 
     val totalTranspiledList = transpiledList + transpiledRawList
 
     val transpiledDirsToTranspiled = totalTranspiledList.map {
-        File(it.dirText)
         File(it.dirText) to it
     }
 
     val transpileFiles = transpiledDirsToTranspiled.map { (dir,it) ->
-        val file = File(dir,it.name)
         dir.makeAllDirsForce()
+        val file = File(dir,it.name)
         println(file.path)
         file.createNewFile()
         file.writeText(it.content)
