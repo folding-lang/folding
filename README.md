@@ -1,7 +1,17 @@
 # folding
 
-just a programming language
+just a programming language without comma(,)
 
+## Features
+
+### inverse function
+
+example
+
+```
+let 8 + (->x - 1) = 9
+println(#x)  // 2
+```
 
 ## Support Platforms
 
