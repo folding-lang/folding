@@ -21,18 +21,18 @@ subprojects {
     }
     kotlin {
         jvm()
-        js(BOTH) {
+        js(IR) {
             browser {}
             nodejs {}
         }
 
         // region:Region: Configurations for Kotlin/Native
-        linuxX64("linux") {
+        linuxX64 {
             binaries {
                 staticLib()
             }
         }
-        mingwX64("windows") {
+        mingwX64 {
             binaries {
                 staticLib()
             }

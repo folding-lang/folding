@@ -4,17 +4,17 @@ plugins {
 
 kotlin {
     jvm()
-    js(BOTH) {
+    js(IR) {
         browser {}
         nodejs {}
     }
-    linuxX64("linux") {
+    linuxX64 {
         binaries {
             staticLib()
             executable()
         }
     }
-    mingwX64("windows") {
+    mingwX64 {
         binaries {
             staticLib()
             executable()
@@ -42,13 +42,13 @@ kotlin {
             }
         }
 
-        val linuxMain by getting {
+        val linuxX64Main by getting {
             dependencies {
                 implementation(project(":folding-parser"))
             }
         }
 
-        val windowsMain by getting {
+        val mingwX64Main by getting {
             dependencies {
                 implementation(project(":folding-parser"))
             }

@@ -3,7 +3,6 @@ rootProject.name = "folding"
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenCentral()
         mavenLocal()
         maven(url="https://jitpack.io")
     }

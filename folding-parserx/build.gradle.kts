@@ -4,17 +4,17 @@ plugins {
 
 kotlin {
     jvm()
-    js(BOTH) {
+    js(IR) {
         browser {}
         nodejs {}
     }
-    linuxX64("linux") {
+    linuxX64 {
         binaries {
             staticLib()
             executable()
         }
     }
-    mingwX64("windows") {
+    mingwX64 {
         binaries {
             staticLib()
             executable()
