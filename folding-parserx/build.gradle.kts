@@ -8,18 +8,16 @@ kotlin {
         browser {}
         nodejs {}
     }
-    linuxX64 {
-        binaries {
-            staticLib()
-            executable()
-        }
-    }
-    mingwX64 {
-        binaries {
-            staticLib()
-            executable()
-        }
-    }
+//    linuxX64 {
+//        binaries {
+//            staticLib()
+//        }
+//    }
+//    mingwX64 {
+//        binaries {
+//            staticLib()
+//        }
+//    }
 
     sourceSets {
 

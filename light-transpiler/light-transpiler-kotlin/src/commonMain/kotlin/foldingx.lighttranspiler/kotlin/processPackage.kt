@@ -1,7 +1,6 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.effect.Effect
-import foldingx.parser.FoldingParser
 
 fun processPackage(packageContext: String, effect: Effect?): String {
     var result = packageContext

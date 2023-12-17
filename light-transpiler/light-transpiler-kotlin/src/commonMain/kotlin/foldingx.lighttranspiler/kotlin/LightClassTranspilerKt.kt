@@ -4,7 +4,7 @@ import foldingx.lighttranspiler.LightClassTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.lighttranspiler.util.extractParamDestruction
-import foldingx.parser.FoldingParser
+import FoldingParser
 import foldingx.parser.classes.ClassCategory
 import foldingx.parser.classes.CommonClass
 import foldingx.parser.classes.processClassContext
@@ -93,7 +93,7 @@ interface LightClassTranspilerKt : LightClassTranspiler<EffectKt>, LightDefTrans
     fun makeConstructFunction(
         classId: String, parameter: FoldingParser.ParameterContext?,
         typeParamContext: FoldingParser.TypeParamContext?
-    , effect: EffectKt): String {
+        , effect: EffectKt): String {
         val (tHead,tTail) = typeParamContext?.let { processTypeParam(it,effect).let { (h,t) ->
             h to t?.let { "$t " }
         } } ?: (null to "")

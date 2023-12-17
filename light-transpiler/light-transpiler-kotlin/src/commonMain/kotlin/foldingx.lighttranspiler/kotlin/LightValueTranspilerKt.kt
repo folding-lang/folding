@@ -5,7 +5,7 @@ import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.lighttranspiler.util.TranspiledArgValue
 import foldingx.lighttranspiler.util.extractParamDestruction
-import foldingx.parser.FoldingParser
+import FoldingParser
 import foldingx.parser.classes.CommonClass
 import foldingx.parser.fields.FieldSpec
 import foldingx.parser.identifier.*
@@ -226,7 +226,7 @@ interface LightValueTranspilerKt : LightValueTranspiler<EffectKt> {
         }
 
 
-    override fun processParamDestruction(fdParamDestruction: List<Pair<String?,FoldingParser.ValueContext>>, effect: EffectKt): String =
+    override fun processParamDestruction(fdParamDestruction: List<Pair<String?, FoldingParser.ValueContext>>, effect: EffectKt): String =
         fdParamDestruction.flatMapIndexed { i, (idNullable,valueCtx) ->
             val id = makeIndexedParamId(i,idNullable)
             processInverse(valueCtx,id,effect).map { (invId,invValue) -> invId to invValue }

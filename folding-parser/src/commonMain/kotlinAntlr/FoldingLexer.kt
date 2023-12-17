@@ -1,10 +1,8 @@
 // Generated from Folding.g4 by ANTLR 4.13.1
-package foldingx.parser
 
 import org.antlr.v4.kotlinruntime.*
 import org.antlr.v4.kotlinruntime.atn.*
 import org.antlr.v4.kotlinruntime.dfa.*
-import org.antlr.v4.kotlinruntime.misc.*
 
 @Suppress("FunctionName", "LocalVariableName")
 public open class FoldingLexer(public val input: CharStream) : Lexer(input) {

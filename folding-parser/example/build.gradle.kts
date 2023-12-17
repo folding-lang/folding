@@ -8,18 +8,18 @@ kotlin {
         browser {}
         nodejs {}
     }
-    linuxX64 {
-        binaries {
-            staticLib()
-            executable()
-        }
-    }
-    mingwX64 {
-        binaries {
-            staticLib()
-            executable()
-        }
-    }
+//    linuxX64 {
+//        binaries {
+//            staticLib()
+//            executable()
+//        }
+//    }
+//    mingwX64 {
+//        binaries {
+//            staticLib()
+//            executable()
+//        }
+//    }
 
     sourceSets {
 
@@ -42,17 +42,17 @@ kotlin {
             }
         }
 
-        val linuxX64Main by getting {
-            dependencies {
-                implementation(project(":folding-parser"))
-            }
-        }
-
-        val mingwX64Main by getting {
-            dependencies {
-                implementation(project(":folding-parser"))
-            }
-        }
+//        val linuxX64Main by getting {
+//            dependencies {
+//                implementation(project(":folding-parser"))
+//            }
+//        }
+//
+//        val mingwX64Main by getting {
+//            dependencies {
+//                implementation(project(":folding-parser"))
+//            }
+//        }
 
     }
 }

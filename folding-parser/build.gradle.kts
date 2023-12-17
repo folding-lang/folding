@@ -16,18 +16,18 @@ kotlin {
         nodejs {}
     }
 
-    // region:Region: Configurations for Kotlin/Native
-    linuxX64 {
-        binaries {
-            staticLib()
-        }
-    }
-    mingwX64 {
-        binaries {
-            staticLib()
-        }
-    }
-    // endregion
+//    // region:Region: Configurations for Kotlin/Native
+//    linuxX64 {
+//        binaries {
+//            staticLib()
+//        }
+//    }
+//    mingwX64 {
+//        binaries {
+//            staticLib()
+//        }
+//    }
+//    // endregion
 
     sourceSets {
 
@@ -114,6 +114,9 @@ tasks {
         // which we might not have in a Kotlin project.
         // Using it is messier than simply registering a new task
         enabled = false
+    }
+    compileKotlinMetadata {
+        source()
     }
 }
 

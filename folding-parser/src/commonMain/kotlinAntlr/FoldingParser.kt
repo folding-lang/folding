@@ -1,12 +1,10 @@
 // Generated from Folding.g4 by ANTLR 4.13.1
-package foldingx.parser
 
 import com.strumenta.kotlinmultiplatform.scoped
 import org.antlr.v4.kotlinruntime.*
 import org.antlr.v4.kotlinruntime.atn.*
 import org.antlr.v4.kotlinruntime.atn.ATN.Companion.INVALID_ALT_NUMBER
 import org.antlr.v4.kotlinruntime.dfa.*
-import org.antlr.v4.kotlinruntime.misc.*
 import org.antlr.v4.kotlinruntime.tree.*
 
 @Suppress("FunctionName", "LocalVariableName", "ConvertSecondaryConstructorToPrimary")
@@ -15,10 +13,10 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
         "Folding.g4"
 
     override val tokenNames: Array<String?> =
-        FoldingParser.tokenNames
+        Companion.tokenNames
 
     override val ruleNames: Array<String> =
-        FoldingParser.ruleNames
+        Companion.ruleNames
 
     override val atn: ATN =
         ATN
@@ -714,7 +712,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
         public fun As(): TerminalNode? = getToken(Tokens.As.id, 0)
         public fun findImportType(): ImportTypeContext? = getRuleContext(ImportTypeContext::class, 0)
         public fun CLASS(): TerminalNode? = getToken(Tokens.CLASS.id, 0)
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
         public fun findImportClassAlias(): ImportClassAliasContext? = getRuleContext(ImportClassAliasContext::class, 0)
 
         public constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState) {
@@ -880,7 +879,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
             get() = Rules.RULE_importClassAlias.id
             set(@Suppress("UNUSED_PARAMETER") value) = throw RuntimeException()
 
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
 
         public constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState) {
         }
@@ -1778,7 +1778,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
 
     public open class JustInterfaceContext : Class_Context {
         public fun CLASS(): TerminalNode? = getToken(Tokens.CLASS.id, 0)
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
         public fun LBRACE(): TerminalNode? = getToken(Tokens.LBRACE.id, 0)
         public fun RBRACE(): TerminalNode? = getToken(Tokens.RBRACE.id, 0)
         public fun findAnnotationBlock(): AnnotationBlockContext? = getRuleContext(AnnotationBlockContext::class, 0)
@@ -1827,7 +1828,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
 
     public open class JustAbstractClassContext : Class_Context {
         public fun CLASS(): TerminalNode? = getToken(Tokens.CLASS.id, 0)
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
         public fun LBRACE(): TerminalNode? = getToken(Tokens.LBRACE.id, 0)
         public fun RBRACE(): TerminalNode? = getToken(Tokens.RBRACE.id, 0)
         public fun findAnnotationBlock(): AnnotationBlockContext? = getRuleContext(AnnotationBlockContext::class, 0)
@@ -1880,7 +1882,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
 
     public open class JustClassContext : Class_Context {
         public fun CLASS(): TerminalNode? = getToken(Tokens.CLASS.id, 0)
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
         public fun LBRACE(): TerminalNode? = getToken(Tokens.LBRACE.id, 0)
         public fun findConstructorSelf(): ConstructorSelfContext? = getRuleContext(ConstructorSelfContext::class, 0)
         public fun RBRACE(): TerminalNode? = getToken(Tokens.RBRACE.id, 0)
@@ -3120,7 +3123,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
             get() = Rules.RULE_typeParamCompo.id
             set(@Suppress("UNUSED_PARAMETER") value) = throw RuntimeException()
 
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
         public fun TILDE(): List<TerminalNode> = getTokens(Tokens.TILDE.id)
         public fun TILDE(i: Int): TerminalNode = getToken(Tokens.TILDE.id, i)!!
         public fun findTypeEx(): List<TypeExContext> = getRuleContexts(TypeExContext::class)
@@ -7111,8 +7115,10 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
         public fun RPAREN(): TerminalNode? = getToken(Tokens.RPAREN.id, 0)
         public fun findValue(): ValueContext? = getRuleContext(ValueContext::class, 0)
         public fun ID(): TerminalNode? = getToken(Tokens.ID.id, 0)
-        public fun findInverseDefGateCompo(): List<InverseDefGateCompoContext> = getRuleContexts(InverseDefGateCompoContext::class)
-        public fun findInverseDefGateCompo(i: Int): InverseDefGateCompoContext? = getRuleContext(InverseDefGateCompoContext::class, i)
+        public fun findInverseDefGateCompo(): List<InverseDefGateCompoContext> = getRuleContexts(
+            InverseDefGateCompoContext::class)
+        public fun findInverseDefGateCompo(i: Int): InverseDefGateCompoContext? = getRuleContext(
+            InverseDefGateCompoContext::class, i)
 
         public constructor(ctx: InverseDefiningContext) {
             copyFrom(ctx)
@@ -7686,7 +7692,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
             get() = Rules.RULE_typeExSingle.id
             set(@Suppress("UNUSED_PARAMETER") value) = throw RuntimeException()
 
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
         public fun findPackage_(): Package_Context? = getRuleContext(Package_Context::class, 0)
         public fun DOT(): TerminalNode? = getToken(Tokens.DOT.id, 0)
         public fun LPAREN(): TerminalNode? = getToken(Tokens.LPAREN.id, 0)
@@ -8513,7 +8520,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
             set(@Suppress("UNUSED_PARAMETER") value) = throw RuntimeException()
 
         public fun TYPEALIAS(): TerminalNode? = getToken(Tokens.TYPEALIAS.id, 0)
-        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(CommonClassIdentifierContext::class, 0)
+        public fun findCommonClassIdentifier(): CommonClassIdentifierContext? = getRuleContext(
+            CommonClassIdentifierContext::class, 0)
         public fun ASSGIN(): TerminalNode? = getToken(Tokens.ASSGIN.id, 0)
         public fun findTypeEx(): TypeExContext? = getRuleContext(TypeExContext::class, 0)
         public fun FOREIGN(): TerminalNode? = getToken(Tokens.FOREIGN.id, 0)
@@ -8521,7 +8529,8 @@ public open class FoldingParser(input: TokenStream) : Parser(input) {
         public fun findTypeParam(): TypeParamContext? = getRuleContext(TypeParamContext::class, 0)
         public fun RPAREN(): TerminalNode? = getToken(Tokens.RPAREN.id, 0)
         public fun findForeignBody(): ForeignBodyContext? = getRuleContext(ForeignBodyContext::class, 0)
-        public fun findForeignTypeExpectitive(): ForeignTypeExpectitiveContext? = getRuleContext(ForeignTypeExpectitiveContext::class, 0)
+        public fun findForeignTypeExpectitive(): ForeignTypeExpectitiveContext? = getRuleContext(
+            ForeignTypeExpectitiveContext::class, 0)
 
         public constructor(parent: ParserRuleContext?, invokingState: Int) : super(parent, invokingState) {
         }

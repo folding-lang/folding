@@ -1,10 +1,10 @@
 package foldingx.lighttranspiler
 
 import foldingx.lighttranspiler.effect.Effect
-import foldingx.parser.FoldingParser
+import FoldingParser
 
 interface LightTranspiler<TEffect: Effect> : LightClassTranspiler<TEffect> {
-    fun transpilePackage(sourcesRoot: String,fdFileContextList: List<FoldingParser.FileContext>, effect: TEffect): List<FileWrapper>
+    fun transpilePackage(sourcesRoot: String, fdFileContextList: List<FoldingParser.FileContext>, effect: TEffect): List<FileWrapper>
     fun transpileFile(fdFileContext: FoldingParser.FileContext, effect: TEffect): String
     fun processImportEx(fdImportExContext: FoldingParser.ImportExContext, effect: TEffect): String
     fun processFileCompo(fdFileCompoContext: FoldingParser.FileCompoContext, effect: TEffect): String

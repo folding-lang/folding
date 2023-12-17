@@ -1,5 +1,4 @@
 // Generated from Folding.g4 by ANTLR 4.13.1
-package foldingx.parser
 
 import org.antlr.v4.kotlinruntime.tree.ParseTreeListener
 

@@ -2,15 +2,15 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.effect.Effect
 import foldingx.lighttranspiler.exception.InvalidCode
-import foldingx.parser.FoldingParser
+import FoldingParser
 import foldingx.parser.identifier.processCommonClassId
 
-fun processTypeEx(fdTypeExContext: FoldingParser.TypeExContext,effect: Effect): String = when {
+fun processTypeEx(fdTypeExContext: FoldingParser.TypeExContext, effect: Effect): String = when {
     fdTypeExContext.findTypeExSingle() != null -> processTypeExSingle(fdTypeExContext.findTypeExSingle()!!,effect)
     fdTypeExContext.findTypeExFunc() != null -> processTypeExFunc(fdTypeExContext.findTypeExFunc()!!,effect)
     else -> throw RuntimeException("Invalid typeEx '${fdTypeExContext.text}'")
 }.let { fdTypeExContext.QM()?.let { _ -> "($it)?" } ?: it }
-fun processTypeExSingle(fdTypeExSingleContext: FoldingParser.TypeExSingleContext,effect: Effect): String =
+fun processTypeExSingle(fdTypeExSingleContext: FoldingParser.TypeExSingleContext, effect: Effect): String =
     if (fdTypeExSingleContext.findPrimitiveType() == null)
         (fdTypeExSingleContext.findPackage_()?.text?.let { "${processPackage(it,effect)}." } ?: "") +
                 (processCommonClassId(fdTypeExSingleContext.findCommonClassIdentifier()!!)) +

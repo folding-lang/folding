@@ -26,18 +26,18 @@ subprojects {
             nodejs {}
         }
 
-        // region:Region: Configurations for Kotlin/Native
-        linuxX64 {
-            binaries {
-                staticLib()
-            }
-        }
-        mingwX64 {
-            binaries {
-                staticLib()
-            }
-        }
-        // endregion
+//        // region:Region: Configurations for Kotlin/Native
+//        linuxX64 {
+//            binaries {
+//                staticLib()
+//            }
+//        }
+//        mingwX64 {
+//            binaries {
+//                staticLib()
+//            }
+//        }
+//        // endregion
     }
 
     val prepareMavenDeployment: Project.(description: String) -> Unit by rootProject.ext

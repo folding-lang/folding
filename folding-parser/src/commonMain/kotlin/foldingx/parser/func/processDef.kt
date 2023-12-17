@@ -1,6 +1,6 @@
 package foldingx.parser.func
 
-import foldingx.parser.FoldingParser
+import FoldingParser
 import foldingx.parser.identifier.processId
 
 fun processJustDef(justDefContext: FoldingParser.JustDefContext): CommonJustDef =

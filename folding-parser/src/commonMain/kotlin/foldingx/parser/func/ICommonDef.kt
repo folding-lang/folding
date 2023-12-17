@@ -1,6 +1,6 @@
 package foldingx.parser.func
 
-import foldingx.parser.FoldingParser
+import FoldingParser
 
 interface CommonDefiningGroup
 

@@ -2,7 +2,7 @@ package foldingx.lighttranspiler
 
 import foldingx.lighttranspiler.effect.Effect
 import foldingx.lighttranspiler.util.TranspiledArgValue
-import foldingx.parser.FoldingParser
+import FoldingParser
 
 interface LightValueTranspiler<TEffect: Effect> {
     fun processValue(fdValueContext: FoldingParser.ValueContext, effect: TEffect): String
@@ -41,7 +41,7 @@ interface LightValueTranspiler<TEffect: Effect> {
     fun processInvoking(fdInvokingContext: FoldingParser.InvokingContext, effect: TEffect): String
 
     fun processParameter(fdParameterContext: FoldingParser.ParameterContext, effect: TEffect): String
-    fun processParamDestruction(fdParamDestruction: List<Pair<String?,FoldingParser.ValueContext>>, effect: TEffect): String
+    fun processParamDestruction(fdParamDestruction: List<Pair<String?, FoldingParser.ValueContext>>, effect: TEffect): String
 
 //    fun processParameterForLambda(fdParameterForLambdaContext: FoldingParser.ParameterForLambdaContext, effect: TEffect): String
 //    fun processParameterFromValueForLambda(fdParameterFromValueForLambdaContext: FoldingParser.ParameterFromValueForLambdaContext, effect: TEffect): String

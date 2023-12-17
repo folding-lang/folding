@@ -4,12 +4,10 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenLocal()
-        maven(url="https://jitpack.io")
     }
 }
 
 include("folding-parser")
-include("folding-parser:example")
 
 include("folding-parserx")
 
