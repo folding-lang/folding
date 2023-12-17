@@ -1,6 +1,6 @@
 package foldingx.parser.fields
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 class FieldSpec(
     val id: String,

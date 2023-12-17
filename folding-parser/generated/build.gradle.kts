@@ -1,7 +1,6 @@
 plugins {
     kotlin("multiplatform")
     `maven-publish`
-    antlr
 }
 
 val antlrGroup = "com.strumenta"
@@ -35,21 +34,12 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 api("$antlrGroup:antlr-kotlin-runtime:$antlrVersion")
-                api(project("generated"))
             }
         }
 
     }
 }
 
-dependencies {
-    // The ANTLR 4 dependency, which instructs the Gradle ANTLR plugin
-    // to use ANTLR 4 instead of the bundled version
-    antlr("org.antlr:antlr4:4.13.1")
-
-    // The ANTLR Kotlin target
-    antlr("$antlrGroup:antlr-kotlin-target:$antlrVersion")
-}
 
 //tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generateKotlinCommonGrammarSource") {
 //    // the classpath used to run antlr code generation
@@ -76,40 +66,6 @@ dependencies {
 //tasks.build {
 //    dependsOn("generateKotlinCommonGrammarSource")
 //}
-
-val generateKotlinGrammarSource = tasks.register<AntlrTask>("generateKotlinGrammarSource") {
-    dependsOn("cleanGenerateKotlinGrammarSource")
-
-    // ANTLR .g4 files are under {example-project}/antlr
-    val source = project.objects
-        .sourceDirectorySet("kotlinAntlr", "kotlinAntlr")
-        .srcDir("${rootDir.absolutePath}/folding-grammar/grammars/antlr4").apply {
-            include("*.g4")
-        }
-    setSource(source)
-
-    val pkgName = "foldingx.parser"
-    arguments = listOf(
-        "-Dlanguage=Kotlin",    // We want to generate Kotlin sources
-        "-visitor",             // We want visitors alongside listeners
-        "-package", pkgName,    // We want the generated sources to have this package declared
-        "-encoding", "UTF-8",   // We want the generated sources to be encoded in UTF-8
-    )
-
-    // Generated files are outputted inside standard sources,
-    // but you can switch to output them under build/
-    val outDir = "generated/src/commonMain/kotlin/${pkgName.replace(".", "/")}"
-    outputDirectory = File(outDir)
-}
-
-tasks {
-    generateGrammarSource {
-        // The default task is set up considering a Java source set,
-        // which we might not have in a Kotlin project.
-        // Using it is messier than simply registering a new task
-        enabled = false
-    }
-}
 
 val prepareMavenDeployment: Project.(description: String) -> Unit by rootProject.ext
 prepareMavenDeployment("the folding-lang parser")

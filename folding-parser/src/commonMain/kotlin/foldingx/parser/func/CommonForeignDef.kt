@@ -1,6 +1,6 @@
 package foldingx.parser.func
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 class CommonForeignDef(
     val annotationBlockContext: FoldingParser.AnnotationBlockContext?,

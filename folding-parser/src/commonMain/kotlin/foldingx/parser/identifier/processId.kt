@@ -1,6 +1,6 @@
 package foldingx.parser.identifier
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 enum class OpIdUsage { OP, AOP }
 

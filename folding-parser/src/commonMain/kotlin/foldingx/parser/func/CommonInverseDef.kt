@@ -1,6 +1,6 @@
 package foldingx.parser.func
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 sealed interface CommonInverseDef : CommonDefiningGroup {
     val parent: ICommonDef

@@ -1,6 +1,6 @@
 package foldingx.parser.classes
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.fields.FieldSpec
 
 class CommonClass (

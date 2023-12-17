@@ -1,6 +1,6 @@
 package foldingx.parser.inversing
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.*
 
 fun processInverseValue(value: FoldingParser.ValueContext, invSeqList: List<List<CallWrapper>> = listOf(listOf())): List<List<CallWrapper>> {
