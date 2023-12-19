@@ -34,8 +34,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                api("$antlrGroup:antlr-kotlin-runtime:$antlrVersion")
-                api(project("generated"))
+                api(project("folding-parser-generated"))
             }
         }
 
@@ -98,7 +97,7 @@ val generateKotlinGrammarSource = tasks.register<AntlrTask>("generateKotlinGramm
 
     // Generated files are outputted inside standard sources,
     // but you can switch to output them under build/
-    val outDir = "generated/src/commonMain/kotlin/${pkgName.replace(".", "/")}"
+    val outDir = "folding-parser-generated/src/commonMain/kotlin/${pkgName.replace(".", "/")}"
     outputDirectory = File(outDir)
 }
 

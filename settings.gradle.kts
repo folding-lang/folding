@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 include("folding-parser")
-include("folding-parser:generated")
+include("folding-parser:folding-parser-generated")
 
 include("folding-parserx")
 
