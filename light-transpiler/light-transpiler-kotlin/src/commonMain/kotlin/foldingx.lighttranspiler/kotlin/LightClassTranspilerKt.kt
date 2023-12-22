@@ -4,7 +4,7 @@ import foldingx.lighttranspiler.LightClassTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.lighttranspiler.util.extractParamDestruction
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.classes.ClassCategory
 import foldingx.parser.classes.CommonClass
 import foldingx.parser.classes.processClassContext

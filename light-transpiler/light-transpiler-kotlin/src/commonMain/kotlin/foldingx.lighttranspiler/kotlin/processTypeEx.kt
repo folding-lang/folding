@@ -2,7 +2,7 @@ package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.effect.Effect
 import foldingx.lighttranspiler.exception.InvalidCode
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.processCommonClassId
 
 fun processTypeEx(fdTypeExContext: FoldingParser.TypeExContext, effect: Effect): String = when {

@@ -1,6 +1,6 @@
 package foldingx.lighttranspiler.util
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 fun extractParamDestruction(fdParamExContext: List<FoldingParser.ParamExContext>) =
     fdParamExContext.filter { it.findValue() != null }.map {

@@ -4,7 +4,7 @@ import foldingx.lighttranspiler.LightDefTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.lighttranspiler.util.extractParamDestruction
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.func.*
 import foldingx.parser.func.processJustDef as processJustDefPre
 import foldingx.parser.func.processInverseDef as processInverseDefPre

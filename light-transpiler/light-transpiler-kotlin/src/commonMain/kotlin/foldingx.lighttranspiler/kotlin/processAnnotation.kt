@@ -1,7 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 fun processAnnotationBlock(
     fdAnnotationBlockContext: FoldingParser.AnnotationBlockContext,

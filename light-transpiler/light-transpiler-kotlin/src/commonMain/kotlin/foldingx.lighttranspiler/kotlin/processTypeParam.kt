@@ -1,7 +1,7 @@
 package foldingx.lighttranspiler.kotlin
 
 import foldingx.lighttranspiler.effect.Effect
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.identifier.processCommonClassId
 
 fun processTypeParam(fdTypeParamContext: FoldingParser.TypeParamContext, effect: Effect): Pair<String,String?> {

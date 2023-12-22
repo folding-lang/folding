@@ -1,7 +1,7 @@
 package foldingx.lighttranspiler
 
 import foldingx.lighttranspiler.effect.Effect
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.classes.CommonClass
 
 interface LightClassTranspiler<TEffect: Effect> : LightDefTranspiler<TEffect> {

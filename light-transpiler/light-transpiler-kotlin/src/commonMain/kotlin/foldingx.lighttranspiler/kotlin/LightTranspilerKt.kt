@@ -4,7 +4,7 @@ import foldingx.lighttranspiler.FileWrapper
 import foldingx.lighttranspiler.LightTranspiler
 import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.classes.CommonClass
 import foldingx.parser.identifier.processCommonClassId
 import foldingx.parser.identifier.processId

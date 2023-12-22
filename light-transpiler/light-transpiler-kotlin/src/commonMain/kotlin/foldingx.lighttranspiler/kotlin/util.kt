@@ -1,6 +1,6 @@
 package foldingx.lighttranspiler.kotlin
 
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 fun String.insertMargin(length: Int) = replace("\n","\n"+" ".repeat(length))
 

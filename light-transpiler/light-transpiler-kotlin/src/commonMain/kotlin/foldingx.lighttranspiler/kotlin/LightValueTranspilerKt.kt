@@ -5,7 +5,7 @@ import foldingx.lighttranspiler.exception.InvalidCode
 import foldingx.lighttranspiler.kotlin.effect.EffectKt
 import foldingx.lighttranspiler.util.TranspiledArgValue
 import foldingx.lighttranspiler.util.extractParamDestruction
-import FoldingParser
+import foldingx.parser.FoldingParser
 import foldingx.parser.classes.CommonClass
 import foldingx.parser.fields.FieldSpec
 import foldingx.parser.identifier.*

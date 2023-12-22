@@ -2,7 +2,7 @@ package foldingx.lighttranspiler
 
 import foldingx.lighttranspiler.effect.Effect
 import foldingx.lighttranspiler.util.TranspiledArgValue
-import FoldingParser
+import foldingx.parser.FoldingParser
 
 interface LightValueTranspiler<TEffect: Effect> {
     fun processValue(fdValueContext: FoldingParser.ValueContext, effect: TEffect): String
